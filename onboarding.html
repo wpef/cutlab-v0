@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUTLAB — Onboarding Monteur</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #252525;
+    --accent: #d4f000;
+    --text: #f0f0f0;
+    --text-muted: #666;
+    --text-dim: #999;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 36px 24px;
+    display: flex; flex-direction: column; gap: 48px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; color: var(--accent); }
+  .logo span { color: var(--text); }
+  .steps-nav { display: flex; flex-direction: column; gap: 4px; }
+  .step-item { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+  .step-item:hover { background: var(--surface2); }
+  .step-item.active { background: var(--surface2); border-color: var(--border); }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--text-muted); flex-shrink: 0; transition: all 0.2s; }
+  .step-item.active .step-num { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+  .step-item.done .step-num { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+  .step-item.done .step-num::after { content: '✓'; }
+  .step-item.done .step-num span { display: none; }
+  .step-label { font-size: 13px; color: var(--text-muted); font-weight: 400; }
+  .step-item.active .step-label { color: var(--text); font-weight: 500; }
+  .step-item.done .step-label { color: var(--text-dim); }
+  .sidebar-footer { margin-top: auto; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* MAIN */
+  .main { padding: 60px 80px; max-width: 720px; }
+  .step-screen { display: none; animation: fadeIn 0.3s ease; }
+  .step-screen.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HEADERS */
+  .step-header { margin-bottom: 48px; }
+  .step-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  h1 { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1.1; letter-spacing: -1px; margin-bottom: 12px; }
+  .step-desc { font-size: 15px; color: var(--text-dim); line-height: 1.6; font-weight: 300; }
+
+  /* FORMS */
+  .form-group { margin-bottom: 24px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--text-dim); margin-bottom: 8px; letter-spacing: 0.2px; }
+  .optional { color: var(--text-muted); font-weight: 400; }
+  input[type="text"], input[type="email"], input[type="password"], input[type="number"], select, textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; padding: 14px 16px; outline: none; transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--text-muted); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  textarea { resize: vertical; min-height: 100px; }
+
+  /* TAGS */
+  .tag-group { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border); font-size: 13px; color: var(--text-dim); cursor: pointer; transition: all 0.15s; user-select: none; display: flex; align-items: center; gap: 8px; }
+  .tag:hover { border-color: var(--accent); color: var(--text); }
+  .tag.selected { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 500; }
+  .tag-icon { font-size: 16px; }
+
+  /* NICHE TAGS */
+  .niche-tag { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+  .niche-tag:hover { border-color: var(--accent); color: var(--text); }
+  .niche-tag.selected { background: rgba(212,240,0,0.1); border-color: var(--accent); color: var(--accent); }
+  .niche-tag.tout { font-weight: 600; }
+  .niche-tag.tout.selected { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  /* UPLOAD */
+  .upload-zone { border: 1px dashed var(--border); border-radius: var(--radius); padding: 48px 32px; text-align: center; cursor: pointer; transition: all 0.2s; }
+  .upload-zone:hover { border-color: var(--accent); background: rgba(212, 240, 0, 0.03); }
+  .upload-icon { font-size: 32px; margin-bottom: 12px; }
+  .upload-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+  .upload-hint { font-size: 13px; color: var(--text-muted); }
+
+  /* TARIF */
+  .tarif-table { width: 100%; border-collapse: collapse; }
+  .tarif-table th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 0 12px 12px 0; }
+  .tarif-table td { padding: 6px 12px 6px 0; }
+  .tarif-label { font-size: 13px; color: var(--text-dim); white-space: nowrap; padding-right: 16px; }
+  .tarif-table input { width: 120px; text-align: center; }
+
+  /* AVAILABILITY */
+  .availability-group { display: flex; gap: 12px; }
+  .avail-btn { padding: 10px 20px; border-radius: 100px; border: 1px solid var(--border); font-size: 13px; color: var(--text-dim); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
+  .avail-btn:hover { border-color: var(--text-dim); color: var(--text); }
+  .avail-btn.selected { border-color: var(--accent); color: var(--accent); }
+  .avail-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  /* PROGRESS BAR */
+  .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--border); z-index: 100; }
+  .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+
+  /* BUTTONS */
+  .step-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .btn { padding: 14px 28px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #000; font-weight: 600; }
+  .btn-primary:hover { background: #e0f700; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
+  .btn-skip { background: transparent; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* DIVIDER */
+  .section-divider { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin: 32px 0 16px; display: flex; align-items: center; gap: 12px; }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* HINT */
+  .hint-box { background: rgba(212,240,0,0.05); border: 1px solid rgba(212,240,0,0.15); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: var(--text-dim); margin-top: 12px; line-height: 1.6; }
+  .hint-box strong { color: var(--accent); }
+
+  /* LANG SELECTOR */
+  .lang-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+  .lang-option { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border); font-size: 13px; color: var(--text-dim); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .lang-option:hover { border-color: var(--accent); color: var(--text); }
+  .lang-option.selected { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 500; }
+  .lang-flag { font-size: 18px; }
+
+  /* ==============================
+     LEVEL LOADING SCREEN
+  ============================== */
+  .level-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0; text-align: center; }
+
+  .circle-wrap { position: relative; width: 160px; height: 160px; margin-bottom: 40px; }
+  .circle-bg { width: 160px; height: 160px; border-radius: 50%; border: 3px solid var(--border); position: absolute; top: 0; left: 0; }
+  .circle-progress { width: 160px; height: 160px; border-radius: 50%; position: absolute; top: 0; left: 0; }
+  .circle-progress svg { width: 160px; height: 160px; transform: rotate(-90deg); }
+  .circle-progress circle { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 471; stroke-dashoffset: 471; transition: stroke-dashoffset 0.05s linear; }
+  .circle-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  .circle-pct { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); }
+  .circle-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+  .loading-text { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; min-height: 20px; }
+
+  /* LEVEL RESULT */
+  .level-result { display: none; flex-direction: column; align-items: center; gap: 24px; animation: fadeIn 0.5s ease; }
+
+  .level-badge-big { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(212,240,0,0.05); box-shadow: 0 0 40px rgba(212,240,0,0.15); }
+  .level-badge-emoji { font-size: 48px; }
+  .level-badge-name { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); margin-top: 4px; }
+  .level-desc { font-size: 14px; color: var(--text-dim); max-width: 380px; text-align: center; line-height: 1.7; }
+
+  .level-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 380px; }
+
+  .level-modify-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-dim); cursor: pointer; background: transparent; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .level-modify-btn:hover { border-color: var(--text-dim); color: var(--text); }
+
+  .level-certify-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: 1px solid rgba(212,240,0,0.3); border-radius: var(--radius-sm); font-size: 13px; color: var(--accent); cursor: pointer; background: rgba(212,240,0,0.05); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .level-certify-btn:hover { background: rgba(212,240,0,0.1); }
+
+  /* LEVEL PICKER */
+  .level-picker { display: none; width: 100%; }
+  .level-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .level-pick-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; font-size: 13px; color: var(--text-dim); }
+  .level-pick-item:hover { border-color: var(--accent); color: var(--text); }
+  .level-pick-item.selected { border-color: var(--accent); background: rgba(212,240,0,0.07); color: var(--text); }
+  .level-pick-emoji { font-size: 18px; }
+
+  /* CERTIF */
+  .certif-banner { background: rgba(212,240,0,0.05); border: 1px solid rgba(212,240,0,0.2); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 13px; color: var(--text-dim); display: flex; align-items: flex-start; gap: 12px; margin-top: 4px; line-height: 1.6; }
+  .certif-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* PROFILE CARD */
+  .profile-preview { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; max-width: 320px; transition: transform 0.2s; }
+  .profile-preview:hover { transform: translateY(-4px); }
+  .profile-thumb { width: 100%; height: 190px; background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%); display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; }
+
+  .profile-avail { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); border: 1px solid rgba(0,200,80,0.3); border-radius: 100px; padding: 4px 10px; font-size: 11px; color: #00c850; display: flex; align-items: center; gap: 5px; }
+  .avail-pulse { width: 6px; height: 6px; border-radius: 50%; background: #00c850; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .profile-skills { position: absolute; top: 12px; left: 12px; right: 80px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .profile-tag { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); border-radius: 4px; padding: 3px 8px; font-size: 10px; color: var(--text-dim); font-weight: 500; }
+
+  /* Niveau badge — bas gauche */
+  .profile-level-badge { position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(212,240,0,0.5); border-radius: 6px; padding: 4px 9px; font-size: 10px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 4px; }
+
+  .profile-body { padding: 16px; }
+  .profile-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 3px; }
+  .profile-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+
+  /* Drapeaux langues */
+  .profile-langs { display: flex; gap: 4px; margin-bottom: 10px; }
+  .profile-lang { font-size: 17px; }
+
+  .profile-platforms { display: flex; gap: 6px; margin-bottom: 14px; }
+  .platform-badge { width: 28px; height: 28px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .profile-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; }
+  .profile-price { font-size: 13px; font-weight: 600; color: var(--accent); }
+  .profile-rating { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+  .card-preview-section { display: grid; grid-template-columns: 320px 1fr; gap: 48px; align-items: start; }
+  .legend-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .legend-text { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  .legend-text strong { color: var(--text); font-weight: 500; }
+
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 60px 0; }
+  .success-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 32px; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill" style="width: 12%"></div>
+</div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="logo">CUT<span>LAB</span></div>
+    <nav class="steps-nav" id="stepsNav"></nav>
+    <div class="sidebar-footer">Tu peux sauvegarder et revenir plus tard à tout moment.</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ==============================
+         ÉTAPE 1 — COMPTE
+    ============================== -->
+    <!-- ÉTAPE 1 — COMPTE -->
+    <div class="step-screen active" id="step-1">
+      <div class="step-header">
+        <div class="step-tag">Étape 1 sur 8</div>
+        <h1>Crée ton compte</h1>
+        <p class="step-desc">30 secondes et c'est parti. Pas besoin de CB, pas d'engagement.</p>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="ton@email.com">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" placeholder="8 caractères minimum">
+      </div>
+      <div class="hint-box">🔒 Tes données sont sécurisées et ne seront jamais revendues.</div>
+      <div style="margin-top: 24px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center;">
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ou continue avec</div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-ghost" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px;">G Google</button>
+          <button class="btn btn-ghost" style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px;">🍎 Apple</button>
+        </div>
+      </div>
+      <div class="step-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="goToStep(2)">Continuer →</button>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 2 — IDENTITÉ
+    ============================== -->
+    <!-- ÉTAPE 2 — IDENTITÉ -->
+    <div class="step-screen" id="step-2">
+      <div class="step-header">
+        <div class="step-tag">Étape 2 sur 8</div>
+        <h1>Qui es-tu ?</h1>
+        <p class="step-desc">Ces infos seront visibles sur ton profil public.</p>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" placeholder="Lucas">
+        </div>
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" placeholder="Martin">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Pseudo / Nom de scène <span class="optional">(optionnel)</span></label>
+        <input type="text" placeholder="Le nom affiché sur ton profil public">
+      </div>
+      <div class="form-group">
+        <label>Photo de profil <span class="optional">(optionnel — tu peux l'ajouter plus tard)</span></label>
+        <div class="upload-zone" style="padding: 24px;">
+          <div class="upload-icon">📷</div>
+          <div class="upload-title">Clique pour uploader</div>
+          <div class="upload-hint">JPG ou PNG, moins de 5Mo</div>
+        </div>
+      </div>
+
+      <!-- LANGUES PARLÉES -->
+      <div class="form-group">
+        <label>Langues parlées</label>
+        <div class="lang-selector">
+          <div class="lang-option selected" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇫🇷</span> Français</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇬🇧</span> Anglais</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇪🇸</span> Espagnol</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇧🇷</span> Portugais</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇩🇪</span> Allemand</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇮🇹</span> Italien</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇨🇳</span> Chinois</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇯🇵</span> Japonais</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇸🇦</span> Arabe</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇷🇺</span> Russe</div>
+          <div class="lang-option" onclick="this.classList.toggle('selected')"><span class="lang-flag">🇰🇷</span> Coréen</div>
+        </div>
+        <div class="hint-box" style="margin-top: 10px; font-size: 12px;">Les drapeaux sélectionnés apparaissent en petit sur ta carte profil pour les clients.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Disponibilité actuelle</label>
+        <div class="availability-group">
+          <div class="avail-btn selected" onclick="selectAvail(this)"><div class="avail-dot"></div> Disponible</div>
+          <div class="avail-btn" onclick="selectAvail(this)"><div class="avail-dot"></div> Sur demande</div>
+          <div class="avail-btn" onclick="selectAvail(this)"><div class="avail-dot"></div> Indisponible</div>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Retour</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">Continuer →</button>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 3 — MÉTIER & SKILLS
+    ============================== -->
+    <!-- ÉTAPE 3 — MÉTIER & SKILLS -->
+    <div class="step-screen" id="step-3">
+      <div class="step-header">
+        <div class="step-tag">Étape 3 sur 8</div>
+        <h1>Ton métier</h1>
+        <p class="step-desc">Sélectionne tout ce que tu sais faire.</p>
+      </div>
+
+      <div class="section-divider">Compétences</div>
+      <div class="tag-group">
+        <div class="tag selected" onclick="toggleTag(this)"><span class="tag-icon">🎬</span> Montage vidéo</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">🖼️</span> Miniatures</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">🎵</span> Sound design</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">✨</span> Motion design</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">🎙️</span> Traitement voix</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">✏️</span> Sous-titrage</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">🎨</span> Color grading</div>
+        <div class="tag" onclick="toggleTag(this)"><span class="tag-icon">📱</span> Reels / Shorts</div>
+      </div>
+
+      <div class="section-divider">Formats</div>
+      <div class="tag-group">
+        <div class="tag" onclick="toggleTag(this)">📱 Portrait / Shorts</div>
+        <div class="tag selected" onclick="toggleTag(this)">🖥️ YouTube long format</div>
+        <div class="tag" onclick="toggleTag(this)">📺 Publicités & spots</div>
+        <div class="tag" onclick="toggleTag(this)">🎞️ Documentaires</div>
+        <div class="tag" onclick="toggleTag(this)">💼 Corporate / B2B</div>
+        <div class="tag" onclick="toggleTag(this)">🎵 Clips musicaux</div>
+        <div class="tag" onclick="toggleTag(this)">🎮 Gaming</div>
+        <div class="tag" onclick="toggleTag(this)">🏋️ Sport / Fitness</div>
+      </div>
+
+      <!-- NICHES avec tag "Tout" -->
+      <div class="section-divider">Niches de contenu</div>
+      <div class="tag-group" id="nicheGroup">
+        <div class="niche-tag tout" id="niche-tout" onclick="toggleNicheTout(this)">✦ Toutes niches</div>
+        <div class="niche-tag selected" onclick="toggleNiche(this)">Gaming</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Finance</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Lifestyle</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Tech</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Food</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Sport</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Mode</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Éducation</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Voyage</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Musique</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Business</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Humour</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Science</div>
+        <div class="niche-tag" onclick="toggleNiche(this)">Politique</div>
+      </div>
+
+      <div class="section-divider">Expérience</div>
+      <div class="tag-group">
+        <div class="tag" onclick="selectExclusive(this, 'exp')">Moins de 6 mois</div>
+        <div class="tag" onclick="selectExclusive(this, 'exp')">6 mois – 1 an</div>
+        <div class="tag selected" onclick="selectExclusive(this, 'exp')">1 – 3 ans</div>
+        <div class="tag" onclick="selectExclusive(this, 'exp')">3 – 5 ans</div>
+        <div class="tag" onclick="selectExclusive(this, 'exp')">5 ans et plus</div>
+      </div>
+
+      <div class="section-divider">Logiciels</div>
+      <div class="tag-group">
+        <div class="tag selected" onclick="toggleTag(this)">Premiere Pro</div>
+        <div class="tag" onclick="toggleTag(this)">After Effects</div>
+        <div class="tag selected" onclick="toggleTag(this)">DaVinci Resolve</div>
+        <div class="tag" onclick="toggleTag(this)">Final Cut Pro</div>
+        <div class="tag" onclick="toggleTag(this)">CapCut</div>
+        <div class="tag" onclick="toggleTag(this)">Canva</div>
+        <div class="tag" onclick="toggleTag(this)">Photoshop</div>
+        <div class="tag" onclick="toggleTag(this)">Illustrator</div>
+        <div class="tag" onclick="toggleTag(this)">Audition</div>
+        <div class="tag" onclick="toggleTag(this)">Figma</div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="goToStep(2)">← Retour</button>
+        <button class="btn btn-primary" onclick="goToStep(4)">Continuer →</button>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 4 — PORTFOLIO
+    ============================== -->
+    <!-- ÉTAPE 4 — PORTFOLIO -->
+    <div class="step-screen" id="step-4">
+      <div class="step-header">
+        <div class="step-tag">Étape 4 sur 8</div>
+        <h1>Ton portfolio</h1>
+        <p class="step-desc">Des clips de 15 à 45 secondes suffisent. Les clients veulent voir ta patte, pas un film.</p>
+      </div>
+      <div class="upload-zone" style="margin-bottom: 24px;">
+        <div class="upload-icon">🎬</div>
+        <div class="upload-title">Glisse tes clips ici</div>
+        <div class="upload-hint" style="margin-bottom: 12px;">MP4 · Max 500Mo par clip</div>
+        <button class="btn btn-ghost" style="margin-top: 8px;">Parcourir les fichiers</button>
+      </div>
+      <div class="section-divider">Ou ajoute des liens externes</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+        <input type="text" placeholder="🔗 Lien YouTube, Vimeo, Google Drive...">
+        <input type="text" placeholder="🔗 Ajouter un autre lien">
+      </div>
+      <div class="form-group">
+        <label>Chaînes / comptes sur lesquels tu as été crédité <span class="optional">(optionnel)</span></label>
+        <input type="text" placeholder="ex: @nomdelachain, youtube.com/c/...">
+      </div>
+      <div class="hint-box">💡 <strong>Astuce :</strong> un seul clip suffit pour publier ton profil. Tu pourras en ajouter d'autres plus tard.</div>
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="goToStep(3)">← Retour</button>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button class="btn-skip" onclick="goToStep(5)">Passer pour l'instant</button>
+          <button class="btn btn-primary" onclick="goToStep(5)">Continuer →</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 5 — TARIFS
+    ============================== -->
+    <!-- ÉTAPE 5 — TARIFS -->
+    <div class="step-screen" id="step-5">
+      <div class="step-header">
+        <div class="step-tag">Étape 5 sur 8</div>
+        <h1>Tes tarifs</h1>
+        <p class="step-desc">Donne une fourchette indicative. Tu pourras ajuster pour chaque projet.</p>
+      </div>
+      <table class="tarif-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Court (&lt; 5 min)</th>
+            <th>Moyen (5–15 min)</th>
+            <th>Long (15 min+)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tarif-label">Montage brut</td>
+            <td><input type="number" placeholder="€"></td>
+            <td><input type="number" placeholder="€"></td>
+            <td><input type="number" placeholder="€"></td>
+          </tr>
+          <tr>
+            <td class="tarif-label">Avec motion</td>
+            <td><input type="number" placeholder="€"></td>
+            <td><input type="number" placeholder="€"></td>
+            <td><input type="number" placeholder="€"></td>
+          </tr>
+          <tr>
+            <td class="tarif-label">Miniature incluse</td>
+            <td><input type="number" placeholder="+€"></td>
+            <td><input type="number" placeholder="+€"></td>
+            <td><input type="number" placeholder="+€"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="section-divider">Ou tarif horaire</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tarif à l'heure</label>
+          <input type="number" placeholder="€ / heure">
+        </div>
+        <div class="form-group">
+          <label>Délai de livraison habituel</label>
+          <input type="text" placeholder="ex: 48–72h après réception des rushs">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nombre de retours inclus par défaut</label>
+        <div class="tag-group">
+          <div class="tag" onclick="selectExclusive(this, 'retours')">1</div>
+          <div class="tag selected" onclick="selectExclusive(this, 'retours')">2</div>
+          <div class="tag" onclick="selectExclusive(this, 'retours')">3</div>
+          <div class="tag" onclick="selectExclusive(this, 'retours')">4</div>
+          <div class="tag" onclick="selectExclusive(this, 'retours')">5</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Capacité de charge simultanée</label>
+        <div class="tag-group">
+          <div class="tag" onclick="selectExclusive(this, 'charge')">1 projet à la fois</div>
+          <div class="tag selected" onclick="selectExclusive(this, 'charge')">2–3 projets</div>
+          <div class="tag" onclick="selectExclusive(this, 'charge')">4 projets et plus</div>
+        </div>
+      </div>
+      <div class="hint-box">📊 Ton indicateur <strong>$$$</strong> sera calculé automatiquement et affiché sur ta carte profil.</div>
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="goToStep(4)">← Retour</button>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button class="btn-skip" onclick="goToStep(6)">Passer pour l'instant</button>
+          <button class="btn btn-primary" onclick="goToStep(6)">Continuer →</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 6 — PRÉSENTATION
+    ============================== -->
+    <!-- ÉTAPE 6 — PRÉSENTATION -->
+    <div class="step-screen" id="step-6">
+      <div class="step-header">
+        <div class="step-tag">Étape 6 sur 8</div>
+        <h1>Ta présentation</h1>
+        <p class="step-desc">En 2–3 phrases : qui tu es, ta patte, ce qui te différencie.</p>
+      </div>
+      <div class="form-group">
+        <label>Bio courte</label>
+        <textarea placeholder="ex: Monteur YouTube depuis 3 ans, spé gaming et lifestyle. J'aime les transitions fluides et le storytelling percutant. Réponse garantie en moins de 4h." maxlength="280"></textarea>
+        <div style="font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px;">0 / 280 caractères</div>
+      </div>
+      <div class="form-group">
+        <label>Vidéo de présentation <span class="optional">(très recommandé — les clients adorent)</span></label>
+        <div class="upload-zone" style="padding: 24px;">
+          <div class="upload-icon">🎥</div>
+          <div class="upload-title">Face caméra · 20 à 45 secondes</div>
+          <div class="upload-hint">Dis bonjour, montre ta personnalité</div>
+        </div>
+      </div>
+      <div class="section-divider">Préférences de collaboration</div>
+      <div class="form-group">
+        <label>Type de mission recherchée</label>
+        <div class="tag-group">
+          <div class="tag selected" onclick="toggleTag(this)">Mission ponctuelle</div>
+          <div class="tag selected" onclick="toggleTag(this)">Partenariat long terme</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Délai de réponse habituel</label>
+        <div class="tag-group">
+          <div class="tag" onclick="selectExclusive(this, 'reponse')">Moins d'1h</div>
+          <div class="tag selected" onclick="selectExclusive(this, 'reponse')">Moins de 4h</div>
+          <div class="tag" onclick="selectExclusive(this, 'reponse')">Moins de 24h</div>
+          <div class="tag" onclick="selectExclusive(this, 'reponse')">Sous 48h</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Réseaux / site perso <span class="optional">(optionnel)</span></label>
+        <input type="text" placeholder="Instagram, TikTok, site web...">
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="goToStep(5)">← Retour</button>
+        <button class="btn btn-primary" onclick="startLevelLoading()">Calculer mon niveau →</button>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 7 — NIVEAU
+    ============================== -->
+    <!-- ÉTAPE 7 — NIVEAU -->
+    <div class="step-screen" id="step-7">
+      <div class="step-header">
+        <div class="step-tag">Étape 7 sur 8</div>
+        <h1>Ton niveau</h1>
+        <p class="step-desc">On analyse ton profil pour te placer au bon endroit dans la communauté.</p>
+      </div>
+
+      <!-- LOADING -->
+      <div class="level-loading" id="levelLoading">
+        <div class="circle-wrap">
+          <div class="circle-bg"></div>
+          <div class="circle-progress">
+            <svg viewBox="0 0 160 160">
+              <circle id="progressCircle" cx="80" cy="80" r="75"/>
+            </svg>
+          </div>
+          <div class="circle-inner">
+            <div class="circle-pct" id="circlePct">0%</div>
+            <div class="circle-label">Analyse</div>
+          </div>
+        </div>
+        <div class="loading-text" id="loadingText">Lecture du profil...</div>
+      </div>
+
+      <!-- RÉSULTAT -->
+      <div class="level-result" id="levelResult">
+        <div class="level-badge-big">
+          <div class="level-badge-emoji" id="resultEmoji">🔥</div>
+        </div>
+        <div class="level-badge-name" id="resultName">Prodige</div>
+        <div class="level-desc" id="resultDesc">Tu as peu d'expérience déclarée, mais ton portfolio parle pour toi. Les clients qui cherchent de la fraîcheur et du talent brut vont adorer.</div>
+
+        <div class="level-actions">
+          <button class="level-modify-btn" onclick="toggleLevelPicker()">✏️ Contester ou modifier mon niveau</button>
+
+          <div class="level-picker" id="levelPicker">
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Choisis le niveau qui te correspond :</div>
+            <div class="level-picker-grid">
+              <div class="level-pick-item" onclick="pickLevel(this, '🌱', 'Débutant', 0)"><span class="level-pick-emoji">🌱</span> Débutant</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '⚡', 'Rising', 1)"><span class="level-pick-emoji">⚡</span> Rising</div>
+              <div class="level-pick-item selected" onclick="pickLevel(this, '🔥', 'Prodige', 2)"><span class="level-pick-emoji">🔥</span> Prodige</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '💎', 'Confirmé', 3)"><span class="level-pick-emoji">💎</span> Confirmé</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '🚀', 'Expert', 4)"><span class="level-pick-emoji">🚀</span> Expert</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '🎯', 'Specialist', 5)"><span class="level-pick-emoji">🎯</span> Specialist</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '⭐', 'Star', 6)"><span class="level-pick-emoji">⭐</span> Star</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '👑', 'Elite', 7)"><span class="level-pick-emoji">👑</span> Elite</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '🏆', 'Signature', 8)"><span class="level-pick-emoji">🏆</span> Signature</div>
+              <div class="level-pick-item" onclick="pickLevel(this, '🔮', 'Légende', 9)"><span class="level-pick-emoji">🔮</span> Légende</div>
+            </div>
+          </div>
+
+          <button class="level-certify-btn" id="certifBtn" onclick="sendCertif()">🛡️ Demander un profil certifié</button>
+          <div class="certif-banner" id="certifBanner" style="display:none;">
+            <span class="certif-icon">✅</span>
+            <span>Demande envoyée ! Notre équipe vérifie ton profil dans les 48h. Une fois certifié, un badge apparaît sur ta carte.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-nav" id="levelNav" style="display:none;">
+        <button class="btn btn-ghost" onclick="goToStep(6)">← Retour</button>
+        <button class="btn btn-primary" onclick="goToStep(8)">Voir mon profil →</button>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉTAPE 8 — APERÇU PROFIL
+    ============================== -->
+    <!-- ÉTAPE 8 — APERÇU PROFIL -->
+    <div class="step-screen" id="step-8">
+      <div class="step-header">
+        <div class="step-tag">Étape 8 sur 8</div>
+        <h1>Voici ta carte profil</h1>
+        <p class="step-desc">C'est comme ça que les clients te voient dans le catalogue.</p>
+      </div>
+
+      <div class="card-preview-section">
+        <div class="profile-preview">
+          <div class="profile-thumb">
+            🎬
+            <div class="profile-avail">
+              <div class="avail-pulse"></div>
+              Dispo
+            </div>
+            <div class="profile-skills">
+              <div class="profile-tag">Montage</div>
+              <div class="profile-tag">Motion</div>
+              <div class="profile-tag">Gaming</div>
+            </div>
+            <!-- NIVEAU bas gauche -->
+            <div class="profile-level-badge" id="cardLevelBadge">🔥 Prodige</div>
+          </div>
+          <div class="profile-body">
+            <div class="profile-name">Lucas M.</div>
+            <div class="profile-meta">2 ans d'expérience</div>
+            <!-- DRAPEAUX LANGUES -->
+            <div class="profile-langs">
+              <span class="profile-lang" title="Français">🇫🇷</span>
+              <span class="profile-lang" title="Anglais">🇬🇧</span>
+            </div>
+            <div class="profile-platforms">
+              <div class="platform-badge" title="YouTube">📺</div>
+              <div class="platform-badge" title="TikTok">🎵</div>
+              <div class="platform-badge" title="Instagram">📷</div>
+            </div>
+            <div class="profile-footer">
+              <div class="profile-price">$$ · À partir de 80€</div>
+              <div class="profile-rating">⭐ Nouveau</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="legend-item"><div class="legend-dot"></div><div class="legend-text"><strong>Niveau</strong> — affiché en bas à gauche de la carte, calculé depuis ton profil</div></div>
+          <div class="legend-item"><div class="legend-dot"></div><div class="legend-text"><strong>Drapeaux</strong> — langues parlées, visibles par les clients directement</div></div>
+          <div class="legend-item"><div class="legend-dot"></div><div class="legend-text"><strong>Disponibilité</strong> — mise à jour depuis ton dashboard en temps réel</div></div>
+          <div class="legend-item"><div class="legend-dot"></div><div class="legend-text"><strong>Tags compétences</strong> — tes 3 premières apparaissent sur la carte</div></div>
+          <div class="legend-item"><div class="legend-dot"></div><div class="legend-text"><strong>Indicateur prix</strong> — de $ à $$$$ calculé automatiquement depuis ta grille</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 48px; padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);">
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Complète ton profil pour plus de visibilité</div>
+        <div style="background: var(--surface2); border-radius: 100px; height: 6px; overflow: hidden;">
+          <div style="width: 70%; height: 100%; background: var(--accent); border-radius: 100px;"></div>
+        </div>
+        <div style="font-size: 12px; color: var(--text-dim); margin-top: 6px;">70% complet — ajoute une vidéo de présentation pour atteindre 85%</div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="goToStep(7)">← Modifier</button>
+        <button class="btn btn-primary" onclick="publishProfile()" style="padding: 14px 40px;">🚀 Publier mon profil</button>
+      </div>
+    </div>
+
+
+    <!-- ==============================
+         ÉCRAN SUCCÈS
+    ============================== -->
+    <!-- ÉCRAN SUCCÈS -->
+    <div class="step-screen" id="step-9">
+      <div class="success-screen">
+        <div class="success-icon">✓</div>
+        <h1 style="margin-bottom: 16px;">Ton profil est en ligne !</h1>
+        <p class="step-desc" style="max-width: 400px; margin: 0 auto 48px;">Tu es maintenant visible dans le catalogue. Les premières demandes arrivent généralement dans les 48h.</p>
+        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: 0 auto;">
+          <button class="btn btn-primary" style="width: 100%;">Voir mon profil public</button>
+          <button class="btn btn-ghost" style="width: 100%;">Accéder à mon dashboard</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // CONFIG
+  const STEPS = [
+    { id: 1, label: 'Compte' },
+    { id: 2, label: 'Identité' },
+    { id: 3, label: 'Métier & Skills' },
+    { id: 4, label: 'Portfolio' },
+    { id: 5, label: 'Tarifs' },
+    { id: 6, label: 'Présentation' },
+    { id: 7, label: 'Niveau' },
+    { id: 8, label: 'Aperçu profil' },
+  ];
+
+  const LEVELS = [
+    { emoji: '🌱', name: 'Débutant',   desc: "Tu débarques dans l'univers du montage. Les clients qui cherchent des tarifs accessibles et un regard neuf vont te trouver ici." },
+    { emoji: '⚡', name: 'Rising',     desc: "Tu commences à avoir des réalisations solides. Ton profil est prometteur et tu montes vite." },
+    { emoji: '🔥', name: 'Prodige',    desc: "Tu as peu d'expérience déclarée, mais ton portfolio parle pour toi. Les clients qui cherchent de la fraîcheur et du talent brut vont adorer." },
+    { emoji: '💎', name: 'Confirmé',   desc: "Tu es régulier, fiable, et tu as prouvé ta valeur sur des projets variés. Un excellent rapport qualité/prix." },
+    { emoji: '🚀', name: 'Expert',     desc: "Multi-formats, réactif, expérimenté. Tu maîtrises ton métier de bout en bout." },
+    { emoji: '🎯', name: 'Specialist', desc: "Tu as une niche bien définie et tu y excelles. Les créateurs pointus dans ton domaine vont directement vers toi." },
+    { emoji: '⭐', name: 'Star',       desc: "Tes références clients sont solides et tes notes parlent d'elles-mêmes. Tu fais partie des meilleurs de la plateforme." },
+    { emoji: '👑', name: 'Elite',      desc: "Top profils de CUTLAB. Tu livres constamment une qualité exceptionnelle et tes clients reviennent toujours." },
+    { emoji: '🏆', name: 'Signature',  desc: "Sélectionné manuellement par notre équipe. Réservé aux monteurs qui définissent le standard de la plateforme." },
+    { emoji: '🔮', name: 'Légende',    desc: "Ultra rare. Réservé aux profils qui ont marqué CUTLAB et le secteur. Une reconnaissance qui ne s'achète pas." },
+  ];
+
+  let currentStep = 1;
+  let assignedLevel = 2; // Prodige pour la démo
+
+  // INIT NAV
+  function initNav() {
+    const nav = document.getElementById('stepsNav');
+    nav.innerHTML = STEPS.map(s => `
+      <div class="step-item ${s.id === currentStep ? 'active' : ''}" id="nav-${s.id}" onclick="goToStep(${s.id})">
+        <div class="step-num"><span>${s.id}</span></div>
+        <div class="step-label">${s.label}</div>
+      </div>
+    `).join('');
+  }
+
+  // NAVIGATION
+  function goToStep(n) {
+    document.getElementById(`step-${currentStep}`)?.classList.remove('active');
+    document.getElementById(`nav-${currentStep}`)?.classList.remove('active');
+    if (n > currentStep) document.getElementById(`nav-${currentStep}`)?.classList.add('done');
+    else document.getElementById(`nav-${currentStep}`)?.classList.remove('done');
+
+    currentStep = n;
+    document.getElementById(`step-${currentStep}`)?.classList.add('active');
+    document.getElementById(`nav-${currentStep}`)?.classList.remove('done');
+    document.getElementById(`nav-${currentStep}`)?.classList.add('active');
+
+    const pct = Math.round((currentStep / STEPS.length) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function publishProfile() {
+    document.getElementById(`step-8`)?.classList.remove('active');
+    document.getElementById(`nav-8`)?.classList.add('done');
+    document.getElementById('step-9')?.classList.add('active');
+    document.getElementById('progressFill').style.width = '100%';
+    currentStep = 9;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // LEVEL LOADING
+  function startLevelLoading() {
+    goToStep(7);
+    document.getElementById('levelLoading').style.display = 'flex';
+    document.getElementById('levelResult').style.display = 'none';
+    document.getElementById('levelNav').style.display = 'none';
+
+    const circle = document.getElementById('progressCircle');
+    const pctEl = document.getElementById('circlePct');
+    const textEl = document.getElementById('loadingText');
+    const circumference = 471;
+
+    const messages = [
+      { pct: 0,  text: 'Lecture du profil...' },
+      { pct: 20, text: 'Analyse des compétences...' },
+      { pct: 40, text: 'Évaluation du portfolio...' },
+      { pct: 60, text: "Calcul de l'expérience..." },
+      { pct: 80, text: 'Comparaison avec la communauté...' },
+      { pct: 95, text: 'Finalisation du niveau...' },
+    ];
+
+    let pct = 0;
+    const interval = setInterval(() => {
+      pct++;
+      circle.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+      pctEl.textContent = pct + '%';
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if (pct >= messages[i].pct) { textEl.textContent = messages[i].text; break; }
+      }
+      if (pct >= 100) { clearInterval(interval); setTimeout(showLevelResult, 500); }
+    }, 25);
+  }
+
+  function showLevelResult() {
+    document.getElementById('levelLoading').style.display = 'none';
+    const lvl = LEVELS[assignedLevel];
+    document.getElementById('resultEmoji').textContent = lvl.emoji;
+    document.getElementById('resultName').textContent = lvl.name;
+    document.getElementById('resultDesc').textContent = lvl.desc;
+    document.getElementById('cardLevelBadge').textContent = `${lvl.emoji} ${lvl.name}`;
+    document.getElementById('levelResult').style.display = 'flex';
+    document.getElementById('levelNav').style.display = 'flex';
+  }
+
+  // LEVEL PICKER
+  function toggleLevelPicker() {
+    const p = document.getElementById('levelPicker');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function pickLevel(el, emoji, name, idx) {
+    document.querySelectorAll('.level-pick-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    assignedLevel = idx;
+    document.getElementById('resultEmoji').textContent = emoji;
+    document.getElementById('resultName').textContent = name;
+    document.getElementById('resultDesc').textContent = LEVELS[idx].desc;
+    document.getElementById('cardLevelBadge').textContent = `${emoji} ${name}`;
+  }
+
+  function sendCertif() {
+    document.getElementById('certifBanner').style.display = 'flex';
+    document.getElementById('certifBtn').style.display = 'none';
+  }
+
+  // TAGS
+  function toggleTag(el) { el.classList.toggle('selected'); }
+
+  function selectExclusive(el, group) {
+    const parent = el.closest('.tag-group') || el.parentElement;
+    parent.querySelectorAll('[onclick*="selectExclusive"]').forEach(t => {
+      if (t.getAttribute('onclick').includes(`'${group}'`)) t.classList.remove('selected');
+    });
+    el.classList.add('selected');
+  }
+
+  function selectAvail(el) {
+    document.querySelectorAll('.avail-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // NICHES
+  function toggleNicheTout(el) {
+    const isSelected = el.classList.contains('selected');
+    if (isSelected) {
+      el.classList.remove('selected');
+      document.querySelectorAll('#nicheGroup .niche-tag:not(#niche-tout)').forEach(t => t.classList.remove('selected'));
+    } else {
+      el.classList.add('selected');
+      document.querySelectorAll('#nicheGroup .niche-tag:not(#niche-tout)').forEach(t => t.classList.add('selected'));
+    }
+  }
+
+  function toggleNiche(el) {
+    el.classList.toggle('selected');
+    const toutTag = document.getElementById('niche-tout');
+    const allNiches = [...document.querySelectorAll('#nicheGroup .niche-tag:not(#niche-tout)')];
+    const allSelected = allNiches.every(t => t.classList.contains('selected'));
+    toutTag.classList.toggle('selected', allSelected);
+  }
+
+  // TEXTAREA COUNTER
+  document.addEventListener('input', e => {
+    if (e.target.tagName === 'TEXTAREA' && e.target.maxLength > 0) {
+      const counter = e.target.nextElementSibling;
+      if (counter) counter.textContent = `${e.target.value.length} / ${e.target.maxLength} caractères`;
+    }
+  });
+
+  initNav();
+</script>
+</body>
+</html>
