@@ -3,7 +3,7 @@ import { useOnboarding } from '../../context/OnboardingContext'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import Tag from '../ui/Tag'
-import UploadZone from '../ui/UploadZone'
+import VideoRecordField from '../ui/VideoRecordField'
 import SectionDivider from '../ui/SectionDivider'
 import StepNav from '../ui/StepNav'
 
@@ -23,28 +23,18 @@ const RESPONSE_TIMES = [
 
 export default function Step6Presentation() {
   const { goToStep, formData, updateFormData } = useOnboarding()
+  const [error, setError] = useState('')
 
-  const [bio,          setBio]         = useState(formData.bio)
-  const [missionTypes, setMissionTypes] = useState(new Set(formData.missionTypes))
-  const [responseTime, setResponseTime] = useState(formData.responseTime)
-  const [socialLinks,  setSocialLinks]  = useState(formData.socialLinks)
-
-  function toggleMission(key) {
-    setMissionTypes((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
+  function handleNext() {
+    if (formData.bio.trim().length < 10) { setError('Écris une bio d\'au moins 10 caractères.'); return }
+    if (formData.missionTypes.length === 0) { setError('Sélectionne au moins un type de mission.'); return }
+    setError('')
+    goToStep(7)
   }
 
-  function save() {
-    updateFormData({
-      bio,
-      missionTypes: [...missionTypes],
-      responseTime,
-      socialLinks,
-    })
+  function toggleMission(key) {
+    const arr = formData.missionTypes
+    updateFormData({ missionTypes: arr.includes(key) ? arr.filter((k) => k !== key) : [...arr, key] })
   }
 
   return (
@@ -59,22 +49,16 @@ export default function Step6Presentation() {
         <textarea
           placeholder="ex: Monteur YouTube depuis 3 ans, spé gaming et lifestyle. J'aime les transitions fluides et le storytelling percutant. Réponse garantie en moins de 4h."
           maxLength={MAX_BIO}
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
+          value={formData.bio}
+          onChange={(e) => updateFormData({ bio: e.target.value })}
         />
         <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'right', marginTop: 4 }}>
-          {bio.length} / {MAX_BIO} caractères
+          {formData.bio.length} / {MAX_BIO} caractères
         </div>
       </FormGroup>
 
       <FormGroup label="Vidéo de présentation" optional="très recommandé — les clients adorent">
-        <UploadZone
-          icon="🎥"
-          title="Face caméra · 20 à 45 secondes"
-          hint="Dis bonjour, montre ta personnalité"
-          accept="video/mp4,video/quicktime,video/webm"
-          style={{ padding: 24 }}
-        />
+        <VideoRecordField />
       </FormGroup>
 
       <SectionDivider>Préférences de collaboration</SectionDivider>
@@ -82,7 +66,7 @@ export default function Step6Presentation() {
       <FormGroup label="Type de mission recherchée">
         <div className="tag-group">
           {MISSION_TYPES.map((m) => (
-            <Tag key={m.key} selected={missionTypes.has(m.key)} onToggle={() => toggleMission(m.key)}>
+            <Tag key={m.key} selected={formData.missionTypes.includes(m.key)} onToggle={() => toggleMission(m.key)}>
               {m.label}
             </Tag>
           ))}
@@ -92,7 +76,7 @@ export default function Step6Presentation() {
       <FormGroup label="Délai de réponse habituel">
         <div className="tag-group">
           {RESPONSE_TIMES.map((rt) => (
-            <Tag key={rt.key} selected={responseTime === rt.key} onToggle={() => setResponseTime(rt.key)}>
+            <Tag key={rt.key} selected={formData.responseTime === rt.key} onToggle={() => updateFormData({ responseTime: rt.key })}>
               {rt.label}
             </Tag>
           ))}
@@ -103,14 +87,15 @@ export default function Step6Presentation() {
         <input
           type="text"
           placeholder="Instagram, TikTok, site web..."
-          value={socialLinks}
-          onChange={(e) => setSocialLinks(e.target.value)}
+          value={formData.socialLinks}
+          onChange={(e) => updateFormData({ socialLinks: e.target.value })}
         />
       </FormGroup>
 
+      {error && <div className="step-error">{error}</div>}
       <StepNav
-        onBack={() => { save(); goToStep(5) }}
-        onNext={() => { save(); goToStep(7) }}
+        onBack={() => goToStep(5)}
+        onNext={handleNext}
         nextLabel="Calculer mon niveau →"
       />
     </div>

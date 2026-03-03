@@ -10,6 +10,7 @@ import Step6Presentation from './components/steps/Step6Presentation'
 import Step7Level from './components/steps/Step7Level'
 import Step8Preview from './components/steps/Step8Preview'
 import Step9Success from './components/steps/Step9Success'
+import ProfileEditor from './components/editor/ProfileEditor'
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -24,7 +25,9 @@ const STEP_COMPONENTS = {
 }
 
 export default function App() {
-  const { currentStep } = useOnboarding()
+  const { currentStep, currentView } = useOnboarding()
+
+  if (currentView === 'editor') return <ProfileEditor />
 
   const progress = currentStep === 9 ? 100 : Math.round((currentStep / 8) * 100)
   const StepComponent = STEP_COMPONENTS[currentStep]

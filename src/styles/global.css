@@ -34,8 +34,9 @@ body {
 .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; color: var(--accent); }
 .logo span { color: var(--text); }
 .steps-nav { display: flex; flex-direction: column; gap: 4px; }
-.step-item { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
-.step-item:hover { background: var(--surface2); }
+.step-item { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border-radius: var(--radius-sm); transition: all 0.2s; border: 1px solid transparent; }
+.step-item.done {  cursor: pointer; }
+.step-item.done:hover { background: var(--surface2); }
 .step-item.active { background: var(--surface2); border-color: var(--border); }
 .step-num { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--text-muted); flex-shrink: 0; transition: all 0.2s; }
 .step-item.active .step-num { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
@@ -112,6 +113,9 @@ textarea { resize: vertical; min-height: 100px; }
 /* PROGRESS BAR */
 .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--border); z-index: 100; }
 .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+
+/* VALIDATION ERROR */
+.step-error { font-size: 13px; color: #ff4d4d; margin-bottom: 12px; padding: 10px 14px; background: rgba(255,77,77,0.07); border-radius: var(--radius-sm); border: 1px solid rgba(255,77,77,0.2); }
 
 /* BUTTONS */
 .step-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
@@ -206,16 +210,59 @@ textarea { resize: vertical; min-height: 100px; }
 /* UPLOAD — functional states */
 .upload-zone.dragging { border-color: var(--accent); background: rgba(212,240,0,0.06); transform: scale(1.01); }
 .upload-zone.has-files { border-color: rgba(212,240,0,0.4); background: rgba(212,240,0,0.04); }
+.upload-zone.has-error { border-color: #ff4d4d; }
 .upload-file-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; width: 100%; }
 .upload-file-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; }
 .upload-file-name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
 .upload-file-size { color: var(--text-muted); font-size: 11px; flex-shrink: 0; margin-left: 12px; }
+.upload-error { color: #ff6b6b; font-size: 12px; margin-top: 8px; }
+.upload-image-preview { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 4px; }
+
+/* VIDEO RECORD FIELD */
+.video-record-field { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.vrf-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.vrf-tab { flex: 1; padding: 11px 12px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.vrf-tab:hover { background: var(--surface2); color: var(--text); }
+.vrf-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(212,240,0,0.04); }
+.vrf-body { padding: 36px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 180px; justify-content: center; }
+.vrf-live-video { width: 100%; max-width: 380px; border-radius: var(--radius-sm); background: #000; max-height: 220px; object-fit: cover; transform: scaleX(-1); }
+.vrf-preview-video { width: 100%; max-width: 380px; border-radius: var(--radius-sm); background: #000; max-height: 220px; object-fit: cover; }
+.vrf-timer { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: 3px; line-height: 1; }
+.vrf-timer-sep { color: var(--text-muted); font-weight: 400; }
+.vrf-timer.urgent { color: #ff6b6b; animation: vrf-pulse 1s ease-in-out infinite; }
+@keyframes vrf-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.vrf-record-btn { background: var(--accent); color: #000; border: none; border-radius: 100px; padding: 11px 28px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; letter-spacing: 0.5px; transition: opacity 0.2s; }
+.vrf-record-btn:hover { opacity: 0.85; }
+.vrf-stop-btn { background: #e53e3e; color: #fff; border: none; border-radius: 100px; padding: 11px 28px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; letter-spacing: 0.5px; transition: opacity 0.2s; }
+.vrf-stop-btn:hover { opacity: 0.85; }
+.vrf-browse-btn, .vrf-reset-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.vrf-browse-btn:hover, .vrf-reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.vrf-error { color: #ff6b6b; font-size: 12px; padding: 10px 16px; border-top: 1px solid var(--border); text-align: center; }
 
 /* MOBILE TOP NAV */
 .mobile-nav { display: none; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 2px; z-index: 50; }
 .mobile-nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--accent); }
 .mobile-nav-logo span { color: var(--text); }
 .mobile-step-pill { font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 4px 12px; }
+
+/* PROFILE EDITOR */
+.editor-page { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+.editor-header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 16px; padding: 14px 32px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.editor-header-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; }
+.editor-header-logo span { color: var(--accent); }
+.editor-header-title { flex: 1; font-size: 14px; color: var(--text-muted); }
+.editor-header-actions { display: flex; align-items: center; gap: 12px; }
+.save-notice { font-size: 13px; font-weight: 500; color: var(--accent); }
+.save-notice--error { color: #ff4d4d; }
+.editor-content { max-width: 720px; width: 100%; margin: 0 auto; padding: 40px 24px 80px; }
+.editor-profile-card { display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px; flex-wrap: wrap; }
+.editor-avatar { width: 56px; height: 56px; font-size: 28px; display: flex; align-items: center; justify-content: center; background: var(--surface2); border-radius: 50%; flex-shrink: 0; }
+.editor-profile-info { flex: 1; min-width: 0; }
+.editor-profile-name { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+.editor-profile-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.editor-badge { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 100px; }
+.editor-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 16px; }
+.editor-section-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
@@ -232,4 +279,7 @@ textarea { resize: vertical; min-height: 100px; }
   h1 { font-size: 28px; }
   .upload-file-name { max-width: 160px; }
   .profile-preview { max-width: 100%; }
+  .editor-header { padding: 12px 16px; }
+  .editor-header-title { display: none; }
+  .editor-content { padding: 20px 16px 80px; }
 }

@@ -23,7 +23,7 @@ export default function Sidebar() {
             <div
               key={step.id}
               className={`step-item${isActive ? ' active' : ''}${isDone ? ' done' : ''}`}
-              onClick={() => goToStep(step.id)}
+              onClick={() => isDone ?? goToStep(step.id)}
             >
               <div className="step-num">
                 <span>{step.id}</span>

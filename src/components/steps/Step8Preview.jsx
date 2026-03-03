@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { LEVELS } from '../../constants/levels'
 import StepHeader from '../ui/StepHeader'
@@ -12,8 +13,15 @@ const LEGEND_ITEMS = [
 ]
 
 export default function Step8Preview() {
-  const { goToStep, publishProfile, assignedLevel } = useOnboarding()
+  const { goToStep, publishProfile, assignedLevel, saving } = useOnboarding()
   const level = LEVELS[assignedLevel]
+  const [error, setError] = useState('')
+
+  async function handlePublish() {
+    setError('')
+    const ok = await publishProfile()
+    if (!ok) setError('Erreur lors de la publication. Vérifie ta connexion et réessaie.')
+  }
 
   return (
     <div className="step-screen">
@@ -95,11 +103,12 @@ export default function Step8Preview() {
         </div>
       </div>
 
+      {error && <div className="step-error">{error}</div>}
       <StepNav
         onBack={() => goToStep(7)}
         backLabel="← Modifier"
-        onNext={publishProfile}
-        nextLabel="🚀 Publier mon profil"
+        onNext={handlePublish}
+        nextLabel={saving ? 'Publication...' : '🚀 Publier mon profil'}
         nextStyle={{ padding: '14px 40px' }}
       />
     </div>

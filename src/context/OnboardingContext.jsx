@@ -22,6 +22,7 @@ const INITIAL_FORM = {
 
 export function OnboardingProvider({ children }) {
   const [currentStep, setCurrentStep] = useState(1)
+  const [currentView, setCurrentView] = useState('onboarding') // 'onboarding' | 'editor'
   const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
@@ -70,7 +71,7 @@ export function OnboardingProvider({ children }) {
   }
 
   async function saveProfile(status = 'draft') {
-    if (!user) return
+    if (!user) return false
     setSaving(true)
     const { error } = await supabase.from('profiles').upsert({
       id: user.id,
@@ -100,12 +101,53 @@ export function OnboardingProvider({ children }) {
       updated_at: new Date().toISOString(),
     })
     setSaving(false)
-    if (error) console.error('[Supabase] saveProfile:', error.message)
+    if (error) { console.error('[Supabase] saveProfile:', error.message); return false }
+    return true
   }
 
   async function publishProfile() {
-    await saveProfile('published')
-    setCurrentStep(9)
+    const ok = await saveProfile('published')
+    if (ok) {
+      setCurrentStep(9)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    return ok
+  }
+
+  async function loadProfile() {
+    if (!user) return
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    if (error || !data) return
+    if (data.assigned_level != null) setAssignedLevel(data.assigned_level)
+    setFormData((prev) => ({
+      ...prev,
+      firstName:       data.first_name        ?? prev.firstName,
+      lastName:        data.last_name         ?? prev.lastName,
+      username:        data.username          ?? prev.username,
+      avatarUrl:       data.avatar_url        ?? prev.avatarUrl,
+      languages:       data.languages         ?? prev.languages,
+      availability:    data.availability      ?? prev.availability,
+      skills:          data.skills            ?? prev.skills,
+      formats:         data.formats           ?? prev.formats,
+      niches:          data.niches            ?? prev.niches,
+      experience:      data.experience        ?? prev.experience,
+      software:        data.software          ?? prev.software,
+      portfolioLinks:  data.portfolio_links   ?? prev.portfolioLinks,
+      creditedChannels: data.credited_channels ?? prev.creditedChannels,
+      revisions:       data.revisions         ?? prev.revisions,
+      capacity:        data.capacity          ?? prev.capacity,
+      hourlyRate:      data.hourly_rate != null ? String(data.hourly_rate) : prev.hourlyRate,
+      deliveryTime:    data.delivery_time      ?? prev.deliveryTime,
+      bio:             data.bio               ?? prev.bio,
+      missionTypes:    data.mission_types     ?? prev.missionTypes,
+      responseTime:    data.response_time     ?? prev.responseTime,
+      socialLinks:     data.social_links      ?? prev.socialLinks,
+    }))
+  }
+
+  async function goToEditor() {
+    await loadProfile()
+    setCurrentView('editor')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -113,6 +155,7 @@ export function OnboardingProvider({ children }) {
     <OnboardingContext.Provider
       value={{
         currentStep, goToStep,
+        currentView, goToEditor,
         assignedLevel, setAssignedLevel,
         formData, updateFormData,
         user, authLoading, authError,

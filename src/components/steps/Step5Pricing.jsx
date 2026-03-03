@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
@@ -16,15 +15,6 @@ const CAPACITY_OPTIONS = [
 
 export default function Step5Pricing() {
   const { goToStep, formData, updateFormData } = useOnboarding()
-
-  const [revisions,    setRevisions]    = useState(formData.revisions)
-  const [capacity,     setCapacity]     = useState(formData.capacity)
-  const [hourlyRate,   setHourlyRate]   = useState(formData.hourlyRate)
-  const [deliveryTime, setDeliveryTime] = useState(formData.deliveryTime)
-
-  function save() {
-    updateFormData({ revisions, capacity, hourlyRate, deliveryTime })
-  }
 
   return (
     <div className="step-screen">
@@ -68,17 +58,27 @@ export default function Step5Pricing() {
       <SectionDivider>Ou tarif horaire</SectionDivider>
       <div className="form-row">
         <FormGroup label="Tarif à l'heure">
-          <input type="number" placeholder="€ / heure" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} />
+          <input
+            type="number"
+            placeholder="€ / heure"
+            value={formData.hourlyRate}
+            onChange={(e) => updateFormData({ hourlyRate: e.target.value })}
+          />
         </FormGroup>
         <FormGroup label="Délai de livraison habituel">
-          <input type="text" placeholder="ex: 48–72h après réception des rushs" value={deliveryTime} onChange={(e) => setDeliveryTime(e.target.value)} />
+          <input
+            type="text"
+            placeholder="ex: 48–72h après réception des rushs"
+            value={formData.deliveryTime}
+            onChange={(e) => updateFormData({ deliveryTime: e.target.value })}
+          />
         </FormGroup>
       </div>
 
       <FormGroup label="Nombre de retours inclus par défaut">
         <div className="tag-group">
           {REVISION_OPTIONS.map((n) => (
-            <Tag key={n} selected={revisions === n} onToggle={() => setRevisions(n)}>
+            <Tag key={n} selected={formData.revisions === n} onToggle={() => updateFormData({ revisions: n })}>
               {n}
             </Tag>
           ))}
@@ -88,7 +88,7 @@ export default function Step5Pricing() {
       <FormGroup label="Capacité de charge simultanée">
         <div className="tag-group">
           {CAPACITY_OPTIONS.map((opt) => (
-            <Tag key={opt.key} selected={capacity === opt.key} onToggle={() => setCapacity(opt.key)}>
+            <Tag key={opt.key} selected={formData.capacity === opt.key} onToggle={() => updateFormData({ capacity: opt.key })}>
               {opt.label}
             </Tag>
           ))}
@@ -100,9 +100,9 @@ export default function Step5Pricing() {
       </HintBox>
 
       <StepNav
-        onBack={() => { save(); goToStep(4) }}
-        onNext={() => { save(); goToStep(6) }}
-        onSkip={() => { save(); goToStep(6) }}
+        onBack={() => goToStep(4)}
+        onNext={() => goToStep(6)}
+        onSkip={() => goToStep(6)}
       />
     </div>
   )

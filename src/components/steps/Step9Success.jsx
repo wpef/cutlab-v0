@@ -1,6 +1,9 @@
+import { useOnboarding } from '../../context/OnboardingContext'
 import Button from '../ui/Button'
 
 export default function Step9Success() {
+  const { goToEditor } = useOnboarding()
+
   return (
     <div className="step-screen">
       <div className="success-screen">
@@ -11,7 +14,7 @@ export default function Step9Success() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 300, margin: '0 auto' }}>
           <Button variant="primary" style={{ width: '100%' }}>Voir mon profil public</Button>
-          <Button variant="ghost" style={{ width: '100%' }}>Accéder à mon dashboard</Button>
+          <Button variant="ghost" style={{ width: '100%' }} onClick={goToEditor}>Modifier mon profil</Button>
         </div>
       </div>
     </div>

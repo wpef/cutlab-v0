@@ -8,20 +8,44 @@ import { useRef, useState } from 'react'
  * @param {string}   hint             secondary muted text
  * @param {string}   [accept]         MIME types / extensions (e.g. "image/*")
  * @param {boolean}  [multiple]       allow multiple file selection
+ * @param {number}   [maxSizeMB]      max file size in MB — shows error if exceeded
  * @param {Function} [onFilesChange]  called with File[] when selection changes
  * @param {React.ReactNode} [children]
  * @param {React.CSSProperties} [style]
  */
-export default function UploadZone({ icon, title, hint, accept, multiple, onFilesChange, children, style }) {
+export default function UploadZone({ icon, title, hint, accept, multiple, maxSizeMB, onFilesChange, children, style }) {
   const inputRef = useRef(null)
   const [files, setFiles] = useState([])
   const [dragging, setDragging] = useState(false)
+  const [error, setError] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null)
 
   function handleFiles(fileList) {
     const arr = Array.from(fileList)
     if (!arr.length) return
+
+    if (maxSizeMB) {
+      const oversized = arr.filter((f) => f.size > maxSizeMB * 1024 * 1024)
+      if (oversized.length) {
+        setError(
+          `${oversized.map((f) => f.name).join(', ')} dépasse${oversized.length > 1 ? 'nt' : ''} ${maxSizeMB} Mo`
+        )
+        return
+      }
+    }
+
+    setError(null)
     setFiles(arr)
     onFilesChange?.(arr)
+
+    // Auto image preview for single-image uploads
+    if (!multiple && arr[0]?.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => setPreviewUrl(e.target.result)
+      reader.readAsDataURL(arr[0])
+    } else {
+      setPreviewUrl(null)
+    }
   }
 
   function handleDrop(e) {
@@ -37,7 +61,7 @@ export default function UploadZone({ icon, title, hint, accept, multiple, onFile
 
   return (
     <div
-      className={`upload-zone${dragging ? ' dragging' : ''}${files.length ? ' has-files' : ''}`}
+      className={`upload-zone${dragging ? ' dragging' : ''}${files.length ? ' has-files' : ''}${error ? ' has-error' : ''}`}
       style={style}
       onClick={handleClick}
       onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
@@ -60,6 +84,11 @@ export default function UploadZone({ icon, title, hint, accept, multiple, onFile
           <div className="upload-title">{title}</div>
           <div className="upload-hint">{hint}</div>
         </>
+      ) : previewUrl ? (
+        <>
+          <img src={previewUrl} alt="Aperçu" className="upload-image-preview" />
+          <div className="upload-hint" style={{ marginTop: 8 }}>Clique pour changer</div>
+        </>
       ) : (
         <>
           <div className="upload-icon">✅</div>
@@ -74,6 +103,8 @@ export default function UploadZone({ icon, title, hint, accept, multiple, onFile
           <div className="upload-hint" style={{ marginTop: 8 }}>Clique pour changer</div>
         </>
       )}
+
+      {error && <div className="upload-error">{error}</div>}
 
       {children}
     </div>

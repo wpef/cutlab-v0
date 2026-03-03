@@ -49,52 +49,26 @@ const SOFTWARE = [
 
 export default function Step3Skills() {
   const { goToStep, formData, updateFormData } = useOnboarding()
+  const [error, setError] = useState('')
 
-  const [skills,    setSkills]    = useState(new Set(formData.skills))
-  const [formats,   setFormats]   = useState(new Set(formData.formats))
-  const [niches,    setNiches]    = useState(new Set(formData.niches))
-  const [allNiches, setAllNiches] = useState(formData.niches.length === NICHES.length)
-  const [experience, setExperience] = useState(formData.experience)
-  const [software,  setSoftware]  = useState(new Set(formData.software))
-
-  function toggle(setter, key) {
-    setter((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
+  function handleNext() {
+    if (formData.skills.length === 0) { setError('Sélectionne au moins une compétence.'); return }
+    if (formData.formats.length === 0) { setError('Sélectionne au moins un format.'); return }
+    if (formData.niches.length === 0) { setError('Sélectionne au moins une niche de contenu.'); return }
+    setError('')
+    goToStep(4)
   }
 
-  function toggleNiche(name) {
-    setNiches((prev) => {
-      const next = new Set(prev)
-      if (next.has(name)) next.delete(name)
-      else next.add(name)
-      setAllNiches(next.size === NICHES.length)
-      return next
-    })
+  function toggleArr(field, key) {
+    const arr = formData[field]
+    updateFormData({ [field]: arr.includes(key) ? arr.filter((k) => k !== key) : [...arr, key] })
   }
 
   function toggleAllNiches() {
-    if (allNiches) {
-      setAllNiches(false)
-      setNiches(new Set())
-    } else {
-      setAllNiches(true)
-      setNiches(new Set(NICHES))
-    }
+    updateFormData({ niches: formData.niches.length === NICHES.length ? [] : [...NICHES] })
   }
 
-  function save() {
-    updateFormData({
-      skills: [...skills],
-      formats: [...formats],
-      niches: [...niches],
-      experience,
-      software: [...software],
-    })
-  }
+  const allNiches = formData.niches.length === NICHES.length
 
   return (
     <div className="step-screen">
@@ -107,7 +81,7 @@ export default function Step3Skills() {
       <SectionDivider>Compétences</SectionDivider>
       <div className="tag-group">
         {SKILLS.map((s) => (
-          <Tag key={s.key} icon={s.icon} selected={skills.has(s.key)} onToggle={() => toggle(setSkills, s.key)}>
+          <Tag key={s.key} icon={s.icon} selected={formData.skills.includes(s.key)} onToggle={() => toggleArr('skills', s.key)}>
             {s.label}
           </Tag>
         ))}
@@ -116,7 +90,7 @@ export default function Step3Skills() {
       <SectionDivider>Formats</SectionDivider>
       <div className="tag-group">
         {FORMATS.map((f) => (
-          <Tag key={f.key} selected={formats.has(f.key)} onToggle={() => toggle(setFormats, f.key)}>
+          <Tag key={f.key} selected={formData.formats.includes(f.key)} onToggle={() => toggleArr('formats', f.key)}>
             {f.label}
           </Tag>
         ))}
@@ -128,7 +102,7 @@ export default function Step3Skills() {
           ✦ Toutes niches
         </NicheTag>
         {NICHES.map((name) => (
-          <NicheTag key={name} selected={niches.has(name)} onToggle={() => toggleNiche(name)}>
+          <NicheTag key={name} selected={formData.niches.includes(name)} onToggle={() => toggleArr('niches', name)}>
             {name}
           </NicheTag>
         ))}
@@ -137,7 +111,7 @@ export default function Step3Skills() {
       <SectionDivider>Expérience</SectionDivider>
       <div className="tag-group">
         {EXPERIENCE_OPTIONS.map((opt) => (
-          <Tag key={opt.key} selected={experience === opt.key} onToggle={() => setExperience(opt.key)}>
+          <Tag key={opt.key} selected={formData.experience === opt.key} onToggle={() => updateFormData({ experience: opt.key })}>
             {opt.label}
           </Tag>
         ))}
@@ -146,13 +120,14 @@ export default function Step3Skills() {
       <SectionDivider>Logiciels</SectionDivider>
       <div className="tag-group">
         {SOFTWARE.map((sw) => (
-          <Tag key={sw} selected={software.has(sw)} onToggle={() => toggle(setSoftware, sw)}>
+          <Tag key={sw} selected={formData.software.includes(sw)} onToggle={() => toggleArr('software', sw)}>
             {sw}
           </Tag>
         ))}
       </div>
 
-      <StepNav onBack={() => { save(); goToStep(2) }} onNext={() => { save(); goToStep(4) }} />
+      {error && <div className="step-error">{error}</div>}
+      <StepNav onBack={() => goToStep(2)} onNext={handleNext} />
     </div>
   )
 }

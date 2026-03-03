@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
@@ -11,19 +10,10 @@ import StepNav from '../ui/StepNav'
 export default function Step4Portfolio() {
   const { goToStep, formData, updateFormData } = useOnboarding()
 
-  const [links, setLinks] = useState(formData.portfolioLinks)
-  const [creditedChannels, setCreditedChannels] = useState(formData.creditedChannels)
-
   function setLink(i, val) {
-    setLinks((prev) => {
-      const next = [...prev]
-      next[i] = val
-      return next
-    })
-  }
-
-  function save() {
-    updateFormData({ portfolioLinks: links, creditedChannels })
+    const next = [...formData.portfolioLinks]
+    next[i] = val
+    updateFormData({ portfolioLinks: next })
   }
 
   return (
@@ -37,9 +27,10 @@ export default function Step4Portfolio() {
       <UploadZone
         icon="🎬"
         title="Glisse tes clips ici"
-        hint="MP4 · Max 500Mo par clip"
+        hint="MP4 · Max 500 Mo par clip"
         accept="video/mp4,video/quicktime,video/webm"
         multiple
+        maxSizeMB={500}
         style={{ marginBottom: 24 }}
       >
         <Button variant="ghost" style={{ marginTop: 8 }} onClick={(e) => e.stopPropagation()}>Parcourir les fichiers</Button>
@@ -50,13 +41,13 @@ export default function Step4Portfolio() {
         <input
           type="text"
           placeholder="🔗 Lien YouTube, Vimeo, Google Drive..."
-          value={links[0] ?? ''}
+          value={formData.portfolioLinks[0] ?? ''}
           onChange={(e) => setLink(0, e.target.value)}
         />
         <input
           type="text"
           placeholder="🔗 Ajouter un autre lien"
-          value={links[1] ?? ''}
+          value={formData.portfolioLinks[1] ?? ''}
           onChange={(e) => setLink(1, e.target.value)}
         />
       </div>
@@ -65,8 +56,8 @@ export default function Step4Portfolio() {
         <input
           type="text"
           placeholder="ex: @nomdelachain, youtube.com/c/..."
-          value={creditedChannels}
-          onChange={(e) => setCreditedChannels(e.target.value)}
+          value={formData.creditedChannels}
+          onChange={(e) => updateFormData({ creditedChannels: e.target.value })}
         />
       </FormGroup>
 
@@ -75,9 +66,9 @@ export default function Step4Portfolio() {
       </HintBox>
 
       <StepNav
-        onBack={() => { save(); goToStep(3) }}
-        onNext={() => { save(); goToStep(5) }}
-        onSkip={() => { save(); goToStep(5) }}
+        onBack={() => goToStep(3)}
+        onNext={() => goToStep(5)}
+        onSkip={() => goToStep(5)}
       />
     </div>
   )

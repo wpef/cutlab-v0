@@ -25,27 +25,19 @@ const AVAILABILITY_OPTIONS = ['Disponible', 'Sur demande', 'Indisponible']
 
 export default function Step2Identity() {
   const { goToStep, formData, updateFormData } = useOnboarding()
+  const [error, setError] = useState('')
 
-  const [firstName, setFirstName] = useState(formData.firstName)
-  const [lastName, setLastName] = useState(formData.lastName)
-  const [username, setUsername] = useState(formData.username)
-  const [selectedLangs, setSelectedLangs] = useState(new Set(formData.languages))
-  const [availability, setAvailability] = useState(formData.availability)
-
-  function toggleLang(key) {
-    setSelectedLangs((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
+  function handleNext() {
+    if (!formData.firstName.trim()) { setError('Ton prénom est requis.'); return }
+    if (!formData.lastName.trim()) { setError('Ton nom est requis.'); return }
+    setError('')
+    goToStep(3)
   }
 
-  function save() {
+  function toggleLang(key) {
+    const langs = formData.languages
     updateFormData({
-      firstName, lastName, username,
-      languages: [...selectedLangs],
-      availability,
+      languages: langs.includes(key) ? langs.filter((k) => k !== key) : [...langs, key],
     })
   }
 
@@ -59,15 +51,30 @@ export default function Step2Identity() {
 
       <div className="form-row">
         <FormGroup label="Prénom">
-          <input type="text" placeholder="Lucas" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          <input
+            type="text"
+            placeholder="Lucas"
+            value={formData.firstName}
+            onChange={(e) => updateFormData({ firstName: e.target.value })}
+          />
         </FormGroup>
         <FormGroup label="Nom">
-          <input type="text" placeholder="Martin" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          <input
+            type="text"
+            placeholder="Martin"
+            value={formData.lastName}
+            onChange={(e) => updateFormData({ lastName: e.target.value })}
+          />
         </FormGroup>
       </div>
 
       <FormGroup label="Pseudo / Nom de scène" optional="optionnel">
-        <input type="text" placeholder="Le nom affiché sur ton profil public" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input
+          type="text"
+          placeholder="Le nom affiché sur ton profil public"
+          value={formData.username}
+          onChange={(e) => updateFormData({ username: e.target.value })}
+        />
       </FormGroup>
 
       <FormGroup label="Photo de profil" optional="optionnel — tu peux l'ajouter plus tard">
@@ -85,10 +92,10 @@ export default function Step2Identity() {
           {LANGUAGES.map((lang) => (
             <div
               key={lang.key}
-              className={`lang-option${selectedLangs.has(lang.key) ? ' selected' : ''}`}
+              className={`lang-option${formData.languages.includes(lang.key) ? ' selected' : ''}`}
               onClick={() => toggleLang(lang.key)}
               role="checkbox"
-              aria-checked={selectedLangs.has(lang.key)}
+              aria-checked={formData.languages.includes(lang.key)}
             >
               <span className="lang-flag">{lang.flag}</span>
               {lang.label}
@@ -106,14 +113,15 @@ export default function Step2Identity() {
             <AvailabilityButton
               key={option}
               label={option}
-              selected={availability === option}
-              onSelect={() => setAvailability(option)}
+              selected={formData.availability === option}
+              onSelect={() => updateFormData({ availability: option })}
             />
           ))}
         </div>
       </FormGroup>
 
-      <StepNav onBack={() => { save(); goToStep(1) }} onNext={() => { save(); goToStep(3) }} />
+      {error && <div className="step-error">{error}</div>}
+      <StepNav onBack={() => goToStep(1)} onNext={handleNext} />
     </div>
   )
 }
