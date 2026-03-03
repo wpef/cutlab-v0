@@ -114,6 +114,14 @@ textarea { resize: vertical; min-height: 100px; }
 .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--border); z-index: 100; }
 .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
 
+/* DEV DEMO BAR */
+.demo-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(212,240,0,0.06); border: 1px dashed rgba(212,240,0,0.3); border-radius: var(--radius-sm); margin-bottom: 28px; flex-wrap: wrap; }
+.demo-bar-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); background: rgba(212,240,0,0.15); padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+.demo-bar-info { flex: 1; display: flex; gap: 8px; font-size: 12px; color: var(--text-dim); min-width: 0; flex-wrap: wrap; }
+.demo-bar-btn { font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid rgba(212,240,0,0.4); background: rgba(212,240,0,0.1); color: var(--accent); cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+.demo-bar-btn:hover:not(:disabled) { background: rgba(212,240,0,0.18); }
+.demo-bar-btn:disabled { opacity: 0.5; cursor: default; }
+
 /* VALIDATION ERROR */
 .step-error { font-size: 13px; color: #ff4d4d; margin-bottom: 12px; padding: 10px 14px; background: rgba(255,77,77,0.07); border-radius: var(--radius-sm); border: 1px solid rgba(255,77,77,0.2); }
 

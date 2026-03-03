@@ -61,6 +61,17 @@ export function OnboardingProvider({ children }) {
     return true
   }
 
+  async function signInUser(email, password) {
+    setAuthLoading(true)
+    setAuthError(null)
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    setAuthLoading(false)
+    if (error) { setAuthError(error.message); return false }
+    setUser(data.user)
+    updateFormData({ email })
+    return true
+  }
+
   async function signInWithGoogle() {
     setAuthError(null)
     const { error } = await supabase.auth.signInWithOAuth({
@@ -159,7 +170,8 @@ export function OnboardingProvider({ children }) {
         assignedLevel, setAssignedLevel,
         formData, updateFormData,
         user, authLoading, authError,
-        signUpUser, signInWithGoogle,
+        signUpUser, signInUser, signInWithGoogle,
+        clearAuthError: () => setAuthError(null),
         saveProfile, publishProfile,
         saving,
       }}

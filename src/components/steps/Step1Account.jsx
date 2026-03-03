@@ -1,16 +1,48 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
+import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_FORM } from '../../lib/demoData'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import HintBox from '../ui/HintBox'
 import StepNav from '../ui/StepNav'
 
+const IS_DEV = import.meta.env.DEV
+
 export default function Step1Account() {
-  const { goToStep, signUpUser, signInWithGoogle, authLoading, authError } = useOnboarding()
+  const { goToStep, signUpUser, signInUser, signInWithGoogle, clearAuthError, updateFormData, authLoading, authError } = useOnboarding()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [localError, setLocalError] = useState('')
+  const [demoLoading, setDemoLoading] = useState(false)
+
+  async function handleDemo() {
+    setLocalError('')
+    setDemoLoading(true)
+
+    // 1) Try to sign in (account already exists from a previous test)
+    let ok = await signInUser(DEMO_EMAIL, DEMO_PASSWORD)
+
+    if (!ok) {
+      clearAuthError()
+      // 2) First time: try to create the account
+      ok = await signUpUser(DEMO_EMAIL, DEMO_PASSWORD)
+
+      if (!ok) {
+        // Account exists but sign-in failed → email confirmation is ON in Supabase
+        clearAuthError()
+        setLocalError(
+          'Email de confirmation requis. Dans Supabase : Authentication → Email → désactive "Confirm email".'
+        )
+        setDemoLoading(false)
+        return
+      }
+    }
+
+    updateFormData({ ...DEMO_FORM, email: DEMO_EMAIL })
+    goToStep(2)
+    setDemoLoading(false)
+  }
 
   async function handleNext() {
     setLocalError('')
@@ -24,6 +56,21 @@ export default function Step1Account() {
 
   return (
     <div className="step-screen">
+
+      {IS_DEV && (
+        <div className="demo-bar">
+          <div className="demo-bar-label">DEV</div>
+          <div className="demo-bar-info">
+            <span>{DEMO_EMAIL}</span>
+            <span style={{ color: 'var(--text-muted)' }}>·</span>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{DEMO_PASSWORD}</span>
+          </div>
+          <button className="demo-bar-btn" onClick={handleDemo} disabled={demoLoading || authLoading}>
+            {demoLoading ? '...' : '⚡ Connexion démo'}
+          </button>
+        </div>
+      )}
+
       <StepHeader
         tag="Étape 1 sur 8"
         title="Crée ton compte"
