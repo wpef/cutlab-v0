@@ -24,10 +24,13 @@ const LANGUAGES = [
 const AVAILABILITY_OPTIONS = ['Disponible', 'Sur demande', 'Indisponible']
 
 export default function Step2Identity() {
-  const { goToStep } = useOnboarding()
+  const { goToStep, formData, updateFormData } = useOnboarding()
 
-  const [selectedLangs, setSelectedLangs] = useState(new Set(['fr']))
-  const [availability, setAvailability] = useState('Disponible')
+  const [firstName, setFirstName] = useState(formData.firstName)
+  const [lastName, setLastName] = useState(formData.lastName)
+  const [username, setUsername] = useState(formData.username)
+  const [selectedLangs, setSelectedLangs] = useState(new Set(formData.languages))
+  const [availability, setAvailability] = useState(formData.availability)
 
   function toggleLang(key) {
     setSelectedLangs((prev) => {
@@ -35,6 +38,14 @@ export default function Step2Identity() {
       if (next.has(key)) next.delete(key)
       else next.add(key)
       return next
+    })
+  }
+
+  function save() {
+    updateFormData({
+      firstName, lastName, username,
+      languages: [...selectedLangs],
+      availability,
     })
   }
 
@@ -48,19 +59,25 @@ export default function Step2Identity() {
 
       <div className="form-row">
         <FormGroup label="Prénom">
-          <input type="text" placeholder="Lucas" />
+          <input type="text" placeholder="Lucas" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
         </FormGroup>
         <FormGroup label="Nom">
-          <input type="text" placeholder="Martin" />
+          <input type="text" placeholder="Martin" value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </FormGroup>
       </div>
 
       <FormGroup label="Pseudo / Nom de scène" optional="optionnel">
-        <input type="text" placeholder="Le nom affiché sur ton profil public" />
+        <input type="text" placeholder="Le nom affiché sur ton profil public" value={username} onChange={(e) => setUsername(e.target.value)} />
       </FormGroup>
 
       <FormGroup label="Photo de profil" optional="optionnel — tu peux l'ajouter plus tard">
-        <UploadZone icon="📷" title="Clique pour uploader" hint="JPG ou PNG, moins de 5Mo" style={{ padding: 24 }} />
+        <UploadZone
+          icon="📷"
+          title="Clique pour uploader"
+          hint="JPG ou PNG, moins de 5Mo"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ padding: 24 }}
+        />
       </FormGroup>
 
       <FormGroup label="Langues parlées">
@@ -96,7 +113,7 @@ export default function Step2Identity() {
         </div>
       </FormGroup>
 
-      <StepNav onBack={() => goToStep(1)} onNext={() => goToStep(3)} />
+      <StepNav onBack={() => { save(); goToStep(1) }} onNext={() => { save(); goToStep(3) }} />
     </div>
   )
 }

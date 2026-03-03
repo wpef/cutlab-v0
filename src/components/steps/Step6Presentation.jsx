@@ -22,11 +22,12 @@ const RESPONSE_TIMES = [
 ]
 
 export default function Step6Presentation() {
-  const { goToStep } = useOnboarding()
+  const { goToStep, formData, updateFormData } = useOnboarding()
 
-  const [bio,          setBio]         = useState('')
-  const [missionTypes, setMissionTypes] = useState(new Set(['ponctuelle', 'long-terme']))
-  const [responseTime, setResponseTime] = useState('<4h')
+  const [bio,          setBio]         = useState(formData.bio)
+  const [missionTypes, setMissionTypes] = useState(new Set(formData.missionTypes))
+  const [responseTime, setResponseTime] = useState(formData.responseTime)
+  const [socialLinks,  setSocialLinks]  = useState(formData.socialLinks)
 
   function toggleMission(key) {
     setMissionTypes((prev) => {
@@ -34,6 +35,15 @@ export default function Step6Presentation() {
       if (next.has(key)) next.delete(key)
       else next.add(key)
       return next
+    })
+  }
+
+  function save() {
+    updateFormData({
+      bio,
+      missionTypes: [...missionTypes],
+      responseTime,
+      socialLinks,
     })
   }
 
@@ -62,6 +72,7 @@ export default function Step6Presentation() {
           icon="🎥"
           title="Face caméra · 20 à 45 secondes"
           hint="Dis bonjour, montre ta personnalité"
+          accept="video/mp4,video/quicktime,video/webm"
           style={{ padding: 24 }}
         />
       </FormGroup>
@@ -89,12 +100,17 @@ export default function Step6Presentation() {
       </FormGroup>
 
       <FormGroup label="Réseaux / site perso" optional="optionnel">
-        <input type="text" placeholder="Instagram, TikTok, site web..." />
+        <input
+          type="text"
+          placeholder="Instagram, TikTok, site web..."
+          value={socialLinks}
+          onChange={(e) => setSocialLinks(e.target.value)}
+        />
       </FormGroup>
 
       <StepNav
-        onBack={() => goToStep(5)}
-        onNext={() => goToStep(7)}
+        onBack={() => { save(); goToStep(5) }}
+        onNext={() => { save(); goToStep(7) }}
         nextLabel="Calculer mon niveau →"
       />
     </div>

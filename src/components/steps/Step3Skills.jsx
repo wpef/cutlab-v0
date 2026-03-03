@@ -48,14 +48,14 @@ const SOFTWARE = [
 ]
 
 export default function Step3Skills() {
-  const { goToStep } = useOnboarding()
+  const { goToStep, formData, updateFormData } = useOnboarding()
 
-  const [skills,    setSkills]    = useState(new Set(['video']))
-  const [formats,   setFormats]   = useState(new Set(['youtube']))
-  const [niches,    setNiches]    = useState(new Set(['Gaming']))
-  const [allNiches, setAllNiches] = useState(false)
-  const [experience, setExperience] = useState('1-3y')
-  const [software,  setSoftware]  = useState(new Set(['Premiere Pro', 'DaVinci Resolve']))
+  const [skills,    setSkills]    = useState(new Set(formData.skills))
+  const [formats,   setFormats]   = useState(new Set(formData.formats))
+  const [niches,    setNiches]    = useState(new Set(formData.niches))
+  const [allNiches, setAllNiches] = useState(formData.niches.length === NICHES.length)
+  const [experience, setExperience] = useState(formData.experience)
+  const [software,  setSoftware]  = useState(new Set(formData.software))
 
   function toggle(setter, key) {
     setter((prev) => {
@@ -64,10 +64,6 @@ export default function Step3Skills() {
       else next.add(key)
       return next
     })
-  }
-
-  function setExclusive(key) {
-    setExperience(key)
   }
 
   function toggleNiche(name) {
@@ -88,6 +84,16 @@ export default function Step3Skills() {
       setAllNiches(true)
       setNiches(new Set(NICHES))
     }
+  }
+
+  function save() {
+    updateFormData({
+      skills: [...skills],
+      formats: [...formats],
+      niches: [...niches],
+      experience,
+      software: [...software],
+    })
   }
 
   return (
@@ -131,7 +137,7 @@ export default function Step3Skills() {
       <SectionDivider>Expérience</SectionDivider>
       <div className="tag-group">
         {EXPERIENCE_OPTIONS.map((opt) => (
-          <Tag key={opt.key} selected={experience === opt.key} onToggle={() => setExclusive(opt.key)}>
+          <Tag key={opt.key} selected={experience === opt.key} onToggle={() => setExperience(opt.key)}>
             {opt.label}
           </Tag>
         ))}
@@ -146,7 +152,7 @@ export default function Step3Skills() {
         ))}
       </div>
 
-      <StepNav onBack={() => goToStep(2)} onNext={() => goToStep(4)} />
+      <StepNav onBack={() => { save(); goToStep(2) }} onNext={() => { save(); goToStep(4) }} />
     </div>
   )
 }

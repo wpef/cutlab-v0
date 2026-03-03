@@ -15,10 +15,16 @@ const CAPACITY_OPTIONS = [
 ]
 
 export default function Step5Pricing() {
-  const { goToStep } = useOnboarding()
+  const { goToStep, formData, updateFormData } = useOnboarding()
 
-  const [revisions, setRevisions] = useState('2')
-  const [capacity,  setCapacity]  = useState('2-3')
+  const [revisions,    setRevisions]    = useState(formData.revisions)
+  const [capacity,     setCapacity]     = useState(formData.capacity)
+  const [hourlyRate,   setHourlyRate]   = useState(formData.hourlyRate)
+  const [deliveryTime, setDeliveryTime] = useState(formData.deliveryTime)
+
+  function save() {
+    updateFormData({ revisions, capacity, hourlyRate, deliveryTime })
+  }
 
   return (
     <div className="step-screen">
@@ -62,10 +68,10 @@ export default function Step5Pricing() {
       <SectionDivider>Ou tarif horaire</SectionDivider>
       <div className="form-row">
         <FormGroup label="Tarif à l'heure">
-          <input type="number" placeholder="€ / heure" />
+          <input type="number" placeholder="€ / heure" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} />
         </FormGroup>
         <FormGroup label="Délai de livraison habituel">
-          <input type="text" placeholder="ex: 48–72h après réception des rushs" />
+          <input type="text" placeholder="ex: 48–72h après réception des rushs" value={deliveryTime} onChange={(e) => setDeliveryTime(e.target.value)} />
         </FormGroup>
       </div>
 
@@ -94,9 +100,9 @@ export default function Step5Pricing() {
       </HintBox>
 
       <StepNav
-        onBack={() => goToStep(4)}
-        onNext={() => goToStep(6)}
-        onSkip={() => goToStep(6)}
+        onBack={() => { save(); goToStep(4) }}
+        onNext={() => { save(); goToStep(6) }}
+        onSkip={() => { save(); goToStep(6) }}
       />
     </div>
   )

@@ -1,4 +1,5 @@
 import { useOnboarding } from './context/OnboardingContext'
+import { STEPS } from './constants/steps'
 import Sidebar from './components/layout/Sidebar'
 import Step1Account from './components/steps/Step1Account'
 import Step2Identity from './components/steps/Step2Identity'
@@ -27,12 +28,20 @@ export default function App() {
 
   const progress = currentStep === 9 ? 100 : Math.round((currentStep / 8) * 100)
   const StepComponent = STEP_COMPONENTS[currentStep]
+  const stepInfo = STEPS.find((s) => s.id === currentStep)
 
   return (
     <>
       <div className="progress-bar">
         <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
+      {/* Mobile-only top navigation */}
+      <nav className="mobile-nav">
+        <div className="mobile-nav-logo">CUT<span>LAB</span></div>
+        <div className="mobile-step-pill">
+          {currentStep === 9 ? '✓ Publié' : `${currentStep} / 8 — ${stepInfo?.label ?? ''}`}
+        </div>
+      </nav>
       <div className="app">
         <Sidebar />
         <main className="main">

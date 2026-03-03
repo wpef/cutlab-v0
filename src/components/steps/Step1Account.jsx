@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
@@ -5,7 +6,21 @@ import HintBox from '../ui/HintBox'
 import StepNav from '../ui/StepNav'
 
 export default function Step1Account() {
-  const { goToStep } = useOnboarding()
+  const { goToStep, signUpUser, signInWithGoogle, authLoading, authError } = useOnboarding()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [localError, setLocalError] = useState('')
+
+  async function handleNext() {
+    setLocalError('')
+    if (!email) { setLocalError('Saisis ton adresse email.'); return }
+    if (password.length < 8) { setLocalError('Le mot de passe doit faire au moins 8 caractères.'); return }
+    const ok = await signUpUser(email, password)
+    if (ok) goToStep(2)
+  }
+
+  const errorMsg = localError || authError
 
   return (
     <div className="step-screen">
@@ -16,12 +31,28 @@ export default function Step1Account() {
       />
 
       <FormGroup label="Email">
-        <input type="email" placeholder="ton@email.com" />
+        <input
+          type="email"
+          placeholder="ton@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </FormGroup>
 
       <FormGroup label="Mot de passe">
-        <input type="password" placeholder="8 caractères minimum" />
+        <input
+          type="password"
+          placeholder="8 caractères minimum"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </FormGroup>
+
+      {errorMsg && (
+        <div style={{ fontSize: 13, color: '#ff4d4d', marginBottom: 12, padding: '10px 14px', background: 'rgba(255,77,77,0.07)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,77,77,0.2)' }}>
+          {errorMsg}
+        </div>
+      )}
 
       <HintBox>🔒 Tes données sont sécurisées et ne seront jamais revendues.</HintBox>
 
@@ -41,6 +72,7 @@ export default function Step1Account() {
           <button
             className="btn btn-ghost"
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            onClick={signInWithGoogle}
           >
             G Google
           </button>
@@ -53,7 +85,7 @@ export default function Step1Account() {
         </div>
       </div>
 
-      <StepNav onNext={() => goToStep(2)} />
+      <StepNav onNext={handleNext} nextLabel={authLoading ? 'Création...' : 'Continuer →'} />
     </div>
   )
 }

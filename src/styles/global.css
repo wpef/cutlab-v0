@@ -202,3 +202,34 @@ textarea { resize: vertical; min-height: 100px; }
 /* SUCCESS */
 .success-screen { text-align: center; padding: 60px 0; }
 .success-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 32px; }
+
+/* UPLOAD — functional states */
+.upload-zone.dragging { border-color: var(--accent); background: rgba(212,240,0,0.06); transform: scale(1.01); }
+.upload-zone.has-files { border-color: rgba(212,240,0,0.4); background: rgba(212,240,0,0.04); }
+.upload-file-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; width: 100%; }
+.upload-file-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; }
+.upload-file-name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+.upload-file-size { color: var(--text-muted); font-size: 11px; flex-shrink: 0; margin-left: 12px; }
+
+/* MOBILE TOP NAV */
+.mobile-nav { display: none; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 2px; z-index: 50; }
+.mobile-nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--accent); }
+.mobile-nav-logo span { color: var(--text); }
+.mobile-step-pill { font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 4px 12px; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .mobile-nav { display: flex; }
+  .sidebar { display: none; }
+  .app { grid-template-columns: 1fr; }
+  .main { padding: 28px 20px 48px; max-width: 100%; }
+  .form-row { grid-template-columns: 1fr; }
+  .card-preview-section { grid-template-columns: 1fr; }
+  .availability-group { flex-wrap: wrap; }
+  .level-picker-grid { grid-template-columns: 1fr 1fr; }
+  .step-nav { flex-wrap: wrap; gap: 12px; }
+  .tarif-table { display: block; overflow-x: auto; }
+  h1 { font-size: 28px; }
+  .upload-file-name { max-width: 160px; }
+  .profile-preview { max-width: 100%; }
+}
