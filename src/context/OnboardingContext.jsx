@@ -24,7 +24,7 @@ const INITIAL_FORM = {
 
 export function OnboardingProvider({ children }) {
   const [currentStep, setCurrentStep] = useState(1)
-  const [currentView, setCurrentView] = useState('landing') // 'landing' | 'onboarding' | 'editor' | 'catalog' | 'creator-signup' | 'messaging' | 'chat' | 'offer-form' | 'offer-preview'
+  const [currentView, setCurrentView] = useState('landing') // 'landing' | 'onboarding' | 'editor' | 'catalog' | 'creator-signup' | 'messaging' | 'chat' | 'offer-form' | 'offer-preview' | 'projects'
   const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
@@ -73,6 +73,15 @@ export function OnboardingProvider({ children }) {
     setUser(data.user)
     updateFormData({ email })
     return true
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut()
+    setUser(null)
+    setFormData(INITIAL_FORM)
+    setAssignedLevel(2)
+    setCurrentStep(1)
+    setCurrentView('landing')
   }
 
   async function signInWithGoogle() {
@@ -167,6 +176,11 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function goToProjects() {
+    setCurrentView('projects')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   function goToLanding() {
     setCurrentView('landing')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -214,18 +228,24 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  /** Navigate to the role-appropriate home: Monteur → projects, Créateur → catalog */
+  function goToHome() {
+    if (formData.role === 'creator') goToCatalog()
+    else goToProjects()
+  }
+
   return (
     <OnboardingContext.Provider
       value={{
         currentStep, goToStep,
-        currentView, goToLanding, goToOnboarding, goToCatalog, goToEditor,
+        currentView, goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
         goToCreatorSignup, goToMessaging, goToChat, goToOfferForm, goToOfferPreview,
         assignedLevel, setAssignedLevel,
         formData, updateFormData,
         userRole: formData.role,
         pendingEditor, clearPendingEditor,
         user, authLoading, authError,
-        signUpUser, signInUser, signInWithGoogle,
+        signUpUser, signInUser, signInWithGoogle, signOut,
         clearAuthError: () => setAuthError(null),
         saveProfile, publishProfile,
         saving,

@@ -18,6 +18,7 @@ import MessagingHub from './components/pages/MessagingHub'
 import ChatView from './components/pages/ChatView'
 import OfferForm from './components/pages/OfferForm'
 import OfferPreview from './components/pages/OfferPreview'
+import MesProjetsMonteur from './components/pages/MesProjetsMonteur'
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -36,6 +37,7 @@ export default function App() {
 
   if (currentView === 'landing')        return <Landing />
   if (currentView === 'catalog')        return <Catalog />
+  if (currentView === 'projects')       return <MesProjetsMonteur />
   if (currentView === 'editor')         return <ProfileEditor />
   if (currentView === 'creator-signup') return <CreatorSignup />
   if (currentView === 'messaging')      return <MessagingHub />

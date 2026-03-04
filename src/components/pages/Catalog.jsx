@@ -18,7 +18,7 @@ const AVAIL_CLASS = {
 
 export default function Catalog() {
   const {
-    goToLanding, goToOnboarding, goToEditor, goToCreatorSignup, goToMessaging,
+    goToLanding, goToOnboarding, goToEditor, goToCreatorSignup, goToMessaging, goToProjects, goToHome, signOut,
     user, userRole,
   } = useOnboarding()
   const { requests, loadRequests, sendContactRequest } = useMessaging()
@@ -87,7 +87,7 @@ export default function Catalog() {
     <div className="catalog-page">
 
       <header className="catalog-header">
-        <div className="catalog-header-logo" onClick={goToLanding}>
+        <div className="catalog-header-logo" onClick={user ? goToHome : goToLanding}>
           CUT<span>LAB</span>
         </div>
         <div className="catalog-header-title">Les monteurs</div>
@@ -95,23 +95,22 @@ export default function Catalog() {
           {user ? (
             <>
               {userRole === 'editor'
-                ? <button className="catalog-header-btn" onClick={goToMessaging}>
-                    Messagerie{pendingCount > 0 ? ` (${pendingCount})` : ''} →
-                  </button>
+                ? <>
+                    <button className="catalog-header-btn" onClick={goToProjects}>Mes projets →</button>
+                    <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
+                  </>
                 : <button className="catalog-header-btn" onClick={goToMessaging}>
                     Mes messages →
                   </button>
               }
-              {userRole === 'editor' && (
-                <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
-              )}
+              <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
             </>
           ) : (
             <>
               <button className="catalog-header-btn" onClick={() => goToCreatorSignup(null)}>
                 Je cherche un monteur
               </button>
-              <button className="catalog-header-btn" onClick={goToOnboarding}>S'inscrire →</button>
+              <button className="catalog-header-btn" onClick={goToOnboarding}>Je suis monteur →</button>
             </>
           )}
         </div>

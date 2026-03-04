@@ -96,7 +96,7 @@ const AVAIL_COLORS = {
 const MAX_BIO = 280
 
 export default function ProfileEditor() {
-  const { formData, updateFormData, saveProfile, saving, assignedLevel, user, goToMessaging } = useOnboarding()
+  const { formData, updateFormData, saveProfile, saving, assignedLevel, user, goToMessaging, goToProjects, goToHome, signOut } = useOnboarding()
   const { requests, loadRequests } = useMessaging()
   const [saveStatus, setSaveStatus] = useState(null) // null | 'saved' | 'error'
   const level = LEVELS[assignedLevel]
@@ -138,12 +138,16 @@ export default function ProfileEditor() {
 
       {/* ── Header ── */}
       <header className="editor-header">
-        <div className="editor-header-logo">CUT<span>LAB</span></div>
+        <div className="editor-header-logo" style={{ cursor: 'pointer' }} onClick={goToHome}>CUT<span>LAB</span></div>
         <div className="editor-header-title">Mon profil</div>
         <div className="editor-header-actions">
+          <button className="catalog-header-btn" onClick={goToProjects} style={{ fontSize: 13 }}>
+            Mes projets →
+          </button>
           <button className="catalog-header-btn" onClick={goToMessaging} style={{ fontSize: 13 }}>
             Messagerie{pendingCount > 0 ? ` (${pendingCount})` : ''}
           </button>
+          <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut} style={{ fontSize: 13 }}>Déconnexion</button>
           {saveStatus === 'saved' && <span className="save-notice">✓ Enregistré</span>}
           {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
           <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>

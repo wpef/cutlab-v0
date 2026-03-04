@@ -8,7 +8,7 @@ const DEMO_CREATOR_PASSWORD = 'cutlab-creator-2024!'
 const DEMO_CREATOR_NAME = 'Alex'
 
 export default function CreatorSignup() {
-  const { goToCatalog, goToLanding, goToMessaging, pendingEditor, clearPendingEditor, formData, user } = useOnboarding()
+  const { goToCatalog, goToHome, goToMessaging, pendingEditor, clearPendingEditor, formData, user } = useOnboarding()
   const { signUpCreator, signupError, signupLoading, sendContactRequest } = useMessaging()
 
   const [firstName, setFirstName] = useState('')
@@ -144,7 +144,7 @@ export default function CreatorSignup() {
   return (
     <div className="creator-signup-page">
       <header className="creator-signup-header">
-        <div className="creator-signup-logo" onClick={goToLanding} style={{ cursor: 'pointer' }}>
+        <div className="creator-signup-logo" onClick={goToCatalog} style={{ cursor: 'pointer' }}>
           CUT<span>LAB</span>
         </div>
         <button className="btn btn-ghost" style={{ fontSize: 13 }} onClick={goToCatalog}>← Catalogue</button>

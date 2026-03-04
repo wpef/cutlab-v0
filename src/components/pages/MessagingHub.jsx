@@ -16,7 +16,7 @@ const STATUS_LABEL = { pending: 'En attente', accepted: 'Acceptée', refused: 'R
 const STATUS_CLASS = { pending: 'pending', accepted: 'accepted', refused: 'refused' }
 
 export default function MessagingHub() {
-  const { goToLanding, goToChat, goToCatalog, goToEditor, userRole, user } = useOnboarding()
+  const { goToHome, goToChat, goToCatalog, goToEditor, goToProjects, signOut, userRole, user } = useOnboarding()
   const { requests, messagingLoading, loadRequests, setActiveRequestId } = useMessaging()
 
   useEffect(() => {
@@ -35,13 +35,17 @@ export default function MessagingHub() {
     <div className="messaging-page">
 
       <header className="messaging-header">
-        <div className="messaging-header-logo" onClick={goToLanding}>CUT<span>LAB</span></div>
+        <div className="messaging-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
         <div className="messaging-header-title">Messagerie</div>
         <div className="messaging-header-actions">
           {userRole === 'creator'
             ? <button className="catalog-header-btn" onClick={goToCatalog}>+ Nouveau contact</button>
-            : <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
+            : <>
+                <button className="catalog-header-btn" onClick={goToProjects}>Mes projets →</button>
+                <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
+              </>
           }
+          <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
         </div>
       </header>
 

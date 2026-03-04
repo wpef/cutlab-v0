@@ -1,7 +1,23 @@
+/**
+ * Landing — Public homepage for non-logged-in users.
+ *
+ * Two distinct paths:
+ * - Créateurs (content creators): search for monteurs via the catalog
+ * - Monteurs (video editors): sign up to be found by créateurs
+ *
+ * Logged-in users are auto-redirected to their role-appropriate home
+ * (see goToHome in OnboardingContext).
+ */
+import { useEffect } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 
 export default function Landing() {
-  const { goToOnboarding, goToCatalog } = useOnboarding()
+  const { goToOnboarding, goToCatalog, goToHome, user, userRole } = useOnboarding()
+
+  // Auto-redirect logged-in users to their home
+  useEffect(() => {
+    if (user) goToHome()
+  }, [user])
 
   return (
     <div className="landing">
