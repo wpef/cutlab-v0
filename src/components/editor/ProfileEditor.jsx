@@ -257,21 +257,10 @@ export default function ProfileEditor() {
         </Button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 0, minHeight: 'calc(100vh - 105px)' }}>
+      <div className="editor-layout">
 
         {/* ── Left sidebar: mini card + section nav ── */}
-        <aside style={{
-          position: 'sticky',
-          top: 105,
-          height: 'calc(100vh - 105px)',
-          overflowY: 'auto',
-          background: 'var(--surface)',
-          borderRight: '1px solid var(--border)',
-          padding: '24px 16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
-        }}>
+        <aside className="editor-sidebar">
 
           {/* Mini profile card — same component as catalog, name hidden */}
           <EditorCard
@@ -341,7 +330,7 @@ export default function ProfileEditor() {
         </aside>
 
         {/* ── Main editor content ── */}
-        <div className="editor-content" style={{ padding: '32px 40px 80px', maxWidth: 720 }}>
+        <div className="editor-content editor-main">
 
           {/* ── Section: Identité ── */}
           <section id="section-identity" className="editor-section" style={{ scrollMarginTop: 80 }}>

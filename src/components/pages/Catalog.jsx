@@ -79,7 +79,7 @@ export default function Catalog() {
           CUT<span>LAB</span>
         </div>
         <div className="catalog-header-title">Les monteurs</div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div className="catalog-header-actions">
           {user ? (
             <>
               {userRole === 'editor'
