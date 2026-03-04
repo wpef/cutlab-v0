@@ -18,17 +18,20 @@ const INITIAL_FORM = {
   revisions: '2', capacity: '2-3', hourlyRate: '', deliveryTime: '',
   // Step 6
   bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: '',
+  // Role
+  role: 'editor',
 }
 
 export function OnboardingProvider({ children }) {
   const [currentStep, setCurrentStep] = useState(1)
-  const [currentView, setCurrentView] = useState('onboarding') // 'onboarding' | 'editor'
+  const [currentView, setCurrentView] = useState('landing') // 'landing' | 'onboarding' | 'editor' | 'catalog' | 'creator-signup' | 'messaging' | 'chat' | 'offer-form' | 'offer-preview'
   const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [pendingEditor, setPendingEditor] = useState(null) // { id, name } — set when non-logged creator clicks "Contacter"
 
   // Sync auth state on mount and across tab changes
   useEffect(() => {
@@ -108,6 +111,7 @@ export function OnboardingProvider({ children }) {
       response_time: formData.responseTime,
       social_links: formData.socialLinks,
       assigned_level: assignedLevel,
+      role: formData.role,
       status,
       updated_at: new Date().toISOString(),
     })
@@ -153,6 +157,7 @@ export function OnboardingProvider({ children }) {
       missionTypes:    data.mission_types     ?? prev.missionTypes,
       responseTime:    data.response_time     ?? prev.responseTime,
       socialLinks:     data.social_links      ?? prev.socialLinks,
+      role:            data.role              ?? prev.role,
     }))
   }
 
@@ -162,13 +167,63 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function goToLanding() {
+    setCurrentView('landing')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToOnboarding() {
+    setCurrentStep(1)
+    setCurrentView('onboarding')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToCatalog() {
+    setCurrentView('catalog')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToCreatorSignup(editorId = null, editorName = '') {
+    if (editorId) setPendingEditor({ id: editorId, name: editorName })
+    else setPendingEditor(null)
+    setCurrentView('creator-signup')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function clearPendingEditor() {
+    setPendingEditor(null)
+  }
+
+  function goToMessaging() {
+    setCurrentView('messaging')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToChat(requestId) {
+    setCurrentView('chat')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToOfferForm() {
+    setCurrentView('offer-form')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goToOfferPreview() {
+    setCurrentView('offer-preview')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <OnboardingContext.Provider
       value={{
         currentStep, goToStep,
-        currentView, goToEditor,
+        currentView, goToLanding, goToOnboarding, goToCatalog, goToEditor,
+        goToCreatorSignup, goToMessaging, goToChat, goToOfferForm, goToOfferPreview,
         assignedLevel, setAssignedLevel,
         formData, updateFormData,
+        userRole: formData.role,
+        pendingEditor, clearPendingEditor,
         user, authLoading, authError,
         signUpUser, signInUser, signInWithGoogle,
         clearAuthError: () => setAuthError(null),

@@ -86,3 +86,97 @@ create policy "Users can view their own portfolio clips"
     bucket_id = 'portfolio'
     and auth.uid()::text = (storage.foldername(name))[1]
   );
+
+-- ============================================================
+-- MESSAGING SYSTEM — run these additions after the base schema
+-- ============================================================
+
+-- Role column on profiles (editor | creator)
+alter table public.profiles add column if not exists role text default 'editor';
+
+-- Allow anyone to read published editor profiles (needed for Catalog)
+create policy "Anyone can read published profiles"
+  on public.profiles for select
+  using (status = 'published');
+
+-- ── Contact requests ──────────────────────────────────────────
+create table if not exists public.contact_requests (
+  id              uuid default gen_random_uuid() primary key,
+  creator_id      uuid references auth.users(id) on delete cascade,
+  editor_id       uuid references auth.users(id) on delete cascade,
+  status          text default 'pending',  -- pending | accepted | refused
+  initial_message text,
+  creator_name    text,
+  editor_name     text,
+  created_at      timestamptz default now()
+);
+
+alter table public.contact_requests enable row level security;
+
+create policy "parties access contact_requests"
+  on public.contact_requests
+  using (auth.uid() = creator_id or auth.uid() = editor_id);
+
+create policy "creator insert contact_request"
+  on public.contact_requests for insert
+  with check (auth.uid() = creator_id);
+
+create policy "parties update contact_requests"
+  on public.contact_requests for update
+  using (auth.uid() = creator_id or auth.uid() = editor_id);
+
+-- ── Messages ─────────────────────────────────────────────────
+create table if not exists public.messages (
+  id          uuid default gen_random_uuid() primary key,
+  request_id  uuid references public.contact_requests(id) on delete cascade,
+  sender_id   uuid references auth.users(id),
+  content     text not null,
+  created_at  timestamptz default now()
+);
+
+alter table public.messages enable row level security;
+
+create policy "parties read messages"
+  on public.messages for select
+  using (exists (
+    select 1 from public.contact_requests cr
+    where cr.id = messages.request_id
+    and (cr.creator_id = auth.uid() or cr.editor_id = auth.uid())
+  ));
+
+create policy "parties send messages"
+  on public.messages for insert
+  with check (auth.uid() = sender_id);
+
+-- ── Offers ────────────────────────────────────────────────────
+create table if not exists public.offers (
+  id           uuid default gen_random_uuid() primary key,
+  request_id   uuid references public.contact_requests(id) on delete cascade,
+  creator_id   uuid references auth.users(id),
+  editor_id    uuid references auth.users(id),
+  title        text not null,
+  description  text,
+  deliverables text,
+  format       text,
+  deadline     text,
+  budget       numeric,
+  revisions    integer default 2,
+  status       text default 'pending',  -- pending | accepted | refused
+  creator_name text,
+  editor_name  text,
+  created_at   timestamptz default now()
+);
+
+alter table public.offers enable row level security;
+
+create policy "parties access offers"
+  on public.offers
+  using (auth.uid() = creator_id or auth.uid() = editor_id);
+
+create policy "creator insert offer"
+  on public.offers for insert
+  with check (auth.uid() = creator_id);
+
+create policy "editor update offer"
+  on public.offers for update
+  using (auth.uid() = editor_id or auth.uid() = creator_id);

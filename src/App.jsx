@@ -11,6 +11,13 @@ import Step7Level from './components/steps/Step7Level'
 import Step8Preview from './components/steps/Step8Preview'
 import Step9Success from './components/steps/Step9Success'
 import ProfileEditor from './components/editor/ProfileEditor'
+import Landing from './components/pages/Landing'
+import Catalog from './components/pages/Catalog'
+import CreatorSignup from './components/pages/CreatorSignup'
+import MessagingHub from './components/pages/MessagingHub'
+import ChatView from './components/pages/ChatView'
+import OfferForm from './components/pages/OfferForm'
+import OfferPreview from './components/pages/OfferPreview'
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -27,7 +34,14 @@ const STEP_COMPONENTS = {
 export default function App() {
   const { currentStep, currentView } = useOnboarding()
 
-  if (currentView === 'editor') return <ProfileEditor />
+  if (currentView === 'landing')        return <Landing />
+  if (currentView === 'catalog')        return <Catalog />
+  if (currentView === 'editor')         return <ProfileEditor />
+  if (currentView === 'creator-signup') return <CreatorSignup />
+  if (currentView === 'messaging')      return <MessagingHub />
+  if (currentView === 'chat')           return <ChatView />
+  if (currentView === 'offer-form')     return <OfferForm />
+  if (currentView === 'offer-preview')  return <OfferPreview />
 
   const progress = currentStep === 9 ? 100 : Math.round((currentStep / 8) * 100)
   const StepComponent = STEP_COMPONENTS[currentStep]

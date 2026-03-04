@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const fs = require\\(''fs''\\); [''src/context/MessagingContext.jsx'',''src/context/OnboardingContext.jsx'',''src/App.jsx'',''src/main.jsx''].forEach\\(f => { try { fs.readFileSync\\(f\\); console.log\\(''OK'', f\\) } catch\\(e\\) { console.log\\(''MISSING'', f\\) } }\\)\")",
+      "Bash(node -e \"const fs = require\\(''fs''\\); [''src/components/pages/CreatorSignup.jsx'',''src/components/pages/MessagingHub.jsx'',''src/components/pages/ChatView.jsx'',''src/components/pages/OfferForm.jsx'',''src/components/pages/OfferPreview.jsx''].forEach\\(f => { try { fs.readFileSync\\(f\\); console.log\\(''OK'', f\\) } catch\\(e\\) { console.log\\(''MISSING'', f\\) } }\\)\")"
+    ]
+  }
+}
