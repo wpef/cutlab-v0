@@ -10,6 +10,7 @@ export function MessagingProvider({ children }) {
   const [requests, setRequests] = useState([])
   const [messages, setMessages] = useState([])
   const [offers, setOffers] = useState([])
+  const [pipelineOffers, setPipelineOffers] = useState([])
   const [activeRequestId, setActiveRequestId] = useState(null)
   const [messagingLoading, setMessagingLoading] = useState(false)
   const [offerFormData, setOfferFormData] = useState(null)
@@ -174,6 +175,45 @@ export function MessagingProvider({ children }) {
     return !error
   }
 
+  async function loadPipelineData() {
+    if (!user) return { requests: [], allOffers: [] }
+    setMessagingLoading(true)
+
+    const { data: reqs } = await supabase
+      .from('contact_requests')
+      .select('*')
+      .eq('editor_id', user.id)
+      .order('created_at', { ascending: false })
+
+    const requestList = reqs ?? []
+    let offerList = []
+    const requestIds = requestList.map((r) => r.id)
+    if (requestIds.length > 0) {
+      const { data: offs } = await supabase
+        .from('offers')
+        .select('*')
+        .in('request_id', requestIds)
+        .order('created_at', { ascending: false })
+      offerList = offs ?? []
+    }
+
+    setRequests(requestList)
+    setPipelineOffers(offerList)
+    setMessagingLoading(false)
+    return { requests: requestList, allOffers: offerList }
+  }
+
+  async function validateMission(offerId) {
+    const { error } = await supabase
+      .from('offers')
+      .update({ validated_by_editor: true })
+      .eq('id', offerId)
+    if (!error) {
+      setPipelineOffers((prev) => prev.map((o) => o.id === offerId ? { ...o, validated_by_editor: true } : o))
+    }
+    return !error
+  }
+
   async function refuseOffer(offerId) {
     const { error } = await supabase
       .from('offers')
@@ -187,18 +227,19 @@ export function MessagingProvider({ children }) {
 
   return (
     <MessagingContext.Provider value={{
-      requests, messages, offers,
+      requests, messages, offers, pipelineOffers,
       activeRequestId, setActiveRequestId,
       messagingLoading,
       offerFormData, setOfferFormData,
       signupError, signupLoading,
       signUpCreator,
-      loadRequests,
+      loadRequests, loadPipelineData,
       sendContactRequest,
       acceptRequest, refuseRequest,
       fetchMessages, sendMessage,
       loadOffers, sendOffer,
       acceptOffer, refuseOffer,
+      validateMission,
     }}>
       {children}
     </MessagingContext.Provider>

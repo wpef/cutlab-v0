@@ -9,6 +9,7 @@ import UploadZone from '../ui/UploadZone'
 import AvailabilityButton from '../ui/AvailabilityButton'
 import Button from '../ui/Button'
 import HintBox from '../ui/HintBox'
+import EditorNav from '../ui/EditorNav'
 
 const LANGUAGES = [
   { key: 'fr', flag: '🇫🇷', label: 'Français' },
@@ -137,20 +138,15 @@ export default function ProfileEditor() {
     <div className="editor-page">
 
       {/* ── Header ── */}
-      <header className="editor-header">
-        <div className="editor-header-logo">CUT<span>LAB</span></div>
-        <div className="editor-header-title">Mon profil</div>
-        <div className="editor-header-actions">
-          <button className="catalog-header-btn" onClick={goToMessaging} style={{ fontSize: 13 }}>
-            Messagerie{pendingCount > 0 ? ` (${pendingCount})` : ''}
-          </button>
-          {saveStatus === 'saved' && <span className="save-notice">✓ Enregistré</span>}
-          {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
-          <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
-            {saving ? 'Enregistrement...' : 'Enregistrer'}
-          </Button>
-        </div>
-      </header>
+      <EditorNav active="editor" />
+      <div className="editor-header-bar">
+        <div style={{ flex: 1 }} />
+        {saveStatus === 'saved' && <span className="save-notice">✓ Enregistré</span>}
+        {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
+        <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
+          {saving ? 'Enregistrement...' : 'Enregistrer'}
+        </Button>
+      </div>
 
       <div className="editor-content">
 
