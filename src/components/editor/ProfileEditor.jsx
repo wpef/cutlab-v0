@@ -11,6 +11,7 @@ import UploadZone from '../ui/UploadZone'
 import AvailabilityButton from '../ui/AvailabilityButton'
 import Button from '../ui/Button'
 import HintBox from '../ui/HintBox'
+import EditorNav from '../ui/EditorNav'
 
 const LANGUAGES = [
   { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
@@ -102,7 +103,7 @@ const NAV_SECTIONS = [
 
 
 export default function ProfileEditor() {
-  const { formData, updateFormData, saveProfile, saving, assignedLevel, user, goToMessaging, goToCatalog } = useOnboarding()
+  const { formData, updateFormData, saveProfile, saving, assignedLevel, user } = useOnboarding()
   const { requests, loadRequests } = useMessaging()
   const [saveStatus, setSaveStatus] = useState(null)
   const [activeSection, setActiveSection] = useState('section-identity')
@@ -245,29 +246,24 @@ export default function ProfileEditor() {
   return (
     <div className="editor-page">
 
-      {/* ── Header ── */}
-      <header className="editor-header">
-        <div className="editor-header-logo" style={{ cursor: 'pointer' }} onClick={goToCatalog}>CUT<span style={{ color: 'var(--accent)' }}>LAB</span></div>
-        <div className="editor-header-title">Mon profil</div>
-        <div className="editor-header-actions">
-          <button className="catalog-header-btn" onClick={goToMessaging} style={{ fontSize: 13 }}>
-            Messagerie{pendingCount > 0 ? ` (${pendingCount})` : ''}
-          </button>
-          {saveStatus === 'saved' && <span className="save-notice">Enregistré</span>}
-          {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
-          <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
-            {saving ? 'Enregistrement...' : 'Enregistrer'}
-          </Button>
-        </div>
-      </header>
+      {/* ── EditorNav (shared nav bar) ── */}
+      <EditorNav active="editor" />
+      <div className="editor-header-bar">
+        <div style={{ flex: 1 }} />
+        {saveStatus === 'saved' && <span className="save-notice">Enregistré</span>}
+        {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
+        <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
+          {saving ? 'Enregistrement...' : 'Enregistrer'}
+        </Button>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 0, minHeight: 'calc(100vh - 57px)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 0, minHeight: 'calc(100vh - 105px)' }}>
 
         {/* ── Left sidebar: mini card + section nav ── */}
         <aside style={{
           position: 'sticky',
-          top: 57,
-          height: 'calc(100vh - 57px)',
+          top: 105,
+          height: 'calc(100vh - 105px)',
           overflowY: 'auto',
           background: 'var(--surface)',
           borderRight: '1px solid var(--border)',

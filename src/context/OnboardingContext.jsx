@@ -213,6 +213,11 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function goToPipeline() {
+    setCurrentView('pipeline')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   function goToOfferForm() {
     setCurrentView('offer-form')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -228,7 +233,7 @@ export function OnboardingProvider({ children }) {
       value={{
         currentStep, goToStep, maxStepReached,
         currentView, goToLanding, goToOnboarding, goToCatalog, goToEditor,
-        goToCreatorSignup, goToMessaging, goToChat, goToOfferForm, goToOfferPreview,
+        goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
         assignedLevel, setAssignedLevel,
         formData, updateFormData,
         userRole: formData.role,

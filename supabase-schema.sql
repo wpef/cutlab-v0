@@ -221,3 +221,11 @@ create policy "creator insert offer"
 create policy "editor update offer"
   on public.offers for update
   using (auth.uid() = editor_id or auth.uid() = creator_id);
+
+-- ============================================================
+-- PIPELINE — mission-tracking columns on offers
+-- ============================================================
+alter table public.offers add column if not exists mission_start date;
+alter table public.offers add column if not exists mission_end date;
+alter table public.offers add column if not exists validated_by_editor boolean default false;
+alter table public.offers add column if not exists validated_by_creator boolean default false;
