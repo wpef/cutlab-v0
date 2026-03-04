@@ -2,7 +2,7 @@ import { useOnboarding } from '../../context/OnboardingContext'
 import Button from '../ui/Button'
 
 export default function Step9Success() {
-  const { goToEditor } = useOnboarding()
+  const { goToEditor, goToCatalog } = useOnboarding()
 
   return (
     <div className="step-screen">
@@ -13,7 +13,7 @@ export default function Step9Success() {
           Tu es maintenant visible dans le catalogue. Les premières demandes arrivent généralement dans les 48h.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 300, margin: '0 auto' }}>
-          <Button variant="primary" style={{ width: '100%' }}>Voir mon profil public</Button>
+          <Button variant="primary" style={{ width: '100%' }} onClick={goToCatalog}>Voir mon profil public</Button>
           <Button variant="ghost" style={{ width: '100%' }} onClick={goToEditor}>Modifier mon profil</Button>
         </div>
       </div>

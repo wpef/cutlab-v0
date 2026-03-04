@@ -8,7 +8,7 @@ const DEMO_CREATOR_PASSWORD = 'cutlab-creator-2024!'
 const DEMO_CREATOR_NAME = 'Alex'
 
 export default function CreatorSignup() {
-  const { goToCatalog, goToLanding, goToMessaging, pendingEditor, clearPendingEditor, formData, user } = useOnboarding()
+  const { goToCatalog, goToLanding, goToOnboarding, goToMessaging, pendingEditor, clearPendingEditor, formData, user } = useOnboarding()
   const { signUpCreator, signupError, signupLoading, sendContactRequest } = useMessaging()
 
   const [firstName, setFirstName] = useState('')
@@ -135,6 +135,13 @@ export default function CreatorSignup() {
           <button className="btn btn-primary" style={{ padding: '14px 32px' }} onClick={goToCatalog}>
             Voir les monteurs →
           </button>
+          <button
+            className="btn btn-ghost"
+            style={{ display: 'block', margin: '16px auto 0', fontSize: 13 }}
+            onClick={goToLanding}
+          >
+            ← Retour
+          </button>
         </div>
       </div>
     )
@@ -221,7 +228,7 @@ export default function CreatorSignup() {
           Tu es monteur ?{' '}
           <span
             style={{ color: 'var(--accent)', cursor: 'pointer', textDecoration: 'underline' }}
-            onClick={() => { clearPendingEditor(); window.history.back() }}
+            onClick={() => { clearPendingEditor(); goToOnboarding() }}
           >
             Inscris-toi comme monteur
           </span>

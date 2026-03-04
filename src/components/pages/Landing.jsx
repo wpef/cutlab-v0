@@ -1,7 +1,7 @@
 import { useOnboarding } from '../../context/OnboardingContext'
 
 export default function Landing() {
-  const { goToOnboarding, goToCatalog } = useOnboarding()
+  const { goToOnboarding, goToCatalog, goToEditor, goToMessaging, user, userRole } = useOnboarding()
 
   return (
     <div className="landing">
@@ -31,9 +31,19 @@ export default function Landing() {
             <div className="landing-eyebrow">Pour les monteurs</div>
             <h1>Trouvez un projet bien payé.</h1>
             <p>Rejoins le catalogue. Les créateurs te contactent directement.</p>
-            <button className="landing-btn landing-btn--dark" onClick={goToOnboarding}>
-              S'inscrire gratuitement →
-            </button>
+            {user && userRole === 'editor' ? (
+              <button className="landing-btn landing-btn--dark" onClick={goToEditor}>
+                Mon profil →
+              </button>
+            ) : user && userRole === 'creator' ? (
+              <button className="landing-btn landing-btn--dark" onClick={goToMessaging}>
+                Mes messages →
+              </button>
+            ) : (
+              <button className="landing-btn landing-btn--dark" onClick={goToOnboarding}>
+                S'inscrire gratuitement →
+              </button>
+            )}
           </div>
         </div>
 

@@ -46,6 +46,10 @@ body {
 .step-label { font-size: 13px; color: var(--text-muted); font-weight: 400; }
 .step-item.active .step-label { color: var(--text); font-weight: 500; }
 .step-item.done .step-label { color: var(--text-dim); }
+.step-item.reachable .step-num { border-color: rgba(212,240,0,0.3); color: var(--text-dim); }
+.step-item.reachable .step-label { color: var(--text-dim); }
+.step-item.reachable:hover .step-num { border-color: var(--accent); }
+.step-item.reachable:hover .step-label { color: var(--text); }
 .sidebar-footer { margin-top: auto; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
 
 /* MAIN */
@@ -188,7 +192,7 @@ textarea { resize: vertical; min-height: 100px; }
 /* PROFILE CARD */
 .profile-preview { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; max-width: 320px; transition: transform 0.2s; }
 .profile-preview:hover { transform: translateY(-4px); }
-.profile-thumb { width: 100%; height: 190px; background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%); display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; }
+.profile-thumb { width: 100%; height: 190px; background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%); display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; overflow: hidden; }
 .profile-avail { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); border: 1px solid rgba(0,200,80,0.3); border-radius: 100px; padding: 4px 10px; font-size: 11px; color: #00c850; display: flex; align-items: center; gap: 5px; }
 .avail-pulse { width: 6px; height: 6px; border-radius: 50%; background: #00c850; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -225,6 +229,11 @@ textarea { resize: vertical; min-height: 100px; }
 .upload-file-size { color: var(--text-muted); font-size: 11px; flex-shrink: 0; margin-left: 12px; }
 .upload-error { color: #ff6b6b; font-size: 12px; margin-top: 8px; }
 .upload-image-preview { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 4px; }
+.upload-video-preview { width: 100%; max-height: 160px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.upload-zone.uploading { border-color: var(--accent); background: rgba(212,240,0,0.04); pointer-events: none; opacity: 0.85; }
+.upload-zone.upload-success { border-color: #00c850; background: rgba(0,200,80,0.06); }
+.upload-spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* VIDEO RECORD FIELD */
 .video-record-field { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -288,10 +297,11 @@ textarea { resize: vertical; min-height: 100px; }
 .catalog-header-btn:hover { border-color: var(--accent); color: var(--accent); }
 .catalog-content { max-width: 1200px; margin: 0 auto; padding: 48px 32px 80px; }
 .catalog-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-.catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; justify-items: center; }
 .catalog-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
 .catalog-card:hover { border-color: rgba(212,240,0,0.35); transform: translateY(-3px); }
-.catalog-card-thumb { aspect-ratio: 16/9; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 36px; position: relative; }
+.catalog-card-thumb { aspect-ratio: 16/9; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 36px; position: relative; overflow: hidden; }
+.catalog-card-media { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
 .catalog-card-avail { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 100px; }
 .catalog-card-avail--green { background: rgba(212,240,0,0.15); color: var(--accent); border: 1px solid rgba(212,240,0,0.3); }
 .catalog-card-avail--yellow { background: rgba(255,200,0,0.15); color: #ffc800; border: 1px solid rgba(255,200,0,0.3); }

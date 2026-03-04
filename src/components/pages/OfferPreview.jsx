@@ -26,7 +26,7 @@ export default function OfferPreview() {
       setError("Erreur lors de l'envoi. Réessaie.")
       return
     }
-    goToChat()
+    goToChat(activeRequestId)
   }
 
   if (!offer) {

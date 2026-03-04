@@ -57,9 +57,9 @@ insert into storage.buckets (id, name, public)
   values ('avatars', 'avatars', true)
   on conflict do nothing;
 
--- Private bucket for portfolio clips
+-- Public bucket for portfolio clips
 insert into storage.buckets (id, name, public)
-  values ('portfolio', 'portfolio', false)
+  values ('portfolio', 'portfolio', true)
   on conflict do nothing;
 
 create policy "Anyone can view avatars"
@@ -80,8 +80,43 @@ create policy "Users can upload their own portfolio clips"
     and auth.uid()::text = (storage.foldername(name))[1]
   );
 
-create policy "Users can view their own portfolio clips"
+create policy "Anyone can view portfolio clips"
   on storage.objects for select
+  using (bucket_id = 'portfolio');
+
+-- Public bucket for presentation videos
+insert into storage.buckets (id, name, public)
+  values ('videos', 'videos', true)
+  on conflict do nothing;
+
+create policy "Anyone can view videos"
+  on storage.objects for select
+  using (bucket_id = 'videos');
+
+create policy "Users can upload their own video"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'videos'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+-- UPDATE policies (needed for upsert)
+create policy "Users can update their own avatar"
+  on storage.objects for update
+  using (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "Users can update their own video"
+  on storage.objects for update
+  using (
+    bucket_id = 'videos'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "Users can update their own portfolio clips"
+  on storage.objects for update
   using (
     bucket_id = 'portfolio'
     and auth.uid()::text = (storage.foldername(name))[1]
@@ -93,6 +128,12 @@ create policy "Users can view their own portfolio clips"
 
 -- Role column on profiles (editor | creator)
 alter table public.profiles add column if not exists role text default 'editor';
+
+-- Certification status: 'draft' (no request) | 'pending' (request sent) | 'certified' | 'refused'
+alter table public.profiles add column if not exists certification_status text default 'draft';
+
+-- Presentation video URL (Supabase Storage or external)
+alter table public.profiles add column if not exists presentation_video_url text;
 
 -- Allow anyone to read published editor profiles (needed for Catalog)
 create policy "Anyone can read published profiles"

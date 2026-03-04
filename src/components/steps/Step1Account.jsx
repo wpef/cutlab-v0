@@ -9,7 +9,7 @@ import StepNav from '../ui/StepNav'
 const IS_DEV = import.meta.env.DEV
 
 export default function Step1Account() {
-  const { goToStep, signUpUser, signInUser, signInWithGoogle, clearAuthError, updateFormData, authLoading, authError } = useOnboarding()
+  const { goToStep, signUpUser, signInUser, signInWithGoogle, clearAuthError, updateFormData, loadProfile, authLoading, authError } = useOnboarding()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,25 +20,32 @@ export default function Step1Account() {
     setLocalError('')
     setDemoLoading(true)
 
-    // 1) Try to sign in (account already exists from a previous test)
-    let ok = await signInUser(DEMO_EMAIL, DEMO_PASSWORD)
+    // 1) Try to sign in (account already exists from a previous session)
+    const signedIn = await signInUser(DEMO_EMAIL, DEMO_PASSWORD)
 
-    if (!ok) {
-      clearAuthError()
-      // 2) First time: try to create the account
-      ok = await signUpUser(DEMO_EMAIL, DEMO_PASSWORD)
-
-      if (!ok) {
-        // Account exists but sign-in failed → email confirmation is ON in Supabase
-        clearAuthError()
-        setLocalError(
-          'Email de confirmation requis. Dans Supabase : Authentication → Email → désactive "Confirm email".'
-        )
-        setDemoLoading(false)
-        return
-      }
+    if (signedIn) {
+      // Existing account — load the real profile from the database
+      await loadProfile()
+      goToStep(2)
+      setDemoLoading(false)
+      return
     }
 
+    // 2) First time: try to create the account
+    clearAuthError()
+    const signedUp = await signUpUser(DEMO_EMAIL, DEMO_PASSWORD)
+
+    if (!signedUp) {
+      // Account exists but sign-in failed → email confirmation is ON in Supabase
+      clearAuthError()
+      setLocalError(
+        'Email de confirmation requis. Dans Supabase : Authentication → Email → désactive "Confirm email".'
+      )
+      setDemoLoading(false)
+      return
+    }
+
+    // New account — seed with hardcoded demo defaults
     updateFormData({ ...DEMO_FORM, email: DEMO_EMAIL })
     goToStep(2)
     setDemoLoading(false)

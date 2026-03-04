@@ -9,7 +9,7 @@ const FORMATS = [
 ]
 
 export default function OfferForm() {
-  const { goToChat, goToOfferPreview } = useOnboarding()
+  const { goToChat, goToOfferPreview, goToMessaging } = useOnboarding()
   const { activeRequestId, requests, setOfferFormData } = useMessaging()
 
   const request = requests.find((r) => r.id === activeRequestId)
@@ -24,6 +24,20 @@ export default function OfferForm() {
     revisions: '2',
   })
   const [error, setError] = useState('')
+
+  /* Empty-state guard: no active request selected */
+  if (!activeRequestId || !request) {
+    return (
+      <div className="offer-form-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+          <p>Aucune demande sélectionnée.</p>
+          <button className="catalog-header-btn" style={{ marginTop: 16 }} onClick={() => goToMessaging()}>
+            ← Retour à la messagerie
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   function set(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -41,7 +55,7 @@ export default function OfferForm() {
     <div className="offer-form-page">
 
       <header className="offer-form-header">
-        <button className="chat-back-btn" onClick={goToChat}>← Retour au chat</button>
+        <button className="chat-back-btn" onClick={() => goToChat(activeRequestId)}>← Retour au chat</button>
         <div style={{ flex: 1, textAlign: 'center', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 16 }}>
           CUT<span style={{ color: 'var(--accent)' }}>LAB</span>
         </div>
