@@ -170,6 +170,23 @@ export function OnboardingProvider({ children }) {
     }))
   }
 
+  async function loginAndRedirect(email, password) {
+    const ok = await signInUser(email, password)
+    if (!ok) return false
+    // Load profile to get the role from DB
+    const { data } = await supabase.from('profiles').select('role').eq('id', (await supabase.auth.getUser()).data.user?.id).single()
+    const role = data?.role || 'editor'
+    setFormData((prev) => ({ ...prev, role }))
+    if (role === 'creator') {
+      setCurrentView('catalog')
+    } else {
+      await loadProfile()
+      setCurrentView('pipeline')
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return true
+  }
+
   async function goToEditor() {
     await loadProfile()
     setCurrentView('editor')
@@ -239,7 +256,7 @@ export function OnboardingProvider({ children }) {
         userRole: formData.role,
         pendingEditor, clearPendingEditor,
         user, authLoading, authError,
-        signUpUser, signInUser, signInWithGoogle,
+        signUpUser, signInUser, signInWithGoogle, loginAndRedirect,
         clearAuthError: () => setAuthError(null),
         saveProfile, publishProfile, loadProfile,
         saving,

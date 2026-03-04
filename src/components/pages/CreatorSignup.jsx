@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-
-const IS_DEV = import.meta.env.DEV
-const DEMO_CREATOR_EMAIL = 'demo-creator@cutlab.io'
-const DEMO_CREATOR_PASSWORD = 'cutlab-creator-2024!'
-const DEMO_CREATOR_NAME = 'Alex'
+import { DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD } from '../../lib/demoData'
 
 export default function CreatorSignup() {
-  const { goToCatalog, goToLanding, goToOnboarding, goToMessaging, pendingEditor, clearPendingEditor, formData, user } = useOnboarding()
+  const {
+    goToCatalog, goToLanding, goToOnboarding, goToMessaging,
+    pendingEditor, clearPendingEditor, formData, user,
+    signInUser, loginAndRedirect, loadProfile, clearAuthError, authLoading, authError,
+  } = useOnboarding()
   const { signUpCreator, signupError, signupLoading, sendContactRequest } = useMessaging()
 
+  const [mode, setMode] = useState('signup') // 'signup' | 'login'
   const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -21,6 +22,12 @@ export default function CreatorSignup() {
   const [signedUp, setSignedUp] = useState(false)
   const [contactMsg, setContactMsg] = useState('')
   const [contactLoading, setContactLoading] = useState(false)
+
+  function switchMode(m) {
+    setMode(m)
+    setLocalError('')
+    clearAuthError()
+  }
 
   async function handleSignup() {
     setLocalError('')
@@ -40,10 +47,27 @@ export default function CreatorSignup() {
     }
   }
 
+  async function handleLogin() {
+    setLocalError('')
+    if (!email) { setLocalError('Entre ton adresse email.'); return }
+    if (password.length < 8) { setLocalError('Le mot de passe doit faire au moins 8 caractères.'); return }
+
+    if (pendingEditor) {
+      // Login then show contact step
+      const ok = await signInUser(email, password)
+      if (!ok) { setLocalError('Email ou mot de passe incorrect.'); return }
+      await loadProfile()
+      setSignedUp(true)
+    } else {
+      const ok = await loginAndRedirect(email, password)
+      if (!ok) setLocalError('Email ou mot de passe incorrect.')
+    }
+  }
+
   async function handleDemo() {
     setLocalError('')
     setDemoLoading(true)
-    const result = await signUpCreator(DEMO_CREATOR_NAME, DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD)
+    const result = await signUpCreator('Alex', DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD)
     setDemoLoading(false)
     if (result.error) { setLocalError(result.error); return }
     if (pendingEditor) {
@@ -72,9 +96,9 @@ export default function CreatorSignup() {
     }
   }
 
-  const errorMsg = localError || signupError
+  const errorMsg = localError || signupError || (mode === 'login' ? authError : null)
 
-  // ── Contact step (after signup) ────────────────────────────
+  // ── Contact step (after signup/login) ────────────────────────
   if (signedUp && pendingEditor) {
     return (
       <div className="creator-signup-page">
@@ -147,7 +171,7 @@ export default function CreatorSignup() {
     )
   }
 
-  // ── Signup form ────────────────────────────────────────────
+  // ── Signup/Login form ────────────────────────────────────────
   return (
     <div className="creator-signup-page">
       <header className="creator-signup-header">
@@ -159,39 +183,45 @@ export default function CreatorSignup() {
 
       <div className="creator-signup-content">
 
-        {IS_DEV && (
-          <div className="demo-bar">
-            <div className="demo-bar-label">DEV</div>
-            <div className="demo-bar-info">
-              <span>{DEMO_CREATOR_EMAIL}</span>
-              <span style={{ color: 'var(--text-muted)' }}>·</span>
-              <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{DEMO_CREATOR_PASSWORD}</span>
-            </div>
-            <button className="demo-bar-btn" onClick={handleDemo} disabled={demoLoading || signupLoading}>
-              {demoLoading ? '...' : '⚡ Compte démo créateur'}
-            </button>
-          </div>
-        )}
+        {/* Auth tabs */}
+        <div className="auth-tabs">
+          <button
+            className={`auth-tab ${mode === 'signup' ? 'auth-tab--active' : ''}`}
+            onClick={() => switchMode('signup')}
+          >
+            Créer un compte
+          </button>
+          <button
+            className={`auth-tab ${mode === 'login' ? 'auth-tab--active' : ''}`}
+            onClick={() => switchMode('login')}
+          >
+            Se connecter
+          </button>
+        </div>
 
         <div className="step-header">
           <div className="step-tag">Pour les créateurs</div>
-          <h1>Crée ton compte gratuit</h1>
+          <h1>{mode === 'signup' ? 'Crée ton compte gratuit' : 'Connecte-toi'}</h1>
           <p className="step-desc">
-            {pendingEditor
-              ? `Inscris-toi pour contacter ${pendingEditor.name || 'ce monteur'}.`
-              : 'Accède au catalogue et contacte les monteurs directement.'}
+            {mode === 'signup'
+              ? (pendingEditor
+                  ? `Inscris-toi pour contacter ${pendingEditor.name || 'ce monteur'}.`
+                  : 'Accède au catalogue et contacte les monteurs directement.')
+              : 'Retrouve ton compte et tes conversations.'}
           </p>
         </div>
 
-        <div className="form-group">
-          <label>Prénom</label>
-          <input
-            type="text"
-            placeholder="Ton prénom"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-        </div>
+        {mode === 'signup' && (
+          <div className="form-group">
+            <label>Prénom</label>
+            <input
+              type="text"
+              placeholder="Ton prénom"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+        )}
 
         <div className="form-group">
           <label>Email</label>
@@ -218,10 +248,12 @@ export default function CreatorSignup() {
         <button
           className="btn btn-primary"
           style={{ width: '100%', padding: '14px 0', fontSize: 15, marginTop: 8 }}
-          onClick={handleSignup}
-          disabled={signupLoading}
+          onClick={mode === 'login' ? handleLogin : handleSignup}
+          disabled={signupLoading || authLoading}
         >
-          {signupLoading ? 'Création...' : 'Créer mon compte →'}
+          {(signupLoading || authLoading)
+            ? (mode === 'login' ? 'Connexion...' : 'Création...')
+            : (mode === 'login' ? 'Se connecter →' : 'Créer mon compte →')}
         </button>
 
         <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginTop: 20, lineHeight: 1.6 }}>
@@ -233,6 +265,17 @@ export default function CreatorSignup() {
             Inscris-toi comme monteur
           </span>
         </p>
+
+        {/* Demo — always visible */}
+        <div className="demo-section">
+          <button
+            className="btn-demo"
+            onClick={handleDemo}
+            disabled={demoLoading || signupLoading || authLoading}
+          >
+            {demoLoading ? '...' : 'Rejoindre le compte démo créateur'}
+          </button>
+        </div>
       </div>
     </div>
   )
