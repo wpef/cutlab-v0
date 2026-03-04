@@ -6,39 +6,50 @@ import FormGroup from '../ui/FormGroup'
 import HintBox from '../ui/HintBox'
 import StepNav from '../ui/StepNav'
 
-const IS_DEV = import.meta.env.DEV
-
 export default function Step1Account() {
-  const { goToStep, signUpUser, signInUser, signInWithGoogle, clearAuthError, updateFormData, authLoading, authError } = useOnboarding()
+  const {
+    goToStep, signUpUser, signInUser, signInWithGoogle, loginAndRedirect,
+    clearAuthError, updateFormData, loadProfile, authLoading, authError,
+  } = useOnboarding()
 
+  const [mode, setMode] = useState('signup') // 'signup' | 'login'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [localError, setLocalError] = useState('')
   const [demoLoading, setDemoLoading] = useState(false)
 
+  function switchMode(m) {
+    setMode(m)
+    setLocalError('')
+    clearAuthError()
+  }
+
   async function handleDemo() {
     setLocalError('')
     setDemoLoading(true)
 
-    // 1) Try to sign in (account already exists from a previous test)
-    let ok = await signInUser(DEMO_EMAIL, DEMO_PASSWORD)
-
-    if (!ok) {
-      clearAuthError()
-      // 2) First time: try to create the account
-      ok = await signUpUser(DEMO_EMAIL, DEMO_PASSWORD)
-
-      if (!ok) {
-        // Account exists but sign-in failed → email confirmation is ON in Supabase
-        clearAuthError()
-        setLocalError(
-          'Email de confirmation requis. Dans Supabase : Authentication → Email → désactive "Confirm email".'
-        )
-        setDemoLoading(false)
-        return
-      }
+    // Try to sign in (account already exists from a previous session)
+    const signedIn = await signInUser(DEMO_EMAIL, DEMO_PASSWORD)
+    if (signedIn) {
+      await loadProfile()
+      goToStep(2)
+      setDemoLoading(false)
+      return
     }
 
+    // First time: try to create the account
+    clearAuthError()
+    const signedUp = await signUpUser(DEMO_EMAIL, DEMO_PASSWORD)
+    if (!signedUp) {
+      clearAuthError()
+      setLocalError(
+        'Email de confirmation requis. Dans Supabase : Authentication → Email → désactive "Confirm email".'
+      )
+      setDemoLoading(false)
+      return
+    }
+
+    // New account — seed with hardcoded demo defaults
     updateFormData({ ...DEMO_FORM, email: DEMO_EMAIL })
     goToStep(2)
     setDemoLoading(false)
@@ -48,8 +59,14 @@ export default function Step1Account() {
     setLocalError('')
     if (!email) { setLocalError('Saisis ton adresse email.'); return }
     if (password.length < 8) { setLocalError('Le mot de passe doit faire au moins 8 caractères.'); return }
-    const ok = await signUpUser(email, password)
-    if (ok) goToStep(2)
+
+    if (mode === 'login') {
+      const ok = await loginAndRedirect(email, password)
+      if (!ok) setLocalError('Email ou mot de passe incorrect.')
+    } else {
+      const ok = await signUpUser(email, password)
+      if (ok) goToStep(2)
+    }
   }
 
   const errorMsg = localError || authError
@@ -57,24 +74,28 @@ export default function Step1Account() {
   return (
     <div className="step-screen">
 
-      {IS_DEV && (
-        <div className="demo-bar">
-          <div className="demo-bar-label">DEV</div>
-          <div className="demo-bar-info">
-            <span>{DEMO_EMAIL}</span>
-            <span style={{ color: 'var(--text-muted)' }}>·</span>
-            <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{DEMO_PASSWORD}</span>
-          </div>
-          <button className="demo-bar-btn" onClick={handleDemo} disabled={demoLoading || authLoading}>
-            {demoLoading ? '...' : '⚡ Connexion démo'}
-          </button>
-        </div>
-      )}
+      {/* Auth tabs */}
+      <div className="auth-tabs">
+        <button
+          className={`auth-tab ${mode === 'signup' ? 'auth-tab--active' : ''}`}
+          onClick={() => switchMode('signup')}
+        >
+          Créer un compte
+        </button>
+        <button
+          className={`auth-tab ${mode === 'login' ? 'auth-tab--active' : ''}`}
+          onClick={() => switchMode('login')}
+        >
+          Se connecter
+        </button>
+      </div>
 
       <StepHeader
-        tag="Étape 1 sur 8"
-        title="Crée ton compte"
-        desc="30 secondes et c'est parti. Pas besoin de CB, pas d'engagement."
+        tag={mode === 'signup' ? 'Étape 1 sur 8' : 'Connexion'}
+        title={mode === 'signup' ? 'Crée ton compte' : 'Connecte-toi'}
+        desc={mode === 'signup'
+          ? '30 secondes et c\'est parti. Pas besoin de CB, pas d\'engagement.'
+          : 'Retrouve ton profil et tes projets.'}
       />
 
       <FormGroup label="Email">
@@ -132,7 +153,25 @@ export default function Step1Account() {
         </div>
       </div>
 
-      <StepNav onNext={handleNext} nextLabel={authLoading ? 'Création...' : 'Continuer →'} />
+      <StepNav
+        onNext={handleNext}
+        nextLabel={
+          authLoading
+            ? (mode === 'login' ? 'Connexion...' : 'Création...')
+            : (mode === 'login' ? 'Se connecter →' : 'Continuer →')
+        }
+      />
+
+      {/* Demo — always visible */}
+      <div className="demo-section">
+        <button
+          className="btn-demo"
+          onClick={handleDemo}
+          disabled={demoLoading || authLoading}
+        >
+          {demoLoading ? '...' : 'Tester l\'onboarding (compte démo)'}
+        </button>
+      </div>
     </div>
   )
 }

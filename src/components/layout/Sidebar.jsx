@@ -3,10 +3,10 @@ import { useOnboarding } from '../../context/OnboardingContext'
 
 /**
  * Sidebar — fixed left column with the logo, step navigation and a footer note.
- * Steps with id < currentStep are marked "done"; the current step is "active".
+ * Steps up to maxStepReached are clickable (done or current).
  */
 export default function Sidebar() {
-  const { currentStep, goToStep } = useOnboarding()
+  const { currentStep, goToStep, maxStepReached } = useOnboarding()
 
   return (
     <aside className="sidebar">
@@ -16,14 +16,17 @@ export default function Sidebar() {
 
       <nav className="steps-nav">
         {STEPS.map((step) => {
-          const isDone = step.id < currentStep
           const isActive = step.id === currentStep
+          const isDone = step.id < currentStep
+          const isReachable = step.id <= maxStepReached && !isActive
 
           return (
             <div
               key={step.id}
-              className={`step-item${isActive ? ' active' : ''}${isDone ? ' done' : ''}`}
-              onClick={() => isDone ?? goToStep(step.id)}
+              className={`step-item${isActive ? ' active' : ''}${isDone ? ' done' : ''}${isReachable && !isDone ? ' reachable' : ''}`}
+              title={isReachable ? `Aller à l'étape ${step.id}` : undefined}
+              onClick={() => isReachable && goToStep(step.id)}
+              style={{ cursor: isReachable ? 'pointer' : undefined }}
             >
               <div className="step-num">
                 <span>{step.id}</span>

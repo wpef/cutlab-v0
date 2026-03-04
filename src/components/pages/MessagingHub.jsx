@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import EditorNav from '../ui/EditorNav'
 
 function formatDate(iso) {
   const d = new Date(iso)
@@ -34,20 +35,18 @@ export default function MessagingHub() {
   return (
     <div className="messaging-page">
 
-      <header className="messaging-header">
-        <div className="messaging-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
-        <div className="messaging-header-title">Messagerie</div>
-        <div className="messaging-header-actions">
-          {userRole === 'creator'
-            ? <button className="catalog-header-btn" onClick={goToCatalog}>+ Nouveau contact</button>
-            : <>
-                <button className="catalog-header-btn" onClick={goToProjects}>Mes projets →</button>
-                <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
-              </>
-          }
-          <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-        </div>
-      </header>
+      {userRole === 'editor' ? (
+        <EditorNav active="messaging" />
+      ) : (
+        <header className="messaging-header">
+          <div className="messaging-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
+          <div className="messaging-header-title">Messagerie</div>
+          <div className="messaging-header-actions">
+            <button className="catalog-header-btn" onClick={goToCatalog}>+ Nouveau contact</button>
+            <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
+          </div>
+        </header>
+      )}
 
       <div className="messaging-content">
 

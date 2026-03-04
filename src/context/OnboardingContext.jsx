@@ -18,13 +18,17 @@ const INITIAL_FORM = {
   revisions: '2', capacity: '2-3', hourlyRate: '', deliveryTime: '',
   // Step 6
   bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: '',
+  presentationVideoUrl: '',
+  // Step 7
+  certificationStatus: 'draft', // 'draft' | 'pending'
   // Role
   role: 'editor',
 }
 
 export function OnboardingProvider({ children }) {
   const [currentStep, setCurrentStep] = useState(1)
-  const [currentView, setCurrentView] = useState('landing') // 'landing' | 'onboarding' | 'editor' | 'catalog' | 'creator-signup' | 'messaging' | 'chat' | 'offer-form' | 'offer-preview' | 'projects'
+  const [maxStepReached, setMaxStepReached] = useState(1)
+  const [currentView, setCurrentView] = useState('landing') // 'landing' | 'onboarding' | 'editor' | 'catalog' | 'creator-signup' | 'messaging' | 'chat' | 'offer-form' | 'offer-preview' | 'projects' | 'pipeline'
   const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
@@ -50,6 +54,7 @@ export function OnboardingProvider({ children }) {
 
   function goToStep(n) {
     setCurrentStep(n)
+    setMaxStepReached((prev) => Math.max(prev, n))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -109,7 +114,7 @@ export function OnboardingProvider({ children }) {
       niches: formData.niches,
       experience: formData.experience,
       software: formData.software,
-      portfolio_links: formData.portfolioLinks,
+      portfolio_links: formData.portfolioLinks.filter(link => link.trim()),
       credited_channels: formData.creditedChannels,
       revisions: formData.revisions,
       capacity: formData.capacity,
@@ -121,6 +126,8 @@ export function OnboardingProvider({ children }) {
       social_links: formData.socialLinks,
       assigned_level: assignedLevel,
       role: formData.role,
+      certification_status: formData.certificationStatus ?? 'draft',
+      presentation_video_url: formData.presentationVideoUrl || null,
       status,
       updated_at: new Date().toISOString(),
     })
@@ -165,9 +172,28 @@ export function OnboardingProvider({ children }) {
       bio:             data.bio               ?? prev.bio,
       missionTypes:    data.mission_types     ?? prev.missionTypes,
       responseTime:    data.response_time     ?? prev.responseTime,
-      socialLinks:     data.social_links      ?? prev.socialLinks,
-      role:            data.role              ?? prev.role,
+      socialLinks:             data.social_links            ?? prev.socialLinks,
+      presentationVideoUrl:    data.presentation_video_url  ?? prev.presentationVideoUrl,
+      certificationStatus:     data.certification_status    ?? prev.certificationStatus,
+      role:                    data.role                    ?? prev.role,
     }))
+  }
+
+  async function loginAndRedirect(email, password) {
+    const ok = await signInUser(email, password)
+    if (!ok) return false
+    // Load profile to get the role from DB
+    const { data } = await supabase.from('profiles').select('role').eq('id', (await supabase.auth.getUser()).data.user?.id).single()
+    const role = data?.role || 'editor'
+    setFormData((prev) => ({ ...prev, role }))
+    if (role === 'creator') {
+      setCurrentView('catalog')
+    } else {
+      await loadProfile()
+      setCurrentView('projects')
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return true
   }
 
   async function goToEditor() {
@@ -218,6 +244,11 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function goToPipeline() {
+    setCurrentView('pipeline')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   function goToOfferForm() {
     setCurrentView('offer-form')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -228,7 +259,7 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  /** Navigate to the role-appropriate home: Monteur → projects, Créateur → catalog */
+  /** Navigate to the role-appropriate home: Monteur -> projects, Créateur -> catalog */
   function goToHome() {
     if (formData.role === 'creator') goToCatalog()
     else goToProjects()
@@ -237,17 +268,17 @@ export function OnboardingProvider({ children }) {
   return (
     <OnboardingContext.Provider
       value={{
-        currentStep, goToStep,
+        currentStep, goToStep, maxStepReached,
         currentView, goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
-        goToCreatorSignup, goToMessaging, goToChat, goToOfferForm, goToOfferPreview,
+        goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
         assignedLevel, setAssignedLevel,
         formData, updateFormData,
         userRole: formData.role,
         pendingEditor, clearPendingEditor,
         user, authLoading, authError,
-        signUpUser, signInUser, signInWithGoogle, signOut,
+        signUpUser, signInUser, signInWithGoogle, signOut, loginAndRedirect,
         clearAuthError: () => setAuthError(null),
-        saveProfile, publishProfile,
+        saveProfile, publishProfile, loadProfile,
         saving,
       }}
     >

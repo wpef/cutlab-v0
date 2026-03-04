@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-import { LEVELS } from '../../constants/levels'
+import { computeCompletion } from '../../lib/profileCompletion'
+import { uploadFile } from '../../lib/uploadFile'
+import EditorCard from '../ui/EditorCard'
 import FormGroup from '../ui/FormGroup'
 import Tag from '../ui/Tag'
 import NicheTag from '../ui/NicheTag'
@@ -9,19 +11,20 @@ import UploadZone from '../ui/UploadZone'
 import AvailabilityButton from '../ui/AvailabilityButton'
 import Button from '../ui/Button'
 import HintBox from '../ui/HintBox'
+import EditorNav from '../ui/EditorNav'
 
 const LANGUAGES = [
-  { key: 'fr', flag: '🇫🇷', label: 'Français' },
-  { key: 'en', flag: '🇬🇧', label: 'Anglais' },
-  { key: 'es', flag: '🇪🇸', label: 'Espagnol' },
-  { key: 'pt', flag: '🇧🇷', label: 'Portugais' },
-  { key: 'de', flag: '🇩🇪', label: 'Allemand' },
-  { key: 'it', flag: '🇮🇹', label: 'Italien' },
-  { key: 'zh', flag: '🇨🇳', label: 'Chinois' },
-  { key: 'ja', flag: '🇯🇵', label: 'Japonais' },
-  { key: 'ar', flag: '🇸🇦', label: 'Arabe' },
-  { key: 'ru', flag: '🇷🇺', label: 'Russe' },
-  { key: 'ko', flag: '🇰🇷', label: 'Coréen' },
+  { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
+  { key: 'en', flag: '🇬🇧', code: 'EN', label: 'Anglais' },
+  { key: 'es', flag: '🇪🇸', code: 'ES', label: 'Espagnol' },
+  { key: 'pt', flag: '🇧🇷', code: 'PT', label: 'Portugais' },
+  { key: 'de', flag: '🇩🇪', code: 'DE', label: 'Allemand' },
+  { key: 'it', flag: '🇮🇹', code: 'IT', label: 'Italien' },
+  { key: 'zh', flag: '🇨🇳', code: 'ZH', label: 'Chinois' },
+  { key: 'ja', flag: '🇯🇵', code: 'JA', label: 'Japonais' },
+  { key: 'ar', flag: '🇸🇦', code: 'AR', label: 'Arabe' },
+  { key: 'ru', flag: '🇷🇺', code: 'RU', label: 'Russe' },
+  { key: 'ko', flag: '🇰🇷', code: 'KO', label: 'Coréen' },
 ]
 
 const AVAILABILITY_OPTIONS = ['Disponible', 'Sur demande', 'Indisponible']
@@ -87,23 +90,111 @@ const RESPONSE_TIMES = [
   { key: '<48h', label: 'Sous 48h' },
 ]
 
-const AVAIL_COLORS = {
-  'Disponible':   { bg: 'rgba(212,240,0,0.12)',   color: '#d4f000', border: 'rgba(212,240,0,0.3)' },
-  'Sur demande':  { bg: 'rgba(255,200,0,0.12)',   color: '#ffc800', border: 'rgba(255,200,0,0.3)' },
-  'Indisponible': { bg: 'rgba(255,77,77,0.12)',   color: '#ff4d4d', border: 'rgba(255,77,77,0.3)' },
-}
 
 const MAX_BIO = 280
+
+const NAV_SECTIONS = [
+  { id: 'section-identity',     label: 'Identité' },
+  { id: 'section-skills',       label: 'Compétences' },
+  { id: 'section-portfolio',    label: 'Portfolio' },
+  { id: 'section-pricing',      label: 'Tarifs' },
+  { id: 'section-presentation', label: 'Présentation' },
+]
+
 
 export default function ProfileEditor() {
   const { formData, updateFormData, saveProfile, saving, assignedLevel, user, goToMessaging, goToProjects, goToHome, signOut } = useOnboarding()
   const { requests, loadRequests } = useMessaging()
-  const [saveStatus, setSaveStatus] = useState(null) // null | 'saved' | 'error'
-  const level = LEVELS[assignedLevel]
+  const [saveStatus, setSaveStatus] = useState(null)
+  const [activeSection, setActiveSection] = useState('section-identity')
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarUploadError, setAvatarUploadError] = useState(null)
+  const [avatarUploadSuccess, setAvatarUploadSuccess] = useState(false)
+  const [videoUploading, setVideoUploading] = useState(false)
+  const [videoUploadError, setVideoUploadError] = useState(null)
+  const [videoUploadSuccess, setVideoUploadSuccess] = useState(false)
+  const [clipUploading, setClipUploading] = useState(false)
+  const [clipUploadError, setClipUploadError] = useState(null)
+  const [clipUploadSuccess, setClipUploadSuccess] = useState(false)
+
+  async function handleAvatarUpload(files) {
+    if (!files.length || !user) return
+    setAvatarUploading(true)
+    setAvatarUploadError(null)
+    const file = files[0]
+    const ext = file.name.split('.').pop()
+    const url = await uploadFile('avatars', `${user.id}/avatar.${ext}`, file)
+    setAvatarUploading(false)
+    if (url) {
+      updateFormData({ avatarUrl: url })
+      setAvatarUploadSuccess(true)
+      setTimeout(() => setAvatarUploadSuccess(false), 3000)
+    } else {
+      setAvatarUploadError("Erreur lors de l'upload.")
+    }
+  }
+
+  async function handleVideoUpload(files) {
+    if (!files.length || !user) return
+    setVideoUploading(true)
+    setVideoUploadError(null)
+    const file = files[0]
+    const ext = file.name.split('.').pop()
+    const url = await uploadFile('videos', `${user.id}/presentation.${ext}`, file)
+    setVideoUploading(false)
+    if (url) {
+      updateFormData({ presentationVideoUrl: url })
+      setVideoUploadSuccess(true)
+      setTimeout(() => setVideoUploadSuccess(false), 3000)
+    } else {
+      setVideoUploadError("Erreur lors de l'upload.")
+    }
+  }
+
+  async function handleClipUpload(files) {
+    if (!files.length || !user) return
+    setClipUploading(true)
+    setClipUploadError(null)
+    const uploadedUrls = []
+    for (const file of files) {
+      const ext = file.name.split('.').pop()
+      const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+      const url = await uploadFile('portfolio', `${user.id}/${name}`, file)
+      if (url) uploadedUrls.push(url)
+    }
+    setClipUploading(false)
+    if (uploadedUrls.length > 0) {
+      const existing = formData.portfolioLinks.filter((l) => l.trim())
+      updateFormData({ portfolioLinks: [...existing, ...uploadedUrls] })
+      setClipUploadSuccess(true)
+      setTimeout(() => setClipUploadSuccess(false), 3000)
+    } else {
+      setClipUploadError("Erreur lors de l'upload.")
+    }
+  }
 
   useEffect(() => {
     if (user) loadRequests()
   }, [user])
+
+  // Scrollspy: highlight active section in nav
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id)
+          }
+        }
+      },
+      { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' }
+    )
+    NAV_SECTIONS.forEach(({ id }) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
+  }, [])
 
   const pendingCount = requests.filter((r) => r.status === 'pending' && r.editor_id === user?.id).length
 
@@ -118,9 +209,18 @@ export default function ProfileEditor() {
   }
 
   function setLink(i, val) {
-    const next = [...formData.portfolioLinks]
+    const next = [...(formData.portfolioLinks.length > 0 ? formData.portfolioLinks : [''])]
     next[i] = val
     updateFormData({ portfolioLinks: next })
+  }
+
+  function addLink() {
+    updateFormData({ portfolioLinks: [...(formData.portfolioLinks.length > 0 ? formData.portfolioLinks : ['']), ''] })
+  }
+
+  function removeLink(i) {
+    if (formData.portfolioLinks.length <= 1) return
+    updateFormData({ portfolioLinks: formData.portfolioLinks.filter((_, idx) => idx !== i) })
   }
 
   async function handleSave() {
@@ -130,301 +230,503 @@ export default function ProfileEditor() {
     if (ok) setTimeout(() => setSaveStatus(null), 3000)
   }
 
-  const availColors = AVAIL_COLORS[formData.availability] ?? AVAIL_COLORS['Disponible']
-  const displayName = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || 'Ton nom'
+  function scrollToSection(id) {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  // Completion
+  const { pct: completionPct } = computeCompletion(formData)
+  const completionColor = completionPct >= 80 ? '#00c850' : completionPct >= 50 ? 'var(--accent)' : '#ffc800'
+
+  const portfolioLinks = formData.portfolioLinks.length > 0 ? formData.portfolioLinks : ['']
 
   return (
     <div className="editor-page">
 
-      {/* ── Header ── */}
-      <header className="editor-header">
-        <div className="editor-header-logo" style={{ cursor: 'pointer' }} onClick={goToHome}>CUT<span>LAB</span></div>
-        <div className="editor-header-title">Mon profil</div>
-        <div className="editor-header-actions">
-          <button className="catalog-header-btn" onClick={goToProjects} style={{ fontSize: 13 }}>
-            Mes projets →
-          </button>
-          <button className="catalog-header-btn" onClick={goToMessaging} style={{ fontSize: 13 }}>
-            Messagerie{pendingCount > 0 ? ` (${pendingCount})` : ''}
-          </button>
-          <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut} style={{ fontSize: 13 }}>Déconnexion</button>
-          {saveStatus === 'saved' && <span className="save-notice">✓ Enregistré</span>}
-          {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
-          <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
-            {saving ? 'Enregistrement...' : 'Enregistrer'}
-          </Button>
-        </div>
-      </header>
+      {/* -- EditorNav (shared nav bar) -- */}
+      <EditorNav active="editor" />
+      <div className="editor-header-bar">
+        <div style={{ flex: 1 }} />
+        {saveStatus === 'saved' && <span className="save-notice">Enregistré</span>}
+        {saveStatus === 'error' && <span className="save-notice save-notice--error">Erreur</span>}
+        <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
+          {saving ? 'Enregistrement...' : 'Enregistrer'}
+        </Button>
+      </div>
 
-      <div className="editor-content">
+      <div className="editor-layout">
 
-        {/* ── Profile card summary ── */}
-        <div className="editor-profile-card">
-          <div className="editor-avatar">🎬</div>
-          <div className="editor-profile-info">
-            <div className="editor-profile-name">{displayName}</div>
-            {formData.username && (
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>@{formData.username}</div>
-            )}
+        {/* -- Left sidebar: mini card + section nav -- */}
+        <aside className="editor-sidebar">
+
+          {/* Mini profile card — same component as catalog, name hidden */}
+          <EditorCard
+            profile={{
+              avatar_url: formData.avatarUrl,
+              presentation_video_url: formData.presentationVideoUrl,
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              username: formData.username,
+              availability: formData.availability,
+              skills: formData.skills,
+              assigned_level: assignedLevel,
+              experience: formData.experience,
+              languages: formData.languages,
+              formats: formData.formats,
+              hourly_rate: formData.hourlyRate,
+            }}
+            hideName
+            stats={{ received: pendingCount }}
+          />
+
+          {/* Completion bar */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>
+              <span>Complétion</span>
+              <span style={{ color: completionColor, fontWeight: 600 }}>{completionPct}%</span>
+            </div>
+            <div style={{ background: 'var(--surface2)', borderRadius: 100, height: 4, overflow: 'hidden' }}>
+              <div style={{ width: `${completionPct}%`, height: '100%', background: completionColor, borderRadius: 100, transition: 'width 0.4s ease' }} />
+            </div>
           </div>
-          <div className="editor-profile-badges">
-            <span className="editor-badge" style={{ background: availColors.bg, color: availColors.color, border: `1px solid ${availColors.border}` }}>
-              {formData.availability}
-            </span>
-            {level && (
-              <span className="editor-badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', border: '1px solid var(--border)' }}>
-                {level.emoji} {level.name}
-              </span>
-            )}
-          </div>
-        </div>
 
-        {/* ── Section: Identité ── */}
-        <section className="editor-section">
-          <div className="editor-section-title">Identité</div>
+          {/* Section navigation */}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6, paddingLeft: 8 }}>
+              Sections
+            </div>
+            {NAV_SECTIONS.map((sec) => (
+              <button
+                key={sec.id}
+                onClick={() => scrollToSection(sec.id)}
+                style={{
+                  background: activeSection === sec.id ? 'var(--surface2)' : 'transparent',
+                  border: activeSection === sec.id ? '1px solid var(--border)' : '1px solid transparent',
+                  borderRadius: 'var(--radius-sm)',
+                  color: activeSection === sec.id ? 'var(--text)' : 'var(--text-muted)',
+                  fontSize: 13,
+                  padding: '8px 10px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  fontFamily: 'inherit',
+                  fontWeight: activeSection === sec.id ? 500 : 400,
+                  transition: 'all 0.15s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                {activeSection === sec.id && (
+                  <span style={{ width: 3, height: 16, background: 'var(--accent)', borderRadius: 2, flexShrink: 0 }} />
+                )}
+                {sec.label}
+              </button>
+            ))}
+          </nav>
 
-          <div className="form-row">
-            <FormGroup label="Prénom">
-              <input type="text" placeholder="Lucas" value={formData.firstName}
-                onChange={(e) => updateFormData({ firstName: e.target.value })} />
+        </aside>
+
+        {/* -- Main editor content -- */}
+        <div className="editor-content editor-main">
+
+          {/* -- Section: Identité -- */}
+          <section id="section-identity" className="editor-section" style={{ scrollMarginTop: 80 }}>
+            <div className="editor-section-title">Identité</div>
+
+            <div className="form-row">
+              <FormGroup label="Prénom">
+                <input type="text" placeholder="Lucas" value={formData.firstName}
+                  onChange={(e) => updateFormData({ firstName: e.target.value })} />
+              </FormGroup>
+              <FormGroup label="Nom">
+                <input type="text" placeholder="Martin" value={formData.lastName}
+                  onChange={(e) => updateFormData({ lastName: e.target.value })} />
+              </FormGroup>
+            </div>
+
+            <FormGroup label="Pseudo / Nom de scène" optional="optionnel">
+              <input type="text" placeholder="Le nom affiché sur ton profil public"
+                value={formData.username} onChange={(e) => updateFormData({ username: e.target.value })} />
             </FormGroup>
-            <FormGroup label="Nom">
-              <input type="text" placeholder="Martin" value={formData.lastName}
-                onChange={(e) => updateFormData({ lastName: e.target.value })} />
-            </FormGroup>
-          </div>
 
-          <FormGroup label="Pseudo / Nom de scène" optional="optionnel">
-            <input type="text" placeholder="Le nom affiché sur ton profil public"
-              value={formData.username} onChange={(e) => updateFormData({ username: e.target.value })} />
-          </FormGroup>
-
-          <FormGroup label="Photo de profil" optional="optionnel">
-            <UploadZone icon="📷" title="Clique pour changer ta photo" hint="JPG ou PNG, moins de 5Mo"
-              accept="image/jpeg,image/png,image/webp" style={{ padding: 24 }} />
-          </FormGroup>
-
-          <FormGroup label="Langues parlées">
-            <div className="lang-selector">
-              {LANGUAGES.map((lang) => (
-                <div key={lang.key}
-                  className={`lang-option${formData.languages.includes(lang.key) ? ' selected' : ''}`}
-                  onClick={() => toggleLang(lang.key)} role="checkbox"
-                  aria-checked={formData.languages.includes(lang.key)}
-                >
-                  <span className="lang-flag">{lang.flag}</span>{lang.label}
+            <FormGroup label="Photo de profil" optional="optionnel">
+              {formData.avatarUrl ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <img
+                      src={formData.avatarUrl}
+                      alt="Photo de profil"
+                      style={{
+                        width: 96, height: 96, borderRadius: '50%', objectFit: 'cover',
+                        border: '2px solid var(--border)', display: 'block',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => updateFormData({ avatarUrl: '' })}
+                      style={{
+                        position: 'absolute', top: -4, right: -4,
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: '#ff4d4d', border: 'none', color: '#fff',
+                        fontSize: 12, cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                      }}
+                      title="Supprimer la photo"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>Photo enregistrée. Clique × pour la changer.</div>
                 </div>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Disponibilité actuelle">
-            <div className="availability-group">
-              {AVAILABILITY_OPTIONS.map((option) => (
-                <AvailabilityButton key={option} label={option}
-                  selected={formData.availability === option}
-                  onSelect={() => updateFormData({ availability: option })} />
-              ))}
-            </div>
-          </FormGroup>
-        </section>
-
-        {/* ── Section: Compétences ── */}
-        <section className="editor-section">
-          <div className="editor-section-title">Compétences</div>
-
-          <FormGroup label="Ce que tu sais faire">
-            <div className="tag-group">
-              {SKILLS.map((s) => (
-                <Tag key={s.key} icon={s.icon} selected={formData.skills.includes(s.key)}
-                  onToggle={() => toggleArr('skills', s.key)}>{s.label}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Formats">
-            <div className="tag-group">
-              {FORMATS.map((f) => (
-                <Tag key={f.key} selected={formData.formats.includes(f.key)}
-                  onToggle={() => toggleArr('formats', f.key)}>{f.label}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Niches de contenu">
-            <div className="tag-group">
-              <NicheTag isTout selected={formData.niches.length === NICHES.length}
-                onToggle={() => updateFormData({ niches: formData.niches.length === NICHES.length ? [] : [...NICHES] })}>
-                ✦ Toutes niches
-              </NicheTag>
-              {NICHES.map((name) => (
-                <NicheTag key={name} selected={formData.niches.includes(name)}
-                  onToggle={() => toggleArr('niches', name)}>{name}</NicheTag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Expérience">
-            <div className="tag-group">
-              {EXPERIENCE_OPTIONS.map((opt) => (
-                <Tag key={opt.key} selected={formData.experience === opt.key}
-                  onToggle={() => updateFormData({ experience: opt.key })}>{opt.label}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Logiciels">
-            <div className="tag-group">
-              {SOFTWARE.map((sw) => (
-                <Tag key={sw} selected={formData.software.includes(sw)}
-                  onToggle={() => toggleArr('software', sw)}>{sw}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-        </section>
-
-        {/* ── Section: Portfolio ── */}
-        <section className="editor-section">
-          <div className="editor-section-title">Portfolio</div>
-
-          <UploadZone icon="🎬" title="Glisse tes clips ici" hint="MP4 · Max 500 Mo par clip"
-            accept="video/mp4,video/quicktime,video/webm" multiple maxSizeMB={500}
-            style={{ marginBottom: 24 }} />
-
-          <FormGroup label="Liens externes" optional="optionnel">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <input type="text" placeholder="🔗 Lien YouTube, Vimeo, Google Drive..."
-                value={formData.portfolioLinks[0] ?? ''} onChange={(e) => setLink(0, e.target.value)} />
-              <input type="text" placeholder="🔗 Ajouter un autre lien"
-                value={formData.portfolioLinks[1] ?? ''} onChange={(e) => setLink(1, e.target.value)} />
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Chaînes / comptes crédités" optional="optionnel">
-            <input type="text" placeholder="ex: @nomdelachain, youtube.com/c/..."
-              value={formData.creditedChannels}
-              onChange={(e) => updateFormData({ creditedChannels: e.target.value })} />
-          </FormGroup>
-
-          <HintBox>💡 <strong>Astuce :</strong> des clips de 15 à 45 secondes suffisent. Les clients veulent voir ta patte.</HintBox>
-        </section>
-
-        {/* ── Section: Tarifs ── */}
-        <section className="editor-section">
-          <div className="editor-section-title">Tarifs</div>
-
-          <table className="tarif-table" style={{ marginBottom: 24 }}>
-            <thead>
-              <tr>
-                <th />
-                <th>Court (&lt; 5 min)</th>
-                <th>Moyen (5–15 min)</th>
-                <th>Long (15 min+)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="tarif-label">Montage brut</td>
-                <td><input type="number" placeholder="€" /></td>
-                <td><input type="number" placeholder="€" /></td>
-                <td><input type="number" placeholder="€" /></td>
-              </tr>
-              <tr>
-                <td className="tarif-label">Avec motion</td>
-                <td><input type="number" placeholder="€" /></td>
-                <td><input type="number" placeholder="€" /></td>
-                <td><input type="number" placeholder="€" /></td>
-              </tr>
-              <tr>
-                <td className="tarif-label">Miniature incluse</td>
-                <td><input type="number" placeholder="+€" /></td>
-                <td><input type="number" placeholder="+€" /></td>
-                <td><input type="number" placeholder="+€" /></td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className="form-row">
-            <FormGroup label="Tarif horaire" optional="optionnel">
-              <input type="number" placeholder="€ / heure" value={formData.hourlyRate}
-                onChange={(e) => updateFormData({ hourlyRate: e.target.value })} />
+              ) : (
+                <UploadZone icon="📷" title="Clique pour uploader" hint="JPG ou PNG, moins de 5Mo"
+                  accept="image/jpeg,image/png,image/webp" maxSizeMB={5} onFilesChange={handleAvatarUpload}
+                  uploading={avatarUploading} uploadError={avatarUploadError} uploadSuccess={avatarUploadSuccess}
+                  style={{ padding: 24 }} />
+              )}
             </FormGroup>
-            <FormGroup label="Délai de livraison habituel" optional="optionnel">
-              <input type="text" placeholder="ex: 48–72h après réception des rushs"
-                value={formData.deliveryTime}
-                onChange={(e) => updateFormData({ deliveryTime: e.target.value })} />
+
+            <FormGroup label="Langues parlées">
+              <div className="lang-selector">
+                {LANGUAGES.map((lang) => (
+                  <div key={lang.key}
+                    className={`lang-option${formData.languages.includes(lang.key) ? ' selected' : ''}`}
+                    onClick={() => toggleLang(lang.key)} role="checkbox"
+                    aria-checked={formData.languages.includes(lang.key)}
+                  >
+                    <span className="lang-flag" aria-hidden="true">{lang.flag}</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>{lang.code}</span>
+                    {lang.label}
+                  </div>
+                ))}
+              </div>
             </FormGroup>
+
+            <FormGroup label="Disponibilité actuelle">
+              <div className="availability-group">
+                {AVAILABILITY_OPTIONS.map((option) => (
+                  <AvailabilityButton key={option} label={option}
+                    selected={formData.availability === option}
+                    onSelect={() => updateFormData({ availability: option })} />
+                ))}
+              </div>
+            </FormGroup>
+          </section>
+
+          {/* -- Section: Compétences -- */}
+          <section id="section-skills" className="editor-section" style={{ scrollMarginTop: 80 }}>
+            <div className="editor-section-title">Compétences</div>
+
+            <FormGroup label="Ce que tu sais faire">
+              <div className="tag-group">
+                {SKILLS.map((s) => (
+                  <Tag key={s.key} icon={s.icon} selected={formData.skills.includes(s.key)}
+                    onToggle={() => toggleArr('skills', s.key)}>{s.label}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Formats">
+              <div className="tag-group">
+                {FORMATS.map((f) => (
+                  <Tag key={f.key} selected={formData.formats.includes(f.key)}
+                    onToggle={() => toggleArr('formats', f.key)}>{f.label}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Niches de contenu">
+              <div className="tag-group">
+                <NicheTag isTout selected={formData.niches.length === NICHES.length}
+                  onToggle={() => updateFormData({ niches: formData.niches.length === NICHES.length ? [] : [...NICHES] })}>
+                  Toutes niches
+                </NicheTag>
+                {NICHES.map((name) => (
+                  <NicheTag key={name} selected={formData.niches.includes(name)}
+                    onToggle={() => toggleArr('niches', name)}>{name}</NicheTag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Expérience">
+              <div className="tag-group">
+                {EXPERIENCE_OPTIONS.map((opt) => (
+                  <Tag key={opt.key} selected={formData.experience === opt.key}
+                    onToggle={() => updateFormData({ experience: opt.key })}>{opt.label}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Logiciels">
+              <div className="tag-group">
+                {SOFTWARE.map((sw) => (
+                  <Tag key={sw} selected={formData.software.includes(sw)}
+                    onToggle={() => toggleArr('software', sw)}>{sw}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+          </section>
+
+          {/* -- Section: Portfolio -- */}
+          <section id="section-portfolio" className="editor-section" style={{ scrollMarginTop: 80 }}>
+            <div className="editor-section-title">Portfolio</div>
+
+            <FormGroup label="Clips vidéo">
+              {/* Existing uploaded clips */}
+              {formData.portfolioLinks.filter((l) => l.trim()).length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                  {formData.portfolioLinks.filter((l) => l.trim()).map((url, i) => (
+                    <div key={i} style={{ position: 'relative', width: 160, borderRadius: 'var(--radius-sm)', overflow: 'hidden', border: '1px solid var(--border)', background: '#000' }}>
+                      {url.match(/\.(mp4|mov|webm)/i) ? (
+                        <video src={url} style={{ width: '100%', height: 90, objectFit: 'cover' }} muted />
+                      ) : (
+                        <div style={{ width: '100%', height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--text-muted)', padding: 8, wordBreak: 'break-all' }}>
+                          {url.split('/').pop()}
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = formData.portfolioLinks.filter((_, idx) => idx !== i)
+                          updateFormData({ portfolioLinks: next.length ? next : [''] })
+                        }}
+                        style={{
+                          position: 'absolute', top: 4, right: 4,
+                          width: 20, height: 20, borderRadius: '50%',
+                          background: '#ff4d4d', border: 'none', color: '#fff',
+                          fontSize: 11, cursor: 'pointer', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center',
+                        }}
+                        title="Supprimer ce clip"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <UploadZone icon="🎬" title="Glisse tes clips ici" hint="MP4 · Max 500 Mo par clip"
+                accept="video/mp4,video/quicktime,video/webm" multiple maxSizeMB={500}
+                onFilesChange={handleClipUpload}
+                uploading={clipUploading} uploadError={clipUploadError} uploadSuccess={clipUploadSuccess}
+                style={{ marginBottom: 8 }} />
+            </FormGroup>
+
+            {/* Portfolio links — multi-champ dynamique */}
+            <FormGroup label="Liens externes" optional="optionnel">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {portfolioLinks.map((link, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input type="text" placeholder="🔗 Lien YouTube, Vimeo, Google Drive..."
+                      value={link} onChange={(e) => setLink(i, e.target.value)} style={{ flex: 1 }} />
+                    {portfolioLinks.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLink(i)}
+                        style={{
+                          background: 'transparent', border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)',
+                          width: 36, height: 36, cursor: 'pointer', fontSize: 16, flexShrink: 0,
+                        }}
+                        title="Supprimer ce lien"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={addLink}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8, background: 'transparent',
+                  border: '1px dashed var(--border)', borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-muted)', fontSize: 13, padding: '8px 14px',
+                  cursor: 'pointer', width: '100%', marginTop: 8, fontFamily: 'inherit',
+                }}
+              >
+                + Ajouter un lien
+              </button>
+            </FormGroup>
+
+            <FormGroup label="Chaînes / comptes crédités" optional="optionnel">
+              <input type="text" placeholder="ex: @nomdelachain, youtube.com/c/..."
+                value={formData.creditedChannels}
+                onChange={(e) => updateFormData({ creditedChannels: e.target.value })} />
+            </FormGroup>
+
+            <HintBox>Des clips de 15 à 45 secondes suffisent. Les clients veulent voir ta patte.</HintBox>
+          </section>
+
+          {/* -- Section: Tarifs -- */}
+          <section id="section-pricing" className="editor-section" style={{ scrollMarginTop: 80 }}>
+            <div className="editor-section-title">Tarifs</div>
+
+            <table className="tarif-table" style={{ marginBottom: 24 }}>
+              <thead>
+                <tr>
+                  <th />
+                  <th>Court (&lt; 5 min)</th>
+                  <th>Moyen (5–15 min)</th>
+                  <th>Long (15 min+)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="tarif-label">Montage brut</td>
+                  <td><input type="number" placeholder="€" /></td>
+                  <td><input type="number" placeholder="€" /></td>
+                  <td><input type="number" placeholder="€" /></td>
+                </tr>
+                <tr>
+                  <td className="tarif-label">Avec motion</td>
+                  <td><input type="number" placeholder="€" /></td>
+                  <td><input type="number" placeholder="€" /></td>
+                  <td><input type="number" placeholder="€" /></td>
+                </tr>
+                <tr>
+                  <td className="tarif-label">Miniature incluse</td>
+                  <td><input type="number" placeholder="+€" /></td>
+                  <td><input type="number" placeholder="+€" /></td>
+                  <td><input type="number" placeholder="+€" /></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="form-row">
+              <FormGroup label="Tarif horaire" optional="optionnel">
+                <input type="number" placeholder="€ / heure" value={formData.hourlyRate}
+                  onChange={(e) => updateFormData({ hourlyRate: e.target.value })} />
+              </FormGroup>
+              <FormGroup label="Délai de livraison habituel" optional="optionnel">
+                <input type="text" placeholder="ex: 48–72h après réception des rushs"
+                  value={formData.deliveryTime}
+                  onChange={(e) => updateFormData({ deliveryTime: e.target.value })} />
+              </FormGroup>
+            </div>
+
+            <FormGroup label="Retours inclus par défaut">
+              <div className="tag-group">
+                {REVISION_OPTIONS.map((n) => (
+                  <Tag key={n} selected={formData.revisions === n}
+                    onToggle={() => updateFormData({ revisions: n })}>{n}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Capacité de charge simultanée">
+              <div className="tag-group">
+                {CAPACITY_OPTIONS.map((opt) => (
+                  <Tag key={opt.key} selected={formData.capacity === opt.key}
+                    onToggle={() => updateFormData({ capacity: opt.key })}>{opt.label}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+          </section>
+
+          {/* -- Section: Présentation -- */}
+          <section id="section-presentation" className="editor-section" style={{ scrollMarginTop: 80 }}>
+            <div className="editor-section-title">Présentation</div>
+
+            <FormGroup label="Bio courte">
+              <textarea placeholder="En 2–3 phrases : qui tu es, ta patte, ce qui te différencie."
+                maxLength={MAX_BIO} value={formData.bio}
+                onChange={(e) => updateFormData({ bio: e.target.value })} />
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'right', marginTop: 4 }}>
+                {formData.bio.length} / {MAX_BIO} caractères
+              </div>
+            </FormGroup>
+
+            {/* Vidéo de présentation — avec VideoRecordField */}
+            <FormGroup label="Vidéo de présentation" optional="très recommandé — les clients adorent">
+              {formData.presentationVideoUrl ? (
+                <div>
+                  <video
+                    src={formData.presentationVideoUrl}
+                    controls
+                    style={{
+                      width: '100%',
+                      maxHeight: 200,
+                      borderRadius: 'var(--radius-sm)',
+                      background: '#000',
+                      border: '1px solid var(--border)',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateFormData({ presentationVideoUrl: '' })}
+                    style={{
+                      marginTop: 6,
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ff4d4d',
+                      fontSize: 12,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    Supprimer la vidéo actuelle
+                  </button>
+                </div>
+              ) : (
+                <UploadZone
+                  icon="🎥"
+                  title="Uploader une vidéo de présentation"
+                  hint="MP4 · Max 100 Mo"
+                  accept="video/mp4,video/quicktime,video/webm"
+                  maxSizeMB={100}
+                  onFilesChange={handleVideoUpload}
+                  uploading={videoUploading} uploadError={videoUploadError} uploadSuccess={videoUploadSuccess}
+                  style={{ padding: 24 }}
+                />
+              )}
+            </FormGroup>
+
+            <FormGroup label="Type de mission recherchée">
+              <div className="tag-group">
+                {MISSION_TYPES.map((m) => (
+                  <Tag key={m.key} selected={formData.missionTypes.includes(m.key)}
+                    onToggle={() => {
+                      const arr = formData.missionTypes
+                      updateFormData({ missionTypes: arr.includes(m.key) ? arr.filter((k) => k !== m.key) : [...arr, m.key] })
+                    }}>{m.label}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Délai de réponse habituel">
+              <div className="tag-group">
+                {RESPONSE_TIMES.map((rt) => (
+                  <Tag key={rt.key} selected={formData.responseTime === rt.key}
+                    onToggle={() => updateFormData({ responseTime: rt.key })}>{rt.label}</Tag>
+                ))}
+              </div>
+            </FormGroup>
+
+            <FormGroup label="Réseaux / site perso" optional="optionnel">
+              <input type="text" placeholder="Instagram, TikTok, site web..."
+                value={formData.socialLinks}
+                onChange={(e) => updateFormData({ socialLinks: e.target.value })} />
+            </FormGroup>
+          </section>
+
+          {/* -- Bottom save -- */}
+          <div style={{ marginTop: 32, paddingBottom: 64 }}>
+            {saveStatus === 'error' && (
+              <div className="step-error" style={{ marginBottom: 16 }}>
+                Erreur lors de l'enregistrement. Vérifie ta connexion et réessaie.
+              </div>
+            )}
+            <Button variant="primary" onClick={handleSave} style={{ width: '100%', padding: '16px 0', fontSize: 15 }}>
+              {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+            </Button>
           </div>
 
-          <FormGroup label="Retours inclus par défaut">
-            <div className="tag-group">
-              {REVISION_OPTIONS.map((n) => (
-                <Tag key={n} selected={formData.revisions === n}
-                  onToggle={() => updateFormData({ revisions: n })}>{n}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Capacité de charge simultanée">
-            <div className="tag-group">
-              {CAPACITY_OPTIONS.map((opt) => (
-                <Tag key={opt.key} selected={formData.capacity === opt.key}
-                  onToggle={() => updateFormData({ capacity: opt.key })}>{opt.label}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-        </section>
-
-        {/* ── Section: Présentation ── */}
-        <section className="editor-section">
-          <div className="editor-section-title">Présentation</div>
-
-          <FormGroup label="Bio courte">
-            <textarea placeholder="En 2–3 phrases : qui tu es, ta patte, ce qui te différencie."
-              maxLength={MAX_BIO} value={formData.bio}
-              onChange={(e) => updateFormData({ bio: e.target.value })} />
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'right', marginTop: 4 }}>
-              {formData.bio.length} / {MAX_BIO} caractères
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Type de mission recherchée">
-            <div className="tag-group">
-              {MISSION_TYPES.map((m) => (
-                <Tag key={m.key} selected={formData.missionTypes.includes(m.key)}
-                  onToggle={() => toggleArr('missionTypes', m.key)}>{m.label}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Délai de réponse habituel">
-            <div className="tag-group">
-              {RESPONSE_TIMES.map((rt) => (
-                <Tag key={rt.key} selected={formData.responseTime === rt.key}
-                  onToggle={() => updateFormData({ responseTime: rt.key })}>{rt.label}</Tag>
-              ))}
-            </div>
-          </FormGroup>
-
-          <FormGroup label="Réseaux / site perso" optional="optionnel">
-            <input type="text" placeholder="Instagram, TikTok, site web..."
-              value={formData.socialLinks}
-              onChange={(e) => updateFormData({ socialLinks: e.target.value })} />
-          </FormGroup>
-        </section>
-
-        {/* ── Bottom save ── */}
-        <div style={{ marginTop: 32, paddingBottom: 64 }}>
-          {saveStatus === 'error' && (
-            <div className="step-error" style={{ marginBottom: 16 }}>
-              Erreur lors de l'enregistrement. Vérifie ta connexion et réessaie.
-            </div>
-          )}
-          <Button variant="primary" onClick={handleSave} style={{ width: '100%', padding: '16px 0', fontSize: 15 }}>
-            {saving ? 'Enregistrement...' : '✓ Enregistrer les modifications'}
-          </Button>
         </div>
-
       </div>
     </div>
   )

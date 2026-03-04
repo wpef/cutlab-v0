@@ -2,19 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-import { LEVELS } from '../../constants/levels'
-
-const SKILL_LABELS = {
-  video: 'Montage', thumb: 'Miniatures', sound: 'Sound design',
-  motion: 'Motion', voice: 'Traitement voix', subs: 'Sous-titres',
-  color: 'Color', reels: 'Reels / Shorts',
-}
-
-const AVAIL_CLASS = {
-  'Disponible':   'green',
-  'Sur demande':  'yellow',
-  'Indisponible': 'red',
-}
+import EditorCard from '../ui/EditorCard'
 
 export default function Catalog() {
   const {
@@ -33,7 +21,7 @@ export default function Catalog() {
   useEffect(() => {
     supabase
       .from('profiles')
-      .select('id, first_name, last_name, username, availability, skills, assigned_level, bio, languages')
+      .select('id, first_name, last_name, username, availability, skills, assigned_level, bio, languages, avatar_url, presentation_video_url, experience, formats, hourly_rate')
       .eq('status', 'published')
       .then(({ data }) => {
         setProfiles(data ?? [])
@@ -91,7 +79,7 @@ export default function Catalog() {
           CUT<span>LAB</span>
         </div>
         <div className="catalog-header-title">Les monteurs</div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div className="catalog-header-actions">
           {user ? (
             <>
               {userRole === 'editor'
@@ -161,73 +149,46 @@ function ProfileCard({
   contactMsg, onContactMsgChange, onSendContact, onCancelContact,
   contactSending, contactError, userRole,
 }) {
-  const level = LEVELS[profile.assigned_level ?? 2]
-  const availClass = AVAIL_CLASS[profile.availability] ?? 'red'
-  const skills = (profile.skills ?? []).slice(0, 3)
-  const name = [profile.first_name, profile.last_name ? profile.last_name[0] + '.' : ''].filter(Boolean).join(' ')
-
   return (
-    <div className={`catalog-card${isContacting ? ' catalog-card--active' : ''}`}>
-      <div className="catalog-card-thumb">
-        🎬
-        <span className={`catalog-card-avail catalog-card-avail--${availClass}`}>
-          {profile.availability}
-        </span>
-      </div>
-      <div className="catalog-card-body">
-        <div className="catalog-card-name">{name || 'Monteur'}</div>
-        {profile.username && (
-          <div className="catalog-card-username">@{profile.username}</div>
-        )}
-        {skills.length > 0 && (
-          <div className="catalog-card-tags">
-            {skills.map((s) => (
-              <span key={s} className="catalog-card-tag">{SKILL_LABELS[s] ?? s}</span>
-            ))}
-          </div>
-        )}
-        {level && (
-          <div className="catalog-card-level">{level.emoji} {level.name}</div>
-        )}
+    <EditorCard profile={profile}>
 
-        {/* Contact button */}
-        {!isContacting && (
-          <button className="catalog-contact-btn" onClick={onContact}>
-            {userRole === 'editor' ? 'Messagerie →' : 'Contacter →'}
-          </button>
-        )}
+      {/* Contact button */}
+      {!isContacting && (
+        <button className="catalog-contact-btn" onClick={onContact}>
+          {userRole === 'editor' ? 'Messagerie →' : 'Contacter →'}
+        </button>
+      )}
 
-        {/* Inline contact form */}
-        {isContacting && (
-          <div className="catalog-contact-form">
-            <textarea
-              className="catalog-contact-input"
-              placeholder="Bonjour, je cherche un monteur pour..."
-              value={contactMsg}
-              onChange={(e) => onContactMsgChange(e.target.value)}
-              rows={3}
-            />
-            {contactError && <div className="step-error" style={{ marginTop: 8, fontSize: 12 }}>{contactError}</div>}
-            <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-              <button
-                className="btn btn-primary"
-                style={{ flex: 1, padding: '9px 0', fontSize: 13 }}
-                onClick={onSendContact}
-                disabled={contactSending || !contactMsg.trim()}
-              >
-                {contactSending ? '...' : 'Envoyer →'}
-              </button>
-              <button
-                className="btn btn-ghost"
-                style={{ padding: '9px 14px', fontSize: 13 }}
-                onClick={onCancelContact}
-              >
-                ✕
-              </button>
-            </div>
+      {/* Inline contact form */}
+      {isContacting && (
+        <div className="catalog-contact-form">
+          <textarea
+            className="catalog-contact-input"
+            placeholder="Bonjour, je cherche un monteur pour..."
+            value={contactMsg}
+            onChange={(e) => onContactMsgChange(e.target.value)}
+            rows={3}
+          />
+          {contactError && <div className="step-error" style={{ marginTop: 8, fontSize: 12 }}>{contactError}</div>}
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <button
+              className="btn btn-primary"
+              style={{ flex: 1, padding: '9px 0', fontSize: 13 }}
+              onClick={onSendContact}
+              disabled={contactSending || !contactMsg.trim()}
+            >
+              {contactSending ? '...' : 'Envoyer →'}
+            </button>
+            <button
+              className="btn btn-ghost"
+              style={{ padding: '9px 14px', fontSize: 13 }}
+              onClick={onCancelContact}
+            >
+              ✕
+            </button>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </EditorCard>
   )
 }

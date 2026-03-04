@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
+import { uploadFile } from '../../lib/uploadFile'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import HintBox from '../ui/HintBox'
@@ -8,24 +9,45 @@ import AvailabilityButton from '../ui/AvailabilityButton'
 import StepNav from '../ui/StepNav'
 
 const LANGUAGES = [
-  { key: 'fr', flag: '🇫🇷', label: 'Français' },
-  { key: 'en', flag: '🇬🇧', label: 'Anglais' },
-  { key: 'es', flag: '🇪🇸', label: 'Espagnol' },
-  { key: 'pt', flag: '🇧🇷', label: 'Portugais' },
-  { key: 'de', flag: '🇩🇪', label: 'Allemand' },
-  { key: 'it', flag: '🇮🇹', label: 'Italien' },
-  { key: 'zh', flag: '🇨🇳', label: 'Chinois' },
-  { key: 'ja', flag: '🇯🇵', label: 'Japonais' },
-  { key: 'ar', flag: '🇸🇦', label: 'Arabe' },
-  { key: 'ru', flag: '🇷🇺', label: 'Russe' },
-  { key: 'ko', flag: '🇰🇷', label: 'Coréen' },
+  { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
+  { key: 'en', flag: '🇬🇧', code: 'EN', label: 'Anglais' },
+  { key: 'es', flag: '🇪🇸', code: 'ES', label: 'Espagnol' },
+  { key: 'pt', flag: '🇧🇷', code: 'PT', label: 'Portugais' },
+  { key: 'de', flag: '🇩🇪', code: 'DE', label: 'Allemand' },
+  { key: 'it', flag: '🇮🇹', code: 'IT', label: 'Italien' },
+  { key: 'zh', flag: '🇨🇳', code: 'ZH', label: 'Chinois' },
+  { key: 'ja', flag: '🇯🇵', code: 'JA', label: 'Japonais' },
+  { key: 'ar', flag: '🇸🇦', code: 'AR', label: 'Arabe' },
+  { key: 'ru', flag: '🇷🇺', code: 'RU', label: 'Russe' },
+  { key: 'ko', flag: '🇰🇷', code: 'KO', label: 'Coréen' },
 ]
 
 const AVAILABILITY_OPTIONS = ['Disponible', 'Sur demande', 'Indisponible']
 
 export default function Step2Identity() {
-  const { goToStep, formData, updateFormData } = useOnboarding()
+  const { goToStep, formData, updateFormData, user } = useOnboarding()
   const [error, setError] = useState('')
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarUploadError, setAvatarUploadError] = useState(null)
+  const [avatarUploadSuccess, setAvatarUploadSuccess] = useState(false)
+
+  async function handleAvatarFiles(files) {
+    if (!files.length || !user) return
+    setAvatarUploading(true)
+    setAvatarUploadError(null)
+    setAvatarUploadSuccess(false)
+    const file = files[0]
+    const ext = file.name.split('.').pop()
+    const url = await uploadFile('avatars', `${user.id}/avatar.${ext}`, file)
+    setAvatarUploading(false)
+    if (url) {
+      updateFormData({ avatarUrl: url })
+      setAvatarUploadSuccess(true)
+      setTimeout(() => setAvatarUploadSuccess(false), 3000)
+    } else {
+      setAvatarUploadError('Erreur lors de l\'upload. Réessaie.')
+    }
+  }
 
   function handleNext() {
     if (!formData.firstName.trim()) { setError('Ton prénom est requis.'); return }
@@ -78,13 +100,30 @@ export default function Step2Identity() {
       </FormGroup>
 
       <FormGroup label="Photo de profil" optional="optionnel — tu peux l'ajouter plus tard">
-        <UploadZone
-          icon="📷"
-          title="Clique pour uploader"
-          hint="JPG ou PNG, moins de 5Mo"
-          accept="image/jpeg,image/png,image/webp"
-          style={{ padding: 24 }}
-        />
+        {formData.avatarUrl && !avatarUploading ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <img src={formData.avatarUrl} alt="Photo" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }} />
+              <button type="button" onClick={() => updateFormData({ avatarUrl: '' })}
+                style={{ position: 'absolute', top: -4, right: -4, width: 20, height: 20, borderRadius: '50%', background: '#ff4d4d', border: 'none', color: '#fff', fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Supprimer">×</button>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>Photo enregistrée. Clique × pour la changer.</div>
+          </div>
+        ) : (
+          <UploadZone
+            icon="📷"
+            title="Clique pour uploader"
+            hint="JPG ou PNG, moins de 5Mo"
+            accept="image/jpeg,image/png,image/webp"
+            maxSizeMB={5}
+            onFilesChange={handleAvatarFiles}
+            uploading={avatarUploading}
+            uploadError={avatarUploadError}
+            uploadSuccess={avatarUploadSuccess}
+            style={{ padding: 24 }}
+          />
+        )}
       </FormGroup>
 
       <FormGroup label="Langues parlées">
@@ -97,7 +136,8 @@ export default function Step2Identity() {
               role="checkbox"
               aria-checked={formData.languages.includes(lang.key)}
             >
-              <span className="lang-flag">{lang.flag}</span>
+              <span className="lang-flag" title={lang.label} aria-hidden="true">{lang.flag}</span>
+              <span className="lang-code" style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>{lang.code}</span>
               {lang.label}
             </div>
           ))}

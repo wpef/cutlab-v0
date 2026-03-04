@@ -19,6 +19,7 @@ import ChatView from './components/pages/ChatView'
 import OfferForm from './components/pages/OfferForm'
 import OfferPreview from './components/pages/OfferPreview'
 import MesProjetsMonteur from './components/pages/MesProjetsMonteur'
+import EditorPipeline from './components/pages/EditorPipeline'
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -44,6 +45,7 @@ export default function App() {
   if (currentView === 'chat')           return <ChatView />
   if (currentView === 'offer-form')     return <OfferForm />
   if (currentView === 'offer-preview')  return <OfferPreview />
+  if (currentView === 'pipeline')       return <EditorPipeline />
 
   const progress = currentStep === 9 ? 100 : Math.round((currentStep / 8) * 100)
   const StepComponent = STEP_COMPONENTS[currentStep]

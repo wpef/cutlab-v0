@@ -28,7 +28,7 @@ export default function Landing() {
 
       <div className="landing-hero">
 
-        {/* ── Côté créateur ── */}
+        {/* -- Côté créateur -- */}
         <div className="landing-panel landing-panel--dark">
           <div className="landing-divider" />
           <div className="landing-panel-content">
@@ -41,7 +41,7 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* ── Côté monteur ── */}
+        {/* -- Côté monteur -- */}
         <div className="landing-panel landing-panel--accent">
           <div className="landing-panel-content">
             <div className="landing-eyebrow">Pour les monteurs</div>

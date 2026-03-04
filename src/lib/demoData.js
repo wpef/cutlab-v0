@@ -1,6 +1,9 @@
-// Demo account — utilisé uniquement en développement (import.meta.env.DEV)
+// Demo accounts
 export const DEMO_EMAIL    = 'demo@cutlab.io'
 export const DEMO_PASSWORD = 'cutlab-demo-2024!'
+
+export const DEMO_CREATOR_EMAIL    = 'demo-creator@cutlab.io'
+export const DEMO_CREATOR_PASSWORD = 'cutlab-creator-2024!'
 
 export const DEMO_FORM = {
   firstName:        'Lucas',

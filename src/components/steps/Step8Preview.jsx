@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
-import { LEVELS } from '../../constants/levels'
+import { computeCompletion } from '../../lib/profileCompletion'
+import EditorCard from '../ui/EditorCard'
 import StepHeader from '../ui/StepHeader'
 import StepNav from '../ui/StepNav'
 
@@ -12,9 +13,9 @@ const LEGEND_ITEMS = [
   { label: 'Indicateur prix',   desc: 'de $ à $$$$ calculé automatiquement depuis ta grille' },
 ]
 
+
 export default function Step8Preview() {
-  const { goToStep, publishProfile, assignedLevel, saving } = useOnboarding()
-  const level = LEVELS[assignedLevel]
+  const { goToStep, publishProfile, assignedLevel, saving, formData } = useOnboarding()
   const [error, setError] = useState('')
 
   async function handlePublish() {
@@ -22,6 +23,12 @@ export default function Step8Preview() {
     const ok = await publishProfile()
     if (!ok) setError('Erreur lors de la publication. Vérifie ta connexion et réessaie.')
   }
+
+  // Completion
+  const { pct: completionPct, missing: suggestions } = computeCompletion(formData)
+
+  // Score bar color
+  const scoreColor = completionPct >= 80 ? '#00c850' : completionPct >= 50 ? 'var(--accent)' : '#ffc800'
 
   return (
     <div className="step-screen">
@@ -32,42 +39,23 @@ export default function Step8Preview() {
       />
 
       <div className="card-preview-section">
-        {/* Profile card */}
-        <div className="profile-preview">
-          <div className="profile-thumb">
-            🎬
-            <div className="profile-avail">
-              <div className="avail-pulse" />
-              Dispo
-            </div>
-            <div className="profile-skills">
-              <div className="profile-tag">Montage</div>
-              <div className="profile-tag">Motion</div>
-              <div className="profile-tag">Gaming</div>
-            </div>
-            <div className="profile-level-badge">
-              {level.emoji} {level.name}
-            </div>
-          </div>
-
-          <div className="profile-body">
-            <div className="profile-name">Lucas M.</div>
-            <div className="profile-meta">2 ans d'expérience</div>
-            <div className="profile-langs">
-              <span className="profile-lang" title="Français">🇫🇷</span>
-              <span className="profile-lang" title="Anglais">🇬🇧</span>
-            </div>
-            <div className="profile-platforms">
-              <div className="platform-badge" title="YouTube">📺</div>
-              <div className="platform-badge" title="TikTok">🎵</div>
-              <div className="platform-badge" title="Instagram">📷</div>
-            </div>
-            <div className="profile-footer">
-              <div className="profile-price">$$ · À partir de 80€</div>
-              <div className="profile-rating">⭐ Nouveau</div>
-            </div>
-          </div>
-        </div>
+        {/* Dynamic profile card — shared component */}
+        <EditorCard
+          profile={{
+            avatar_url: formData.avatarUrl,
+            presentation_video_url: formData.presentationVideoUrl,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            username: formData.username,
+            availability: formData.availability,
+            skills: formData.skills,
+            assigned_level: assignedLevel,
+            experience: formData.experience,
+            languages: formData.languages,
+            formats: formData.formats,
+            hourly_rate: formData.hourlyRate,
+          }}
+        />
 
         {/* Legend */}
         <div>
@@ -82,7 +70,7 @@ export default function Step8Preview() {
         </div>
       </div>
 
-      {/* Completion progress */}
+      {/* Completion score */}
       <div
         style={{
           marginTop: 48,
@@ -92,23 +80,54 @@ export default function Step8Preview() {
           background: 'var(--surface)',
         }}
       >
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>
-          Complète ton profil pour plus de visibilité
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+            Complétion du profil
+          </div>
+          <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, color: scoreColor, fontSize: 18 }}>
+            {completionPct}%
+          </div>
         </div>
         <div style={{ background: 'var(--surface2)', borderRadius: 100, height: 6, overflow: 'hidden' }}>
-          <div style={{ width: '70%', height: '100%', background: 'var(--accent)', borderRadius: 100 }} />
+          <div style={{
+            width: `${completionPct}%`,
+            height: '100%',
+            background: scoreColor,
+            borderRadius: 100,
+            transition: 'width 0.5s ease',
+          }} />
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 6 }}>
-          70% complet — ajoute une vidéo de présentation pour atteindre 85%
-        </div>
+
+        {/* Suggestions if < 80% */}
+        {completionPct < 80 && suggestions.length > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Améliorations suggérées
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {suggestions.slice(0, 4).map((s, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13, color: 'var(--text-dim)' }}>
+                  <span style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 1 }}>+</span>
+                  {s}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {completionPct >= 80 && (
+          <div style={{ marginTop: 10, fontSize: 12, color: '#00c850' }}>
+            Excellent ! Ton profil est bien rempli.
+          </div>
+        )}
       </div>
 
       {error && <div className="step-error">{error}</div>}
       <StepNav
         onBack={() => goToStep(7)}
-        backLabel="← Modifier"
+        backLabel="Modifier"
         onNext={handlePublish}
-        nextLabel={saving ? 'Publication...' : '🚀 Publier mon profil'}
+        nextLabel={saving ? 'Publication...' : 'Publier mon profil'}
         nextStyle={{ padding: '14px 40px' }}
       />
     </div>
