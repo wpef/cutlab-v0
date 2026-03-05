@@ -20,28 +20,40 @@
 | `/creator-signup` | CreatorSignup | none (public) |
 | `/catalog` | Catalog | AppLayout |
 | `/projects` | MesProjetsMonteur | AppLayout |
-| `/editor` | ProfileEditor | AppLayout |
+| `/editor` | ProfileEditor | AppLayout (fill) |
 | `/messaging` | MessagingHub | AppLayout |
-| `/messaging/:id` | ChatView | AppLayout |
-| `/pipeline` | EditorPipeline | AppLayout |
+| `/messaging/:id` | ChatView | AppLayout (fill) |
+| `/pipeline` | EditorPipeline | AppLayout (fill) |
 | `/offer/new` | OfferForm | AppLayout |
 | `/offer/preview` | OfferPreview | AppLayout |
 
 ## Layout system
-- **AppLayout** (`src/components/layout/AppLayout.jsx`): wraps authenticated routes. Contains TopNav + Outlet (with AnimatePresence) + BottomNav.
+- **AppLayout** (`src/components/layout/AppLayout.jsx`): wraps authenticated routes. Contains TopNav + Outlet (with AnimatePresence) + BottomNav + Toast.
 - **TopNav**: desktop only, role-based tabs, animated indicator (layoutId).
-- **BottomNav**: mobile only (fixed bottom), role-based tabs, animated indicator.
-- **PageTitle**: optional sub-header with title + action buttons.
+- **BottomNav**: mobile = in-flow flex child (NOT position:fixed). Desktop = hidden.
+- **PageTitle**: sticky sub-header with title + action buttons (`position: sticky; top: 0`).
 - **OnboardingLayout**: Sidebar + Steps 1-9 with progress bar. Separate from AppLayout.
 
+### Mobile viewport strategy
+- `.app-layout` is `position: fixed` on mobile (no `bottom`, height via JS).
+- `useViewportHeight()` hook tracks `window.visualViewport.height` — handles keyboard open/close.
+- **Fill pages** (editor, chat, pipeline): `app-layout-content--fill` disables outer scroll. Page manages its own internal scroll.
+- **Normal pages** (catalog, projects, messaging): outer `overflow-y: auto` scrolls naturally.
+- Pages never use `min-height: 100vh` inside AppLayout.
+
 ## Key contexts
-- **OnboardingContext** (`src/context/OnboardingContext.jsx`): auth (Supabase), formData, goTo* navigation (uses navigateRef from React Router), saveProfile.
+- **OnboardingContext** (`src/context/OnboardingContext.jsx`): auth (Supabase), formData, goTo* navigation (uses navigateRef from React Router), saveProfile, loadProfile.
 - **MessagingContext** (`src/context/MessagingContext.jsx`): requests, messages, offers, signUpCreator.
 
 ## Navigation pattern
 - `navigateRef` in OnboardingContext is injected by `NavigationBridge` component (in main.jsx).
 - All `goTo*` functions call `navigateRef.current('/path')` — components don't need to import useNavigate.
 - `goToHome()` redirects to role-appropriate home.
+
+## Toast notifications
+- `src/components/ui/Toast.jsx` — CustomEvent-based, no context/provider.
+- Usage: `import { toast } from '../ui/Toast'; toast.success('msg'); toast.error('msg')`
+- Auto-dismiss 3s, max 3 stacked, framer-motion animations.
 
 ## Animation conventions
 - `AnimatedList` / `AnimatedItem` for staggered list appearances (spring, 0.06s stagger).
@@ -54,8 +66,11 @@
 - Mobile breakpoint: `@media (max-width: 768px)`
 - Touch targets: min 44px on mobile
 - `.catalog-header-btn` is a shared utility button class (not tied to catalog)
+- Fill pages use `flex: 1; min-height: 0; overflow: hidden` — internal scroll via child elements
+- Chat: `flex-shrink: 0` on header/input/actions to survive keyboard resize
 
 ## Conventions
 - Each step: reads from `formData` context, calls `save()` + `goToStep()` on navigation.
 - Sets for multi-select in local state, converted to arrays before context/DB.
 - French UI, code comments in English.
+- Update CLAUDE.md and MEMORY.md after every significant feature merge to main.
