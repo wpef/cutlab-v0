@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useOnboarding } from '../../context/OnboardingContext'
 
 const EDITOR_TABS = [
@@ -28,7 +29,15 @@ export default function BottomNav() {
             key={t.path}
             className={`bottom-nav-tab${isActive ? ' bottom-nav-tab--active' : ''}`}
             onClick={() => navigate(t.path)}
+            style={{ position: 'relative' }}
           >
+            {isActive && (
+              <motion.div
+                className="bottom-nav-indicator"
+                layoutId="bottom-nav-indicator"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
             <span className="bottom-nav-tab-icon">{t.icon}</span>
             <span className="bottom-nav-tab-label">{t.label}</span>
           </button>

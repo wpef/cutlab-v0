@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 function formatDate(iso) {
   const d = new Date(iso)
@@ -57,11 +58,11 @@ export default function MessagingHub() {
                   Demandes en attente
                   <span className="messaging-badge" style={{ marginLeft: 8 }}>{pendingRequests.length}</span>
                 </div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
 
@@ -71,11 +72,11 @@ export default function MessagingHub() {
                 <div className="messaging-section-title">
                   {userRole === 'editor' ? 'Conversations actives' : 'Mes demandes'}
                 </div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {activeRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
 
@@ -83,22 +84,22 @@ export default function MessagingHub() {
             {userRole === 'creator' && pendingRequests.length > 0 && activeRequests.length === 0 && (
               <div>
                 <div className="messaging-section-title">Mes demandes</div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
 
             {userRole === 'creator' && pendingRequests.length > 0 && activeRequests.length > 0 && (
               <div style={{ marginBottom: 32 }}>
                 <div className="messaging-section-title">Demandes en attente</div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
           </>

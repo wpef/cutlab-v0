@@ -4,6 +4,7 @@ import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import EditorCard from '../ui/EditorCard'
 import PageTitle from '../layout/PageTitle'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 export default function Catalog() {
   const {
@@ -101,23 +102,24 @@ export default function Catalog() {
         ) : (
           <>
             <div className="catalog-meta">{profiles.length} monteur{profiles.length > 1 ? 's' : ''}</div>
-            <div className="catalog-grid">
+            <AnimatedList className="catalog-grid">
               {profiles.map((p) => (
-                <ProfileCard
-                  key={p.id}
-                  profile={p}
-                  onContact={() => handleContact(p)}
-                  isContacting={contactingId === p.id}
-                  contactMsg={contactMsg}
-                  onContactMsgChange={setContactMsg}
-                  onSendContact={() => handleSendContact(p)}
-                  onCancelContact={() => setContactingId(null)}
-                  contactSending={contactSending}
-                  contactError={contactError}
-                  userRole={userRole}
-                />
+                <AnimatedItem key={p.id}>
+                  <ProfileCard
+                    profile={p}
+                    onContact={() => handleContact(p)}
+                    isContacting={contactingId === p.id}
+                    contactMsg={contactMsg}
+                    onContactMsgChange={setContactMsg}
+                    onSendContact={() => handleSendContact(p)}
+                    onCancelContact={() => setContactingId(null)}
+                    contactSending={contactSending}
+                    contactError={contactError}
+                    userRole={userRole}
+                  />
+                </AnimatedItem>
               ))}
-            </div>
+            </AnimatedList>
           </>
         )}
       </div>

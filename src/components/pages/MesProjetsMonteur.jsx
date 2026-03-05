@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 const STATUS_LABEL = { pending: 'En attente', accepted: 'En cours', refused: 'Refusée' }
 const STATUS_CLASS = { pending: 'pending', accepted: 'accepted', refused: 'refused' }
@@ -83,9 +84,9 @@ export default function MesProjetsMonteur() {
                   Demandes en attente
                   <span className="projects-badge">{pendingRequests.length}</span>
                 </div>
-                <div className="projects-list">
+                <AnimatedList className="projects-list">
                   {pendingRequests.map((r) => (
-                    <div key={r.id} className="projects-card projects-card--pending" onClick={() => openRequest(r.id)}>
+                    <AnimatedItem key={r.id} className="projects-card projects-card--pending" onClick={() => openRequest(r.id)}>
                       <div className="projects-card-avatar">{r.creator_name?.[0]?.toUpperCase() || '?'}</div>
                       <div className="projects-card-info">
                         <div className="projects-card-name">{r.creator_name || 'Créateur'}</div>
@@ -95,9 +96,9 @@ export default function MesProjetsMonteur() {
                         <span className="projects-status projects-status--pending">En attente</span>
                         <span>{formatDate(r.created_at)}</span>
                       </div>
-                    </div>
+                    </AnimatedItem>
                   ))}
-                </div>
+                </AnimatedList>
               </section>
             )}
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 const STAGES = [
   { key: 'contact_demande',      label: 'Contact demande',      icon: '📩' },
@@ -122,12 +123,12 @@ export default function EditorPipeline() {
                   <span className="pipeline-column-count">{grouped[stage.key].length}</span>
                 )}
               </div>
-              <div className="pipeline-column-cards">
+              <AnimatedList className="pipeline-column-cards">
                 {grouped[stage.key].length === 0 ? (
                   <div className="pipeline-column-empty">Aucune demande</div>
                 ) : (
                   grouped[stage.key].map(({ request, offer, stage: s }) => (
-                    <PipelineCard
+                    <AnimatedItem key={request.id}><PipelineCard
                       key={request.id}
                       request={request}
                       offer={offer}
@@ -136,10 +137,10 @@ export default function EditorPipeline() {
                       onRefuse={handleRefuse}
                       onAcceptOffer={handleAcceptOffer}
                       onOpenChat={openChat}
-                    />
+                    /></AnimatedItem>
                   ))
                 )}
-              </div>
+              </AnimatedList>
             </div>
           ))}
         </div>
