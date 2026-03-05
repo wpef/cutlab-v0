@@ -115,7 +115,7 @@ export default function OfferPreview() {
         )}
 
         {/* Details row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 28 }}>
+        <div className="offer-doc-details">
           {offer.format && (
             <div className="offer-doc-section" style={{ marginBottom: 0 }}>
               <div className="offer-doc-section-label">Format</div>

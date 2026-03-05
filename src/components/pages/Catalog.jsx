@@ -3,10 +3,12 @@ import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import EditorCard from '../ui/EditorCard'
+import PageTitle from '../layout/PageTitle'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 export default function Catalog() {
   const {
-    goToLanding, goToOnboarding, goToEditor, goToCreatorSignup, goToMessaging, goToProjects, goToHome, signOut,
+    goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
   } = useOnboarding()
   const { requests, loadRequests, sendContactRequest } = useMessaging()
@@ -74,35 +76,16 @@ export default function Catalog() {
   return (
     <div className="catalog-page">
 
-      <header className="catalog-header">
-        <div className="catalog-header-logo" onClick={user ? goToHome : goToLanding}>
-          CUT<span>LAB</span>
-        </div>
-        <div className="catalog-header-title">Les monteurs</div>
-        <div className="catalog-header-actions">
-          {user ? (
-            <>
-              {userRole === 'editor'
-                ? <>
-                    <button className="catalog-header-btn" onClick={goToProjects}>Mes projets →</button>
-                    <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
-                  </>
-                : <button className="catalog-header-btn" onClick={goToMessaging}>
-                    Mes messages →
-                  </button>
-              }
-              <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-            </>
-          ) : (
-            <>
-              <button className="catalog-header-btn" onClick={() => goToCreatorSignup(null)}>
-                Je cherche un monteur
-              </button>
-              <button className="catalog-header-btn" onClick={goToOnboarding}>Je suis monteur →</button>
-            </>
-          )}
-        </div>
-      </header>
+      <PageTitle title="Les monteurs">
+        {!user && (
+          <>
+            <button className="catalog-header-btn" onClick={() => goToCreatorSignup(null)}>
+              Je cherche un monteur
+            </button>
+            <button className="catalog-header-btn" onClick={goToOnboarding}>Je suis monteur →</button>
+          </>
+        )}
+      </PageTitle>
 
       <div className="catalog-content">
         {loading ? (
@@ -119,23 +102,24 @@ export default function Catalog() {
         ) : (
           <>
             <div className="catalog-meta">{profiles.length} monteur{profiles.length > 1 ? 's' : ''}</div>
-            <div className="catalog-grid">
+            <AnimatedList className="catalog-grid">
               {profiles.map((p) => (
-                <ProfileCard
-                  key={p.id}
-                  profile={p}
-                  onContact={() => handleContact(p)}
-                  isContacting={contactingId === p.id}
-                  contactMsg={contactMsg}
-                  onContactMsgChange={setContactMsg}
-                  onSendContact={() => handleSendContact(p)}
-                  onCancelContact={() => setContactingId(null)}
-                  contactSending={contactSending}
-                  contactError={contactError}
-                  userRole={userRole}
-                />
+                <AnimatedItem key={p.id}>
+                  <ProfileCard
+                    profile={p}
+                    onContact={() => handleContact(p)}
+                    isContacting={contactingId === p.id}
+                    contactMsg={contactMsg}
+                    onContactMsgChange={setContactMsg}
+                    onSendContact={() => handleSendContact(p)}
+                    onCancelContact={() => setContactingId(null)}
+                    contactSending={contactSending}
+                    contactError={contactError}
+                    userRole={userRole}
+                  />
+                </AnimatedItem>
               ))}
-            </div>
+            </AnimatedList>
           </>
         )}
       </div>

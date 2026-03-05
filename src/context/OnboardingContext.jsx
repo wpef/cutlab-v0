@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
 const OnboardingContext = createContext(null)
@@ -28,7 +28,6 @@ const INITIAL_FORM = {
 export function OnboardingProvider({ children }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [maxStepReached, setMaxStepReached] = useState(1)
-  const [currentView, setCurrentView] = useState('landing') // 'landing' | 'onboarding' | 'editor' | 'catalog' | 'creator-signup' | 'messaging' | 'chat' | 'offer-form' | 'offer-preview' | 'projects' | 'pipeline'
   const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
@@ -36,6 +35,14 @@ export function OnboardingProvider({ children }) {
   const [authError, setAuthError] = useState(null)
   const [saving, setSaving] = useState(false)
   const [pendingEditor, setPendingEditor] = useState(null) // { id, name } — set when non-logged creator clicks "Contacter"
+
+  // React Router navigation bridge
+  const navigateRef = useRef(null)
+
+  function nav(path) {
+    if (navigateRef.current) navigateRef.current(path)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   // Sync auth state on mount and across tab changes
   useEffect(() => {
@@ -55,7 +62,7 @@ export function OnboardingProvider({ children }) {
   function goToStep(n) {
     setCurrentStep(n)
     setMaxStepReached((prev) => Math.max(prev, n))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    nav(`/onboarding/${n}`)
   }
 
   async function signUpUser(email, password) {
@@ -86,7 +93,7 @@ export function OnboardingProvider({ children }) {
     setFormData(INITIAL_FORM)
     setAssignedLevel(2)
     setCurrentStep(1)
-    setCurrentView('landing')
+    nav('/')
   }
 
   async function signInWithGoogle() {
@@ -182,84 +189,50 @@ export function OnboardingProvider({ children }) {
   async function loginAndRedirect(email, password) {
     const ok = await signInUser(email, password)
     if (!ok) return false
-    // Load profile to get the role from DB
     const { data } = await supabase.from('profiles').select('role').eq('id', (await supabase.auth.getUser()).data.user?.id).single()
     const role = data?.role || 'editor'
     setFormData((prev) => ({ ...prev, role }))
     if (role === 'creator') {
-      setCurrentView('catalog')
+      nav('/catalog')
     } else {
       await loadProfile()
-      setCurrentView('projects')
+      nav('/projects')
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
     return true
   }
 
   async function goToEditor() {
     await loadProfile()
-    setCurrentView('editor')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    nav('/editor')
   }
 
-  function goToProjects() {
-    setCurrentView('projects')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function goToLanding() {
-    setCurrentView('landing')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  function goToProjects() { nav('/projects') }
+  function goToLanding() { nav('/') }
 
   function goToOnboarding() {
     setCurrentStep(1)
-    setCurrentView('onboarding')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    nav('/onboarding/1')
   }
 
-  function goToCatalog() {
-    setCurrentView('catalog')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  function goToCatalog() { nav('/catalog') }
 
   function goToCreatorSignup(editorId = null, editorName = '') {
     if (editorId) setPendingEditor({ id: editorId, name: editorName })
     else setPendingEditor(null)
-    setCurrentView('creator-signup')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    nav('/creator-signup')
   }
 
-  function clearPendingEditor() {
-    setPendingEditor(null)
-  }
+  function clearPendingEditor() { setPendingEditor(null) }
 
-  function goToMessaging() {
-    setCurrentView('messaging')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  function goToMessaging() { nav('/messaging') }
 
-  function goToChat(requestId) {
-    setCurrentView('chat')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  function goToChat(requestId) { nav(`/messaging/${requestId}`) }
 
-  function goToPipeline() {
-    setCurrentView('pipeline')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  function goToPipeline() { nav('/pipeline') }
+  function goToOfferForm() { nav('/offer/new') }
+  function goToOfferPreview() { nav('/offer/preview') }
 
-  function goToOfferForm() {
-    setCurrentView('offer-form')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function goToOfferPreview() {
-    setCurrentView('offer-preview')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  /** Navigate to the role-appropriate home: Monteur -> projects, Créateur -> catalog */
+  /** Navigate to the role-appropriate home: Monteur -> projects, Createur -> catalog */
   function goToHome() {
     if (formData.role === 'creator') goToCatalog()
     else goToProjects()
@@ -269,7 +242,8 @@ export function OnboardingProvider({ children }) {
     <OnboardingContext.Provider
       value={{
         currentStep, goToStep, maxStepReached,
-        currentView, goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
+        navigateRef,
+        goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
         goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
         assignedLevel, setAssignedLevel,
         formData, updateFormData,

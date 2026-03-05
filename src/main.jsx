@@ -1,16 +1,21 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { OnboardingProvider } from './context/OnboardingContext'
 import { MessagingProvider } from './context/MessagingContext'
+import NavigationBridge from './NavigationBridge'
 import './styles/global.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <OnboardingProvider>
-      <MessagingProvider>
-        <App />
-      </MessagingProvider>
-    </OnboardingProvider>
+    <BrowserRouter>
+      <OnboardingProvider>
+        <NavigationBridge />
+        <MessagingProvider>
+          <App />
+        </MessagingProvider>
+      </OnboardingProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 )

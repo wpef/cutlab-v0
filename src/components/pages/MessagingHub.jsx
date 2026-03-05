@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-import EditorNav from '../ui/EditorNav'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 function formatDate(iso) {
   const d = new Date(iso)
@@ -17,7 +17,7 @@ const STATUS_LABEL = { pending: 'En attente', accepted: 'Acceptée', refused: 'R
 const STATUS_CLASS = { pending: 'pending', accepted: 'accepted', refused: 'refused' }
 
 export default function MessagingHub() {
-  const { goToHome, goToChat, goToCatalog, goToEditor, goToProjects, signOut, userRole, user } = useOnboarding()
+  const { goToChat, goToCatalog, userRole, user } = useOnboarding()
   const { requests, messagingLoading, loadRequests, setActiveRequestId } = useMessaging()
 
   useEffect(() => {
@@ -34,19 +34,6 @@ export default function MessagingHub() {
 
   return (
     <div className="messaging-page">
-
-      {userRole === 'editor' ? (
-        <EditorNav active="messaging" />
-      ) : (
-        <header className="messaging-header">
-          <div className="messaging-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
-          <div className="messaging-header-title">Messagerie</div>
-          <div className="messaging-header-actions">
-            <button className="catalog-header-btn" onClick={goToCatalog}>+ Nouveau contact</button>
-            <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-          </div>
-        </header>
-      )}
 
       <div className="messaging-content">
 
@@ -71,11 +58,11 @@ export default function MessagingHub() {
                   Demandes en attente
                   <span className="messaging-badge" style={{ marginLeft: 8 }}>{pendingRequests.length}</span>
                 </div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
 
@@ -85,11 +72,11 @@ export default function MessagingHub() {
                 <div className="messaging-section-title">
                   {userRole === 'editor' ? 'Conversations actives' : 'Mes demandes'}
                 </div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {activeRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
 
@@ -97,22 +84,22 @@ export default function MessagingHub() {
             {userRole === 'creator' && pendingRequests.length > 0 && activeRequests.length === 0 && (
               <div>
                 <div className="messaging-section-title">Mes demandes</div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
 
             {userRole === 'creator' && pendingRequests.length > 0 && activeRequests.length > 0 && (
               <div style={{ marginBottom: 32 }}>
                 <div className="messaging-section-title">Demandes en attente</div>
-                <div className="messaging-list">
+                <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
                     <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
                   ))}
-                </div>
+                </AnimatedList>
               </div>
             )}
           </>

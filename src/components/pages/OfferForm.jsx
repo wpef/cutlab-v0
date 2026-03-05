@@ -54,14 +54,6 @@ export default function OfferForm() {
   return (
     <div className="offer-form-page">
 
-      <header className="offer-form-header">
-        <button className="chat-back-btn" onClick={() => goToChat(activeRequestId)}>← Retour au chat</button>
-        <div style={{ flex: 1, textAlign: 'center', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 16 }}>
-          CUT<span style={{ color: 'var(--accent)' }}>LAB</span>
-        </div>
-        <div style={{ width: 80 }} />
-      </header>
-
       <div className="offer-form-content">
 
         <div className="step-header">

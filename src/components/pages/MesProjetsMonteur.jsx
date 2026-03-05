@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 const STATUS_LABEL = { pending: 'En attente', accepted: 'En cours', refused: 'Refusée' }
 const STATUS_CLASS = { pending: 'pending', accepted: 'accepted', refused: 'refused' }
@@ -24,7 +25,7 @@ function formatDate(iso) {
 }
 
 export default function MesProjetsMonteur() {
-  const { goToEditor, goToMessaging, goToChat, goToHome, signOut, user } = useOnboarding()
+  const { goToChat, goToEditor, user } = useOnboarding()
   const { requests, loadRequests, setActiveRequestId } = useMessaging()
   const [offers, setOffers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -59,18 +60,6 @@ export default function MesProjetsMonteur() {
   return (
     <div className="projects-page">
 
-      <header className="projects-header">
-        <div className="projects-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
-        <div className="projects-header-title">Mes projets</div>
-        <div className="projects-header-actions">
-          <button className="catalog-header-btn" onClick={goToMessaging}>
-            Messagerie{pendingRequests.length > 0 ? ` (${pendingRequests.length})` : ''} →
-          </button>
-          <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
-          <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-        </div>
-      </header>
-
       <div className="projects-content">
 
         {loading ? (
@@ -95,9 +84,9 @@ export default function MesProjetsMonteur() {
                   Demandes en attente
                   <span className="projects-badge">{pendingRequests.length}</span>
                 </div>
-                <div className="projects-list">
+                <AnimatedList className="projects-list">
                   {pendingRequests.map((r) => (
-                    <div key={r.id} className="projects-card projects-card--pending" onClick={() => openRequest(r.id)}>
+                    <AnimatedItem key={r.id} className="projects-card projects-card--pending" onClick={() => openRequest(r.id)}>
                       <div className="projects-card-avatar">{r.creator_name?.[0]?.toUpperCase() || '?'}</div>
                       <div className="projects-card-info">
                         <div className="projects-card-name">{r.creator_name || 'Créateur'}</div>
@@ -107,9 +96,9 @@ export default function MesProjetsMonteur() {
                         <span className="projects-status projects-status--pending">En attente</span>
                         <span>{formatDate(r.created_at)}</span>
                       </div>
-                    </div>
+                    </AnimatedItem>
                   ))}
-                </div>
+                </AnimatedList>
               </section>
             )}
 
