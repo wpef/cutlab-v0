@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 
@@ -7,9 +8,10 @@ function formatTime(iso) {
 }
 
 export default function ChatView() {
+  const { id: urlId } = useParams()
   const { goToMessaging, goToOfferForm, userRole, user } = useOnboarding()
   const {
-    activeRequestId, requests,
+    activeRequestId, setActiveRequestId, requests,
     messages, fetchMessages,
     sendMessage,
     offers, loadOffers,
@@ -17,29 +19,38 @@ export default function ChatView() {
     acceptOffer, refuseOffer,
   } = useMessaging()
 
+  // Sync URL param → activeRequestId
+  useEffect(() => {
+    if (urlId && urlId !== activeRequestId) {
+      setActiveRequestId(urlId)
+    }
+  }, [urlId])
+
+  const requestId = urlId || activeRequestId
+
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const messagesEndRef = useRef(null)
 
-  const request = requests.find((r) => r.id === activeRequestId)
+  const request = requests.find((r) => r.id === requestId)
   const otherName = request
     ? (userRole === 'creator' ? request.editor_name : request.creator_name)
     : 'Conversation'
 
   // Initial load + polling every 5s
   useEffect(() => {
-    if (!activeRequestId) return
-    fetchMessages(activeRequestId)
-    loadOffers(activeRequestId)
+    if (!requestId) return
+    fetchMessages(requestId)
+    loadOffers(requestId)
 
     const interval = setInterval(() => {
-      fetchMessages(activeRequestId)
-      loadOffers(activeRequestId)
+      fetchMessages(requestId)
+      loadOffers(requestId)
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [activeRequestId])
+  }, [requestId])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -51,8 +62,8 @@ export default function ChatView() {
     if (!text || sending) return
     setSending(true)
     setInput('')
-    await sendMessage(activeRequestId, text)
-    await fetchMessages(activeRequestId)
+    await sendMessage(requestId, text)
+    await fetchMessages(requestId)
     setSending(false)
   }
 
@@ -65,17 +76,17 @@ export default function ChatView() {
 
   async function handleAccept() {
     setActionLoading(true)
-    await acceptRequest(activeRequestId)
+    await acceptRequest(requestId)
     setActionLoading(false)
   }
 
   async function handleRefuse() {
     setActionLoading(true)
-    await refuseRequest(activeRequestId)
+    await refuseRequest(requestId)
     goToMessaging()
   }
 
-  if (!activeRequestId || !request) {
+  if (!requestId || !request) {
     return (
       <div className="chat-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
