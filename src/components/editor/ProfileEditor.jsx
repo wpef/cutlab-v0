@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
@@ -11,6 +11,8 @@ import UploadZone from '../ui/UploadZone'
 import AvailabilityButton from '../ui/AvailabilityButton'
 import Button from '../ui/Button'
 import HintBox from '../ui/HintBox'
+import { toast } from '../ui/Toast'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const LANGUAGES = [
   { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
@@ -102,7 +104,7 @@ const NAV_SECTIONS = [
 
 
 export default function ProfileEditor() {
-  const { formData, updateFormData, saveProfile, saving, assignedLevel, user } = useOnboarding()
+  const { formData, updateFormData, saveProfile, loadProfile, saving, assignedLevel, user, signOut } = useOnboarding()
   const { requests, loadRequests } = useMessaging()
   const [saveStatus, setSaveStatus] = useState(null)
   const [activeSection, setActiveSection] = useState('section-identity')
@@ -112,6 +114,7 @@ export default function ProfileEditor() {
   const [videoUploading, setVideoUploading] = useState(false)
   const [videoUploadError, setVideoUploadError] = useState(null)
   const [videoUploadSuccess, setVideoUploadSuccess] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [clipUploading, setClipUploading] = useState(false)
   const [clipUploadError, setClipUploadError] = useState(null)
   const [clipUploadSuccess, setClipUploadSuccess] = useState(false)
@@ -173,7 +176,10 @@ export default function ProfileEditor() {
   }
 
   useEffect(() => {
-    if (user) loadRequests()
+    if (user) {
+      loadProfile()
+      loadRequests()
+    }
   }, [user])
 
   // Scrollspy: highlight active section in nav
@@ -226,7 +232,12 @@ export default function ProfileEditor() {
     setSaveStatus(null)
     const ok = await saveProfile('published')
     setSaveStatus(ok ? 'saved' : 'error')
-    if (ok) setTimeout(() => setSaveStatus(null), 3000)
+    if (ok) {
+      toast.success('Profil mis a jour !')
+      setTimeout(() => setSaveStatus(null), 3000)
+    } else {
+      toast.error('Erreur lors de la sauvegarde')
+    }
   }
 
   function scrollToSection(id) {
@@ -252,6 +263,46 @@ export default function ProfileEditor() {
         <Button variant="primary" onClick={handleSave} style={{ padding: '10px 22px', fontSize: 13 }}>
           {saving ? 'Enregistrement...' : 'Enregistrer'}
         </Button>
+      </div>
+
+      {/* Mobile-only sticky accordion preview */}
+      <div className="editor-mobile-preview">
+        <button
+          className="editor-preview-toggle"
+          onClick={() => setPreviewOpen((v) => !v)}
+        >
+          <span>{previewOpen ? '▾' : '▸'} Apercu de ma carte</span>
+          <span className="editor-preview-completion" style={{ color: completionColor }}>{completionPct}%</span>
+        </button>
+        <AnimatePresence>
+          {previewOpen && (
+            <motion.div
+              className="editor-preview-body"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+            >
+              <EditorCard
+                profile={{
+                  avatar_url: formData.avatarUrl,
+                  presentation_video_url: formData.presentationVideoUrl,
+                  first_name: formData.firstName,
+                  last_name: formData.lastName,
+                  username: formData.username,
+                  availability: formData.availability,
+                  skills: formData.skills,
+                  assigned_level: assignedLevel,
+                  experience: formData.experience,
+                  languages: formData.languages,
+                  formats: formData.formats,
+                  hourly_rate: formData.hourlyRate,
+                }}
+                stats={{ received: pendingCount }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="editor-layout">
@@ -721,6 +772,9 @@ export default function ProfileEditor() {
             <Button variant="primary" onClick={handleSave} style={{ width: '100%', padding: '16px 0', fontSize: 15 }}>
               {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
             </Button>
+            <button className="editor-logout-mobile" onClick={signOut}>
+              Se deconnecter
+            </button>
           </div>
 
         </div>

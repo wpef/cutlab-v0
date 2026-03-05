@@ -1,7 +1,31 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
+import PageTitle from '../layout/PageTitle'
+
+function usePipelineSwipe(boardRef) {
+  useEffect(() => {
+    const el = boardRef.current
+    if (!el) return
+    let startX = 0, startScroll = 0
+    function onStart(e) { startX = e.touches[0].clientX; startScroll = el.scrollLeft }
+    function onMove(e) { el.scrollLeft = startScroll - (e.touches[0].clientX - startX) }
+    function onEnd() {
+      const colW = 270 // min-width + gap
+      const target = Math.round(el.scrollLeft / colW) * colW
+      el.scrollTo({ left: target, behavior: 'smooth' })
+    }
+    el.addEventListener('touchstart', onStart, { passive: true })
+    el.addEventListener('touchmove', onMove, { passive: true })
+    el.addEventListener('touchend', onEnd)
+    return () => {
+      el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove', onMove)
+      el.removeEventListener('touchend', onEnd)
+    }
+  }, [boardRef])
+}
 
 const STAGES = [
   { key: 'contact_demande',      label: 'Contact demande',      icon: '📩' },
@@ -45,6 +69,8 @@ export default function EditorPipeline() {
     setActiveRequestId, acceptOffer,
   } = useMessaging()
 
+  const boardRef = useRef(null)
+  usePipelineSwipe(boardRef)
   const [localOffers, setLocalOffers] = useState([])
 
   useEffect(() => {
@@ -102,6 +128,7 @@ export default function EditorPipeline() {
 
   return (
     <div className="pipeline-page">
+      <PageTitle title="Pipeline" />
       {messagingLoading ? (
         <div className="pipeline-empty">Chargement...</div>
       ) : requests.length === 0 ? (
@@ -113,7 +140,7 @@ export default function EditorPipeline() {
           </p>
         </div>
       ) : (
-        <div className="pipeline-board">
+        <div className="pipeline-board" ref={boardRef}>
           {STAGES.map((stage) => (
             <div className="pipeline-column" key={stage.key}>
               <div className="pipeline-column-header">
