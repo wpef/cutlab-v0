@@ -19,6 +19,7 @@ body {
   font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  max-width: 100vw;
 }
 
 .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
@@ -451,6 +452,7 @@ textarea { resize: vertical; min-height: 100px; }
 .offer-doc-section { margin-bottom: 24px; }
 .offer-doc-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
 .offer-doc-section-value { font-size: 15px; color: var(--text); line-height: 1.6; }
+.offer-doc-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 28px; }
 .offer-doc-budget { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
 .offer-doc-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
 .offer-doc-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 48px; }
@@ -572,9 +574,9 @@ textarea { resize: vertical; min-height: 100px; }
   .landing-eyebrow { font-size: 10px; margin-bottom: 16px; }
 
   /* ── Catalog ── */
-  .catalog-header { padding: 10px 16px; gap: 10px; }
+  .catalog-header { padding: 10px 16px; gap: 10px; flex-wrap: wrap; }
   .catalog-header-title { display: none; }
-  .catalog-header-btn { font-size: 12px; padding: 8px 12px; white-space: nowrap; }
+  .catalog-header-btn { font-size: 12px; padding: 8px 12px; white-space: nowrap; min-height: 44px; display: inline-flex; align-items: center; }
   .catalog-header-actions { gap: 6px; flex-wrap: wrap; }
   .catalog-content { padding: 20px 12px 80px; }
   .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
@@ -582,7 +584,7 @@ textarea { resize: vertical; min-height: 100px; }
   .catalog-card-name { font-size: 14px; }
   .catalog-card-tags { gap: 4px; }
   .catalog-card-tag { font-size: 10px; padding: 2px 6px; }
-  .catalog-contact-btn { min-height: 40px; font-size: 13px; }
+  .catalog-contact-btn { min-height: 44px; font-size: 13px; }
   .catalog-meta { font-size: 12px; margin-bottom: 14px; }
 
   /* ── Creator signup ── */
@@ -612,11 +614,12 @@ textarea { resize: vertical; min-height: 100px; }
   .editor-profile-name { font-size: 16px; }
 
   /* ── Messaging ── */
-  .messaging-header { padding: 10px 16px; gap: 10px; }
+  .messaging-header { padding: 10px 16px; gap: 10px; flex-wrap: wrap; }
   .messaging-header-title { font-size: 13px; }
   .messaging-content { padding: 16px 12px 80px; }
   .messaging-item { padding: 12px 14px; gap: 10px; }
-  .messaging-item-avatar { width: 38px; height: 38px; font-size: 15px; }
+  .messaging-item { min-height: 44px; }
+  .messaging-item-avatar { width: 44px; height: 44px; font-size: 15px; }
   .messaging-item-name { font-size: 14px; }
   .messaging-item-preview { font-size: 12px; }
   .messaging-item-meta { font-size: 11px; }
@@ -644,10 +647,12 @@ textarea { resize: vertical; min-height: 100px; }
   .offer-doc-meta { text-align: left; }
   .offer-doc-title { font-size: 22px; margin-bottom: 24px; }
   .offer-doc-parties { grid-template-columns: 1fr; gap: 16px; }
+  .offer-doc-details { grid-template-columns: 1fr; gap: 16px; }
   .offer-doc-budget { font-size: 32px; }
   .offer-doc-signatures { grid-template-columns: 1fr; gap: 24px; }
   /* ── Projects ── */
-  .projects-header { padding: 12px 16px; }
+  .projects-header { padding: 12px 16px; flex-wrap: wrap; }
+  .projects-header-actions { flex-wrap: wrap; gap: 6px; }
   .projects-content { padding: 20px 16px 60px; }
 
   /* ── Pipeline ── */
