@@ -25,7 +25,7 @@ function formatDate(iso) {
 }
 
 export default function MesProjetsMonteur() {
-  const { goToChat, user } = useOnboarding()
+  const { goToChat, goToEditor, user } = useOnboarding()
   const { requests, loadRequests, setActiveRequestId } = useMessaging()
   const [offers, setOffers] = useState([])
   const [loading, setLoading] = useState(true)

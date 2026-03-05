@@ -8,7 +8,7 @@ import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 export default function Catalog() {
   const {
-    goToLanding, goToOnboarding, goToEditor, goToCreatorSignup, goToMessaging, goToProjects, goToHome, signOut,
+    goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
   } = useOnboarding()
   const { requests, loadRequests, sendContactRequest } = useMessaging()

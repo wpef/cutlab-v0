@@ -102,7 +102,7 @@ const NAV_SECTIONS = [
 
 
 export default function ProfileEditor() {
-  const { formData, updateFormData, saveProfile, saving, assignedLevel, user, goToMessaging, goToProjects, goToHome, signOut } = useOnboarding()
+  const { formData, updateFormData, saveProfile, saving, assignedLevel, user } = useOnboarding()
   const { requests, loadRequests } = useMessaging()
   const [saveStatus, setSaveStatus] = useState(null)
   const [activeSection, setActiveSection] = useState('section-identity')
