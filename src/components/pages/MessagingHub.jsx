@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-import EditorNav from '../ui/EditorNav'
 
 function formatDate(iso) {
   const d = new Date(iso)
@@ -17,7 +16,7 @@ const STATUS_LABEL = { pending: 'En attente', accepted: 'Acceptée', refused: 'R
 const STATUS_CLASS = { pending: 'pending', accepted: 'accepted', refused: 'refused' }
 
 export default function MessagingHub() {
-  const { goToHome, goToChat, goToCatalog, goToEditor, goToProjects, signOut, userRole, user } = useOnboarding()
+  const { goToChat, goToCatalog, userRole, user } = useOnboarding()
   const { requests, messagingLoading, loadRequests, setActiveRequestId } = useMessaging()
 
   useEffect(() => {
@@ -34,19 +33,6 @@ export default function MessagingHub() {
 
   return (
     <div className="messaging-page">
-
-      {userRole === 'editor' ? (
-        <EditorNav active="messaging" />
-      ) : (
-        <header className="messaging-header">
-          <div className="messaging-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
-          <div className="messaging-header-title">Messagerie</div>
-          <div className="messaging-header-actions">
-            <button className="catalog-header-btn" onClick={goToCatalog}>+ Nouveau contact</button>
-            <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-          </div>
-        </header>
-      )}
 
       <div className="messaging-content">
 

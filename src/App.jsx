@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useOnboarding } from './context/OnboardingContext'
 import { STEPS } from './constants/steps'
 import Sidebar from './components/layout/Sidebar'
+import AppLayout from './components/layout/AppLayout'
 import Step1Account from './components/steps/Step1Account'
 import Step2Identity from './components/steps/Step2Identity'
 import Step3Skills from './components/steps/Step3Skills'
@@ -39,7 +40,6 @@ function OnboardingLayout() {
   const { step } = useParams()
   const stepNum = Number(step)
 
-  // Sync URL step with context (if user navigates via URL or back button)
   if (stepNum && stepNum !== currentStep && stepNum >= 1 && stepNum <= 9) {
     goToStep(stepNum)
   }
@@ -54,7 +54,6 @@ function OnboardingLayout() {
       <div className="progress-bar">
         <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
-      {/* Mobile-only top navigation */}
       <nav className="mobile-nav">
         <div className="mobile-nav-logo">CUT<span>LAB</span></div>
         <div className="mobile-step-pill">
@@ -74,18 +73,23 @@ function OnboardingLayout() {
 export default function App() {
   return (
     <Routes>
+      {/* Public routes */}
       <Route path="/" element={<Landing />} />
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />
-      <Route path="/catalog" element={<Catalog />} />
-      <Route path="/projects" element={<MesProjetsMonteur />} />
-      <Route path="/editor" element={<ProfileEditor />} />
-      <Route path="/messaging" element={<MessagingHub />} />
-      <Route path="/messaging/:id" element={<ChatView />} />
-      <Route path="/pipeline" element={<EditorPipeline />} />
-      <Route path="/offer/new" element={<OfferForm />} />
-      <Route path="/offer/preview" element={<OfferPreview />} />
       <Route path="/creator-signup" element={<CreatorSignup />} />
-      {/* Fallback */}
+
+      {/* App routes with shared navigation */}
+      <Route element={<AppLayout />}>
+        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/projects" element={<MesProjetsMonteur />} />
+        <Route path="/editor" element={<ProfileEditor />} />
+        <Route path="/messaging" element={<MessagingHub />} />
+        <Route path="/messaging/:id" element={<ChatView />} />
+        <Route path="/pipeline" element={<EditorPipeline />} />
+        <Route path="/offer/new" element={<OfferForm />} />
+        <Route path="/offer/preview" element={<OfferPreview />} />
+      </Route>
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

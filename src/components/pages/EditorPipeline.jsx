@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-import EditorNav from '../ui/EditorNav'
 
 const STAGES = [
   { key: 'contact_demande',      label: 'Contact demande',      icon: '📩' },
@@ -102,8 +101,6 @@ export default function EditorPipeline() {
 
   return (
     <div className="pipeline-page">
-      <EditorNav active="pipeline" />
-
       {messagingLoading ? (
         <div className="pipeline-empty">Chargement...</div>
       ) : requests.length === 0 ? (

@@ -11,7 +11,6 @@ import UploadZone from '../ui/UploadZone'
 import AvailabilityButton from '../ui/AvailabilityButton'
 import Button from '../ui/Button'
 import HintBox from '../ui/HintBox'
-import EditorNav from '../ui/EditorNav'
 
 const LANGUAGES = [
   { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
@@ -246,8 +245,6 @@ export default function ProfileEditor() {
   return (
     <div className="editor-page">
 
-      {/* -- EditorNav (shared nav bar) -- */}
-      <EditorNav active="editor" />
       <div className="editor-header-bar">
         <div style={{ flex: 1 }} />
         {saveStatus === 'saved' && <span className="save-notice">Enregistré</span>}

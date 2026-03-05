@@ -24,7 +24,7 @@ function formatDate(iso) {
 }
 
 export default function MesProjetsMonteur() {
-  const { goToEditor, goToMessaging, goToChat, goToHome, signOut, user } = useOnboarding()
+  const { goToChat, user } = useOnboarding()
   const { requests, loadRequests, setActiveRequestId } = useMessaging()
   const [offers, setOffers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -58,18 +58,6 @@ export default function MesProjetsMonteur() {
 
   return (
     <div className="projects-page">
-
-      <header className="projects-header">
-        <div className="projects-header-logo" onClick={goToHome}>CUT<span>LAB</span></div>
-        <div className="projects-header-title">Mes projets</div>
-        <div className="projects-header-actions">
-          <button className="catalog-header-btn" onClick={goToMessaging}>
-            Messagerie{pendingRequests.length > 0 ? ` (${pendingRequests.length})` : ''} →
-          </button>
-          <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
-          <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-        </div>
-      </header>
 
       <div className="projects-content">
 

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import EditorCard from '../ui/EditorCard'
+import PageTitle from '../layout/PageTitle'
 
 export default function Catalog() {
   const {
@@ -74,35 +75,16 @@ export default function Catalog() {
   return (
     <div className="catalog-page">
 
-      <header className="catalog-header">
-        <div className="catalog-header-logo" onClick={user ? goToHome : goToLanding}>
-          CUT<span>LAB</span>
-        </div>
-        <div className="catalog-header-title">Les monteurs</div>
-        <div className="catalog-header-actions">
-          {user ? (
-            <>
-              {userRole === 'editor'
-                ? <>
-                    <button className="catalog-header-btn" onClick={goToProjects}>Mes projets →</button>
-                    <button className="catalog-header-btn" onClick={goToEditor}>Mon profil →</button>
-                  </>
-                : <button className="catalog-header-btn" onClick={goToMessaging}>
-                    Mes messages →
-                  </button>
-              }
-              <button className="catalog-header-btn catalog-header-btn--logout" onClick={signOut}>Déconnexion</button>
-            </>
-          ) : (
-            <>
-              <button className="catalog-header-btn" onClick={() => goToCreatorSignup(null)}>
-                Je cherche un monteur
-              </button>
-              <button className="catalog-header-btn" onClick={goToOnboarding}>Je suis monteur →</button>
-            </>
-          )}
-        </div>
-      </header>
+      <PageTitle title="Les monteurs">
+        {!user && (
+          <>
+            <button className="catalog-header-btn" onClick={() => goToCreatorSignup(null)}>
+              Je cherche un monteur
+            </button>
+            <button className="catalog-header-btn" onClick={goToOnboarding}>Je suis monteur →</button>
+          </>
+        )}
+      </PageTitle>
 
       <div className="catalog-content">
         {loading ? (
