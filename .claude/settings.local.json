@@ -5,7 +5,9 @@
       "Bash(npx vite:*)",
       "Bash(chmod +x:*)",
       "Bash(npm install:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(git:*)",
+      "Bash(cd:*)"
     ]
   }
 }
