@@ -5,19 +5,40 @@
  * - Créateurs (content creators): search for monteurs via the catalog
  * - Monteurs (video editors): sign up to be found by créateurs
  *
- * Logged-in users are auto-redirected to their role-appropriate home
- * (see goToHome in OnboardingContext).
+ * Three demo buttons let visitors test the app without creating a real account.
  */
-import { useEffect } from 'react'
+import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
+import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD } from '../../lib/demoData'
 
 export default function Landing() {
-  const { goToOnboarding, goToCatalog, goToHome, user, userRole } = useOnboarding()
+  const {
+    goToOnboarding, goToCreatorSignup,
+    loginDemoEditor, loginDemoCreator, startDemoOnboarding,
+    authLoading,
+  } = useOnboarding()
 
-  // Auto-redirect logged-in users to their home
-  useEffect(() => {
-    if (user) goToHome()
-  }, [user])
+  const [demoLoading, setDemoLoading] = useState(null) // 'editor' | 'creator' | 'onboarding' | null
+
+  async function handleDemoEditor() {
+    setDemoLoading('editor')
+    await loginDemoEditor(DEMO_EMAIL, DEMO_PASSWORD)
+    setDemoLoading(null)
+  }
+
+  async function handleDemoCreator() {
+    setDemoLoading('creator')
+    await loginDemoCreator(DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD)
+    setDemoLoading(null)
+  }
+
+  async function handleDemoOnboarding() {
+    setDemoLoading('onboarding')
+    await startDemoOnboarding()
+    setDemoLoading(null)
+  }
+
+  const busy = !!demoLoading || authLoading
 
   return (
     <div className="landing">
@@ -35,7 +56,7 @@ export default function Landing() {
             <div className="landing-eyebrow">Pour les créateurs</div>
             <h1>Trouvez votre monteur en moins d'un quart d'heure.</h1>
             <p>Des monteurs vérifiés, disponibles, au niveau exact que vous cherchez.</p>
-            <button className="landing-btn landing-btn--primary" onClick={goToCatalog}>
+            <button className="landing-btn landing-btn--primary" onClick={() => goToCreatorSignup()}>
               Parcourir les monteurs →
             </button>
           </div>
@@ -53,6 +74,34 @@ export default function Landing() {
           </div>
         </div>
 
+      </div>
+
+      {/* -- Demo section -- */}
+      <div className="landing-demo-section">
+        <div className="landing-demo-label">Tester sans créer de compte</div>
+        <div className="landing-demo-buttons">
+          <button
+            className="btn-demo"
+            onClick={handleDemoCreator}
+            disabled={busy}
+          >
+            {demoLoading === 'creator' ? '...' : 'Démo créateur'}
+          </button>
+          <button
+            className="btn-demo"
+            onClick={handleDemoEditor}
+            disabled={busy}
+          >
+            {demoLoading === 'editor' ? '...' : 'Démo monteur'}
+          </button>
+          <button
+            className="btn-demo"
+            onClick={handleDemoOnboarding}
+            disabled={busy}
+          >
+            {demoLoading === 'onboarding' ? '...' : 'Tester l\'onboarding'}
+          </button>
+        </div>
       </div>
     </div>
   )

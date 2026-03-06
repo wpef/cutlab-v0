@@ -12,20 +12,62 @@
 - **Monteur** (`role='editor'`): video editor. Home = `/projects`
 - **Createur** (`role='creator'`): content creator. Home = `/catalog`
 
+## Auth & Access Control
+
+### Route protection (App.jsx)
+Three guard components wrap routes:
+- **`RequireAuth`**: redirects to `/` if not logged in (waits for `authReady` to avoid flash).
+- **`RequireRole({ allowed })`**: redirects to `/` if user's role is not in `allowed` list.
+- **`PublicOnly`**: redirects logged-in users to their role-appropriate home.
+
+### Access rules
+| Role | Accessible pages |
+|------|-----------------|
+| **Creator** | `/catalog`, `/messaging`, `/messaging/:id`, `/offer/new`, `/offer/preview` |
+| **Editor** | `/projects`, `/editor`, `/messaging`, `/messaging/:id`, `/pipeline`, `/catalog` |
+| **Not logged in** | `/` (Landing), `/creator-signup`, `/onboarding/:step` (step 1 only for auth) |
+
+- Logged-in users cannot access the Landing page — they are auto-redirected to their home.
+- Logged-out users cannot access any app route — they are redirected to Landing.
+- Each user only sees their own projects, messages, and offers (queries scoped by `user.id`).
+
+### Auth state
+- `user`: Supabase user object (null when logged out).
+- `authReady`: boolean, true once the initial session check completes. Guards render nothing until this is true.
+- `userRole`: derived from `formData.role`. Loaded from DB on session restore (page refresh).
+
+### Logout (`signOut`)
+1. Calls `supabase.auth.signOut()`.
+2. If `demoMode === 'onboarding'`, deletes the temporary profile from DB.
+3. Clears **all** `localStorage` and `sessionStorage` (prevents data leaks between accounts).
+4. Resets all in-memory state (formData, step, level, demoMode).
+5. Navigates to `/`.
+
+### Demo modes
+Three demo modes, controlled by `demoMode` state in OnboardingContext:
+
+| Mode | Trigger | Behavior |
+|------|---------|----------|
+| **`'creator'`** | Landing "Démo créateur" / CreatorSignup "Compte démo créateur" | Logs into `DEMO_CREATOR_EMAIL` account, redirects to `/catalog` |
+| **`'editor'`** | Landing "Démo monteur" | Logs into `DEMO_EMAIL` account, redirects to `/projects` |
+| **`'onboarding'`** | Landing "Tester l'onboarding" / Step1 "Tester l'onboarding" | Creates a throwaway Supabase account with unique email, redirects to step 2. **Account profile is deleted on logout.** |
+
+Demo credentials are in `src/lib/demoData.js`. Demo accounts (creator/editor) must be pre-created in Supabase with matching credentials.
+
 ## Routes
-| Path | Component | Layout |
-|------|-----------|--------|
-| `/` | Landing | none (public) |
-| `/onboarding/:step` | OnboardingLayout (Sidebar + Steps 1-9) | none |
-| `/creator-signup` | CreatorSignup | none (public) |
-| `/catalog` | Catalog | AppLayout |
-| `/projects` | MesProjetsMonteur | AppLayout |
-| `/editor` | ProfileEditor | AppLayout (fill) |
-| `/messaging` | MessagingHub | AppLayout |
-| `/messaging/:id` | ChatView | AppLayout (fill) |
-| `/pipeline` | EditorPipeline | AppLayout (fill) |
-| `/offer/new` | OfferForm | AppLayout |
-| `/offer/preview` | OfferPreview | AppLayout |
+| Path | Component | Layout | Guard |
+|------|-----------|--------|-------|
+| `/` | Landing | none | PublicOnly |
+| `/onboarding/:step` | OnboardingLayout (Sidebar + Steps 1-9) | none | none (step 1 handles auth) |
+| `/creator-signup` | CreatorSignup | none | none (handles both logged-in and anonymous) |
+| `/catalog` | Catalog | AppLayout | RequireAuth |
+| `/projects` | MesProjetsMonteur | AppLayout | RequireAuth + RequireRole(editor) |
+| `/editor` | ProfileEditor | AppLayout (fill) | RequireAuth + RequireRole(editor) |
+| `/messaging` | MessagingHub | AppLayout | RequireAuth |
+| `/messaging/:id` | ChatView | AppLayout (fill) | RequireAuth |
+| `/pipeline` | EditorPipeline | AppLayout (fill) | RequireAuth + RequireRole(editor) |
+| `/offer/new` | OfferForm | AppLayout | RequireAuth + RequireRole(creator) |
+| `/offer/preview` | OfferPreview | AppLayout | RequireAuth + RequireRole(creator) |
 
 ## Layout system
 - **AppLayout** (`src/components/layout/AppLayout.jsx`): wraps authenticated routes. Contains TopNav + Outlet (with AnimatePresence) + BottomNav + Toast.
@@ -42,7 +84,7 @@
 - Pages never use `min-height: 100vh` inside AppLayout.
 
 ## Key contexts
-- **OnboardingContext** (`src/context/OnboardingContext.jsx`): auth (Supabase), formData, goTo* navigation (uses navigateRef from React Router), saveProfile, loadProfile.
+- **OnboardingContext** (`src/context/OnboardingContext.jsx`): auth (Supabase), formData, goTo* navigation (uses navigateRef from React Router), saveProfile, loadProfile, demo mode, signOut with full cleanup.
 - **MessagingContext** (`src/context/MessagingContext.jsx`): requests, messages, offers, signUpCreator.
 
 ## Navigation pattern

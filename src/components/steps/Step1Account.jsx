@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
-import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_FORM } from '../../lib/demoData'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import HintBox from '../ui/HintBox'
@@ -10,6 +9,7 @@ export default function Step1Account() {
   const {
     goToStep, signUpUser, signInUser, signInWithGoogle, loginAndRedirect,
     clearAuthError, updateFormData, loadProfile, authLoading, authError,
+    startDemoOnboarding,
   } = useOnboarding()
 
   const [mode, setMode] = useState('signup') // 'signup' | 'login'
@@ -27,31 +27,8 @@ export default function Step1Account() {
   async function handleDemo() {
     setLocalError('')
     setDemoLoading(true)
-
-    // Try to sign in (account already exists from a previous session)
-    const signedIn = await signInUser(DEMO_EMAIL, DEMO_PASSWORD)
-    if (signedIn) {
-      await loadProfile()
-      goToStep(2)
-      setDemoLoading(false)
-      return
-    }
-
-    // First time: try to create the account
-    clearAuthError()
-    const signedUp = await signUpUser(DEMO_EMAIL, DEMO_PASSWORD)
-    if (!signedUp) {
-      clearAuthError()
-      setLocalError(
-        'Email de confirmation requis. Dans Supabase : Authentication → Email → désactive "Confirm email".'
-      )
-      setDemoLoading(false)
-      return
-    }
-
-    // New account — seed with hardcoded demo defaults
-    updateFormData({ ...DEMO_FORM, email: DEMO_EMAIL })
-    goToStep(2)
+    const ok = await startDemoOnboarding()
+    if (!ok) setLocalError('Impossible de créer le compte démo. Réessaie.')
     setDemoLoading(false)
   }
 

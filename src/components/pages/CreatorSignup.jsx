@@ -7,7 +7,7 @@ export default function CreatorSignup() {
   const {
     goToCatalog, goToHome, goToOnboarding, goToMessaging,
     pendingEditor, clearPendingEditor, formData, user,
-    signInUser, loginAndRedirect, loadProfile, clearAuthError, authLoading, authError,
+    signInUser, loginAndRedirect, loginDemoCreator, loadProfile, clearAuthError, authLoading, authError,
   } = useOnboarding()
   const { signUpCreator, signupError, signupLoading, sendContactRequest } = useMessaging()
 
@@ -67,6 +67,7 @@ export default function CreatorSignup() {
   async function handleDemo() {
     setLocalError('')
     setDemoLoading(true)
+    // signUpCreator handles sign-in (existing) or sign-up (new) + creates creator profile
     const result = await signUpCreator('Alex', DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD)
     setDemoLoading(false)
     if (result.error) { setLocalError(result.error); return }

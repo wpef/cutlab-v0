@@ -31,10 +31,14 @@ export function OnboardingProvider({ children }) {
   const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
+  const [authReady, setAuthReady] = useState(false) // true once initial session check is done
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState(null)
   const [saving, setSaving] = useState(false)
   const [pendingEditor, setPendingEditor] = useState(null) // { id, name } — set when non-logged creator clicks "Contacter"
+
+  // Demo mode: null | 'editor' | 'creator' | 'onboarding'
+  const [demoMode, setDemoMode] = useState(null)
 
   // React Router navigation bridge
   const navigateRef = useRef(null)
@@ -44,10 +48,18 @@ export function OnboardingProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Sync auth state on mount and across tab changes
+  // Sync auth state on mount and across tab changes.
+  // When a session already exists (page refresh), load the user's role from DB
+  // so route guards work correctly before any user interaction.
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const u = session?.user ?? null
+      setUser(u)
+      if (u) {
+        const { data } = await supabase.from('profiles').select('role').eq('id', u.id).single()
+        if (data?.role) setFormData((prev) => ({ ...prev, role: data.role }))
+      }
+      setAuthReady(true)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
@@ -88,11 +100,33 @@ export function OnboardingProvider({ children }) {
   }
 
   async function signOut() {
+    const wasDemoOnboarding = demoMode === 'onboarding'
+    const userId = user?.id
+
+    // Sign out from Supabase (clears auth tokens)
     await supabase.auth.signOut()
+
+    // If onboarding demo, delete the temporary profile + auth user
+    // Profile deletion relies on Supabase RLS / cascade; auth user
+    // deletion requires a server-side function or service-role call.
+    // We delete the profile row; the orphaned auth user is harmless.
+    if (wasDemoOnboarding && userId) {
+      try {
+        await supabase.from('profiles').delete().eq('id', userId)
+      } catch (_) { /* best-effort cleanup */ }
+    }
+
+    // Clear ALL local/session storage to avoid data leaks between accounts
+    localStorage.clear()
+    sessionStorage.clear()
+
+    // Reset in-memory state
     setUser(null)
     setFormData(INITIAL_FORM)
     setAssignedLevel(2)
     setCurrentStep(1)
+    setDemoMode(null)
+
     nav('/')
   }
 
@@ -201,6 +235,53 @@ export function OnboardingProvider({ children }) {
     return true
   }
 
+  /** Login to a demo editor account and redirect to /projects */
+  async function loginDemoEditor(email, password) {
+    setDemoMode('editor')
+    const ok = await signInUser(email, password)
+    if (!ok) { setDemoMode(null); return false }
+    const { data } = await supabase.from('profiles').select('role').eq('id', (await supabase.auth.getUser()).data.user?.id).single()
+    setFormData((prev) => ({ ...prev, role: data?.role || 'editor' }))
+    await loadProfile()
+    nav('/projects')
+    return true
+  }
+
+  /** Login to a demo creator account and redirect to /catalog */
+  async function loginDemoCreator(email, password) {
+    setDemoMode('creator')
+    const ok = await signInUser(email, password)
+    if (!ok) { setDemoMode(null); return false }
+    setFormData((prev) => ({ ...prev, role: 'creator' }))
+    nav('/catalog')
+    return true
+  }
+
+  /** Start onboarding demo: create anonymous Supabase account, go to onboarding step 2 */
+  async function startDemoOnboarding() {
+    setDemoMode('onboarding')
+    setAuthLoading(true)
+    setAuthError(null)
+
+    // Generate a unique throwaway email for this demo session
+    const ts = Date.now()
+    const rand = Math.random().toString(36).slice(2, 8)
+    const demoEmail = `demo-onboarding-${ts}-${rand}@cutlab.io`
+    const demoPassword = `demo-onboarding-${ts}!`
+
+    const { data, error } = await supabase.auth.signUp({ email: demoEmail, password: demoPassword })
+    setAuthLoading(false)
+    if (error) {
+      setAuthError(error.message)
+      setDemoMode(null)
+      return false
+    }
+    setUser(data.user)
+    updateFormData({ email: demoEmail })
+    goToStep(2)
+    return true
+  }
+
   async function goToEditor() {
     await loadProfile()
     nav('/editor')
@@ -249,8 +330,10 @@ export function OnboardingProvider({ children }) {
         formData, updateFormData,
         userRole: formData.role,
         pendingEditor, clearPendingEditor,
-        user, authLoading, authError,
+        user, authReady, authLoading, authError,
+        demoMode,
         signUpUser, signInUser, signInWithGoogle, signOut, loginAndRedirect,
+        loginDemoEditor, loginDemoCreator, startDemoOnboarding,
         clearAuthError: () => setAuthError(null),
         saveProfile, publishProfile, loadProfile,
         saving,

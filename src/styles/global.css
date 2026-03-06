@@ -298,6 +298,9 @@ textarea { resize: vertical; min-height: 100px; }
 .landing-btn:hover { transform: translateY(-2px); opacity: 0.9; }
 .landing-btn--primary { background: var(--accent); color: #000; }
 .landing-btn--dark { background: #000; color: var(--accent); }
+.landing-demo-section { text-align: center; padding: 24px 32px 32px; background: var(--bg); border-top: 1px solid var(--border); }
+.landing-demo-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.08em; }
+.landing-demo-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
 /* CATALOG */
 .catalog-page { display: flex; flex-direction: column; background: var(--bg); overflow-x: hidden; }

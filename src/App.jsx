@@ -70,24 +70,56 @@ function OnboardingLayout() {
   )
 }
 
+/** Redirects to landing if not authenticated. Shows nothing while auth is loading. */
+function RequireAuth({ children }) {
+  const { user, authReady } = useOnboarding()
+  if (!authReady) return null // avoid flash redirect before session is checked
+  if (!user) return <Navigate to="/" replace />
+  return children
+}
+
+/** Redirects to role-appropriate home if user lacks the required role */
+function RequireRole({ allowed, children }) {
+  const { userRole } = useOnboarding()
+  if (!allowed.includes(userRole)) return <Navigate to="/" replace />
+  return children
+}
+
+/** Redirects logged-in users to their home (for public-only pages) */
+function PublicOnly({ children }) {
+  const { user, authReady, userRole } = useOnboarding()
+  if (!authReady) return null
+  if (user) {
+    return <Navigate to={userRole === 'creator' ? '/catalog' : '/projects'} replace />
+  }
+  return children
+}
+
 export default function App() {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<Landing />} />
-      <Route path="/onboarding/:step" element={<OnboardingLayout />} />
+      {/* Public-only routes — logged-in users get redirected to home */}
+      <Route path="/" element={<PublicOnly><Landing /></PublicOnly>} />
       <Route path="/creator-signup" element={<CreatorSignup />} />
 
-      {/* App routes with shared navigation */}
-      <Route element={<AppLayout />}>
+      {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
+      <Route path="/onboarding/:step" element={<OnboardingLayout />} />
+
+      {/* Authenticated app routes */}
+      <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
+        {/* Creator routes: catalog + messaging only */}
         <Route path="/catalog" element={<Catalog />} />
-        <Route path="/projects" element={<MesProjetsMonteur />} />
-        <Route path="/editor" element={<ProfileEditor />} />
         <Route path="/messaging" element={<MessagingHub />} />
         <Route path="/messaging/:id" element={<ChatView />} />
-        <Route path="/pipeline" element={<EditorPipeline />} />
-        <Route path="/offer/new" element={<OfferForm />} />
-        <Route path="/offer/preview" element={<OfferPreview />} />
+
+        {/* Editor-only routes */}
+        <Route path="/projects" element={<RequireRole allowed={['editor']}><MesProjetsMonteur /></RequireRole>} />
+        <Route path="/editor" element={<RequireRole allowed={['editor']}><ProfileEditor /></RequireRole>} />
+        <Route path="/pipeline" element={<RequireRole allowed={['editor']}><EditorPipeline /></RequireRole>} />
+
+        {/* Creator-only routes */}
+        <Route path="/offer/new" element={<RequireRole allowed={['creator']}><OfferForm /></RequireRole>} />
+        <Route path="/offer/preview" element={<RequireRole allowed={['creator']}><OfferPreview /></RequireRole>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
