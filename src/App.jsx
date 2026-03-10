@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useOnboarding } from './context/OnboardingContext'
 import { STEPS } from './constants/steps'
@@ -36,13 +37,19 @@ const STEP_COMPONENTS = {
 }
 
 function OnboardingLayout() {
-  const { currentStep, goToStep } = useOnboarding()
+  const { currentStep, goToStep, user, authReady } = useOnboarding()
   const { step } = useParams()
   const stepNum = Number(step)
 
-  if (stepNum && stepNum !== currentStep && stepNum >= 1 && stepNum <= 9) {
-    goToStep(stepNum)
-  }
+  useEffect(() => {
+    // Sync currentStep to URL (browser back/forward) — must be in effect, not render body
+    if (stepNum >= 1 && stepNum <= 9 && stepNum !== currentStep) goToStep(stepNum)
+  }, [stepNum])
+
+  useEffect(() => {
+    // If already authenticated and on step 1, skip to step 2
+    if (authReady && user && stepNum === 1) goToStep(2)
+  }, [authReady, user, stepNum])
 
   const displayStep = stepNum >= 1 && stepNum <= 9 ? stepNum : currentStep
   const progress = displayStep === 9 ? 100 : Math.round((displayStep / 8) * 100)
@@ -87,9 +94,10 @@ function RequireRole({ allowed, children }) {
 
 /** Redirects logged-in users to their home (for public-only pages) */
 function PublicOnly({ children }) {
-  const { user, authReady, userRole } = useOnboarding()
+  const { user, authReady, userRole, demoMode } = useOnboarding()
   if (!authReady) return null
-  if (user) {
+  // Don't redirect during onboarding demo — user is set but we're navigating to /onboarding/2
+  if (user && demoMode !== 'onboarding') {
     return <Navigate to={userRole === 'creator' ? '/catalog' : '/projects'} replace />
   }
   return children
@@ -105,10 +113,13 @@ export default function App() {
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />
 
+      {/* Public catalog — guests can browse, auth required only to contact */}
+      <Route element={<AppLayout />}>
+        <Route path="/catalog" element={<Catalog />} />
+      </Route>
+
       {/* Authenticated app routes */}
       <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
-        {/* Creator routes: catalog + messaging only */}
-        <Route path="/catalog" element={<Catalog />} />
         <Route path="/messaging" element={<MessagingHub />} />
         <Route path="/messaging/:id" element={<ChatView />} />
 

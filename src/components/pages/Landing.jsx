@@ -13,7 +13,7 @@ import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD } 
 
 export default function Landing() {
   const {
-    goToOnboarding, goToCreatorSignup,
+    goToOnboarding, goToCreatorSignup, goToCatalog,
     loginDemoEditor, loginDemoCreator, startDemoOnboarding,
     authLoading,
   } = useOnboarding()
@@ -56,7 +56,7 @@ export default function Landing() {
             <div className="landing-eyebrow">Pour les créateurs</div>
             <h1>Trouvez votre monteur en moins d'un quart d'heure.</h1>
             <p>Des monteurs vérifiés, disponibles, au niveau exact que vous cherchez.</p>
-            <button className="landing-btn landing-btn--primary" onClick={() => goToCreatorSignup()}>
+            <button className="landing-btn landing-btn--primary" onClick={goToCatalog}>
               Parcourir les monteurs →
             </button>
           </div>

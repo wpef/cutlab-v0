@@ -81,8 +81,22 @@ export function OnboardingProvider({ children }) {
     setAuthLoading(true)
     setAuthError(null)
     const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) { setAuthLoading(false); setAuthError(error.message); return false }
+
+    // No session after signUp = account already exists (unconfirmed), try signIn
+    if (!data.session) {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      setAuthLoading(false)
+      if (signInError) {
+        setAuthError('Ce compte existe déjà. Essaie de te connecter avec ton mot de passe.')
+        return false
+      }
+      setUser(signInData.user)
+      updateFormData({ email })
+      return true
+    }
+
     setAuthLoading(false)
-    if (error) { setAuthError(error.message); return false }
     setUser(data.user)
     updateFormData({ email })
     return true
@@ -271,8 +285,8 @@ export function OnboardingProvider({ children }) {
 
     const { data, error } = await supabase.auth.signUp({ email: demoEmail, password: demoPassword })
     setAuthLoading(false)
-    if (error) {
-      setAuthError(error.message)
+    if (error || !data.session) {
+      setAuthError(error?.message ?? 'Impossible de créer le compte démo. Désactive la confirmation email dans Supabase.')
       setDemoMode(null)
       return false
     }

@@ -680,6 +680,8 @@ textarea { resize: vertical; min-height: 100px; }
     transition: color 0.15s;
   }
   .bottom-nav-tab--active { color: var(--accent); }
+  .bottom-nav-tab--logout { color: rgba(255,77,77,0.6); }
+  .bottom-nav-tab--logout:hover { color: #ff4d4d; }
   .bottom-nav-tab-icon { font-size: 20px; }
   .bottom-nav-tab-label { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
   .bottom-nav-indicator { position: absolute; top: 0; left: 25%; right: 25%; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px; }

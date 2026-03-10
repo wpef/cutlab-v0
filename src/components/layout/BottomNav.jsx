@@ -15,7 +15,8 @@ const CREATOR_TABS = [
 ]
 
 export default function BottomNav() {
-  const { userRole } = useOnboarding()
+  const { user, userRole, signOut } = useOnboarding()
+  if (!user) return null
   const location = useLocation()
   const navigate = useNavigate()
   const tabs = userRole === 'creator' ? CREATOR_TABS : EDITOR_TABS
@@ -43,6 +44,12 @@ export default function BottomNav() {
           </button>
         )
       })}
+      {userRole === 'creator' && (
+        <button className="bottom-nav-tab bottom-nav-tab--logout" onClick={signOut}>
+          <span className="bottom-nav-tab-icon">↪</span>
+          <span className="bottom-nav-tab-label">Quitter</span>
+        </button>
+      )}
     </nav>
   )
 }

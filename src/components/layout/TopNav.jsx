@@ -16,10 +16,23 @@ const CREATOR_TABS = [
 ]
 
 export default function TopNav() {
-  const { userRole, signOut, goToHome } = useOnboarding()
+  const { user, userRole, signOut, goToHome, goToOnboarding, goToCreatorSignup } = useOnboarding()
   const location = useLocation()
   const navigate = useNavigate()
   const tabs = userRole === 'creator' ? CREATOR_TABS : EDITOR_TABS
+
+  if (!user) {
+    return (
+      <header className="top-nav">
+        <div className="top-nav-logo" onClick={() => navigate('/')}>CUT<span>LAB</span></div>
+        <nav className="top-nav-tabs" />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="top-nav-logout" onClick={() => goToCreatorSignup(null)}>Je cherche un monteur</button>
+          <button className="top-nav-logout" onClick={goToOnboarding}>Je suis monteur</button>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header className="top-nav">
