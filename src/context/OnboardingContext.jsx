@@ -340,6 +340,9 @@ export function OnboardingProvider({ children }) {
   function goToPipeline() { nav('/pipeline') }
   function goToOfferForm() { nav('/offer/new') }
   function goToOfferPreview() { nav('/offer/preview') }
+  function goToMyProjects() { nav('/my-projects') }
+  function goToProjectForm(id) { nav(id ? `/project/new?edit=${id}` : '/project/new') }
+  function goToProjectDetail(id) { nav(`/project/${id}`) }
 
   /** Navigate to the role-appropriate home: Monteur -> projects, Createur -> catalog */
   function goToHome() {
@@ -354,6 +357,7 @@ export function OnboardingProvider({ children }) {
         navigateRef,
         goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
         goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
+        goToMyProjects, goToProjectForm, goToProjectDetail,
         formData, updateFormData,
         userRole: formData.role,
         pendingEditor, clearPendingEditor,

@@ -1,28 +1,13 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { uploadFile } from '../../lib/uploadFile'
+import { LANGUAGES, AVAILABILITY_OPTIONS } from '../../constants/options'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import HintBox from '../ui/HintBox'
 import UploadZone from '../ui/UploadZone'
 import AvailabilityButton from '../ui/AvailabilityButton'
 import StepNav from '../ui/StepNav'
-
-const LANGUAGES = [
-  { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
-  { key: 'en', flag: '🇬🇧', code: 'EN', label: 'Anglais' },
-  { key: 'es', flag: '🇪🇸', code: 'ES', label: 'Espagnol' },
-  { key: 'pt', flag: '🇧🇷', code: 'PT', label: 'Portugais' },
-  { key: 'de', flag: '🇩🇪', code: 'DE', label: 'Allemand' },
-  { key: 'it', flag: '🇮🇹', code: 'IT', label: 'Italien' },
-  { key: 'zh', flag: '🇨🇳', code: 'ZH', label: 'Chinois' },
-  { key: 'ja', flag: '🇯🇵', code: 'JA', label: 'Japonais' },
-  { key: 'ar', flag: '🇸🇦', code: 'AR', label: 'Arabe' },
-  { key: 'ru', flag: '🇷🇺', code: 'RU', label: 'Russe' },
-  { key: 'ko', flag: '🇰🇷', code: 'KO', label: 'Coréen' },
-]
-
-const AVAILABILITY_OPTIONS = ['Disponible', 'Sur demande', 'Indisponible']
 
 export default function Step2Identity() {
   const { goToStep, formData, updateFormData, user } = useOnboarding()

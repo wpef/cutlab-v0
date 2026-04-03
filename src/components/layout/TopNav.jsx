@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useOnboarding } from '../../context/OnboardingContext'
+import NotificationBell from '../projects/NotificationBell'
 
 const EDITOR_TABS = [
   { path: '/projects',  label: 'Mes projets', icon: '📋' },
@@ -11,8 +12,9 @@ const EDITOR_TABS = [
 ]
 
 const CREATOR_TABS = [
-  { path: '/catalog',   label: 'Catalogue',   icon: '🔍' },
-  { path: '/messaging', label: 'Messagerie',  icon: '💬' },
+  { path: '/my-projects', label: 'Projets',     icon: '📋' },
+  { path: '/catalog',     label: 'Monteurs',    icon: '🔍' },
+  { path: '/messaging',   label: 'Messagerie',  icon: '💬' },
 ]
 
 export default function TopNav() {
@@ -60,7 +62,10 @@ export default function TopNav() {
           )
         })}
       </nav>
-      <button className="top-nav-logout" onClick={signOut}>Deconnexion</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <NotificationBell />
+        <button className="top-nav-logout" onClick={signOut}>Deconnexion</button>
+      </div>
     </header>
   )
 }

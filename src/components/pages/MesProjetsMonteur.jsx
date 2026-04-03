@@ -2,12 +2,14 @@
  * MesProjetsMonteur — Home page for Monteurs (editors).
  *
  * Displays all projects/offers received from Créateurs, grouped by status.
- * This is the default landing view for logged-in monteurs.
+ * Also shows the editor's project candidatures (applications).
  */
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import { useProjects } from '../../context/ProjectContext'
+import ProjectStatusBadge from '../projects/ProjectStatusBadge'
 import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 const STATUS_LABEL = { pending: 'En attente', accepted: 'En cours', refused: 'Refusée' }
@@ -24,9 +26,16 @@ function formatDate(iso) {
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
+function formatBudget(project) {
+  if (!project) return ''
+  if (project.budget_type === 'range') return `${project.budget_min}–${project.budget_max} €`
+  return project.budget_fixed ? `${project.budget_fixed} €` : ''
+}
+
 export default function MesProjetsMonteur() {
-  const { goToChat, goToEditor, user } = useOnboarding()
+  const { goToChat, goToEditor, goToProjectDetail, user } = useOnboarding()
   const { requests, loadRequests, setActiveRequestId } = useMessaging()
+  const { myApplications, fetchMyApplications } = useProjects()
   const [offers, setOffers] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -34,6 +43,7 @@ export default function MesProjetsMonteur() {
     if (!user) return
     loadRequests()
     loadOffers()
+    fetchMyApplications()
   }, [user])
 
   async function loadOffers() {
@@ -52,10 +62,17 @@ export default function MesProjetsMonteur() {
   const pendingOffers = offers.filter((o) => o.status === 'pending')
   const pastOffers = offers.filter((o) => o.status === 'refused')
 
+  // Group candidatures by status
+  const pendingApps = myApplications.filter((a) => a.status === 'pending')
+  const acceptedApps = myApplications.filter((a) => a.status === 'accepted')
+  const refusedApps = myApplications.filter((a) => a.status === 'refused')
+
   function openRequest(requestId) {
     setActiveRequestId(requestId)
     goToChat(requestId)
   }
+
+  const hasContent = activeOffers.length > 0 || pendingOffers.length > 0 || pendingRequests.length > 0 || pastOffers.length > 0 || myApplications.length > 0
 
   return (
     <div className="projects-page">
@@ -64,12 +81,12 @@ export default function MesProjetsMonteur() {
 
         {loading ? (
           <div className="projects-empty">Chargement...</div>
-        ) : (activeOffers.length === 0 && pendingOffers.length === 0 && pendingRequests.length === 0 && pastOffers.length === 0) ? (
+        ) : !hasContent ? (
           <div className="projects-empty">
             <div style={{ fontSize: 48, marginBottom: 16 }}>📂</div>
             <h3>Aucun projet pour l'instant</h3>
             <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
-              Les créateurs te contacteront directement via le catalogue.
+              Les créateurs te contacteront directement via le catalogue, ou consulte les projets disponibles.
             </p>
             <button className="catalog-header-btn" style={{ marginTop: 24 }} onClick={goToEditor}>
               Compléter mon profil →
@@ -132,7 +149,7 @@ export default function MesProjetsMonteur() {
               </section>
             )}
 
-            {/* Historique */}
+            {/* Historique offres */}
             {pastOffers.length > 0 && (
               <section className="projects-section">
                 <div className="projects-section-title" style={{ color: 'var(--text-muted)' }}>Historique</div>
@@ -145,6 +162,73 @@ export default function MesProjetsMonteur() {
                   ))}
                 </div>
               </section>
+            )}
+
+            {/* ── Mes candidatures (project applications) ────── */}
+            {myApplications.length > 0 && (
+              <div className="my-applications">
+                <div className="my-applications-title">Mes candidatures</div>
+
+                {pendingApps.length > 0 && (
+                  <div className="application-status-group">
+                    <div style={{ fontSize: 12, color: '#fbbf24', marginBottom: 6 }}>En attente ({pendingApps.length})</div>
+                    <AnimatedList style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {pendingApps.map((a) => (
+                        <AnimatedItem key={a.id}>
+                          <div className="application-item" onClick={() => goToProjectDetail(a.project_id)}>
+                            <div className="application-item-info">
+                              <div className="application-item-title">{a.projects?.title || 'Projet'}</div>
+                              <div className="application-item-meta">
+                                {a.projects?.profiles?.first_name || 'Créateur'}
+                                {a.projects && ` · ${formatBudget(a.projects)}`}
+                              </div>
+                            </div>
+                            <ProjectStatusBadge status="published" />
+                          </div>
+                        </AnimatedItem>
+                      ))}
+                    </AnimatedList>
+                  </div>
+                )}
+
+                {acceptedApps.length > 0 && (
+                  <div className="application-status-group">
+                    <div style={{ fontSize: 12, color: '#4ade80', marginBottom: 6 }}>Acceptées ({acceptedApps.length})</div>
+                    <AnimatedList style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {acceptedApps.map((a) => (
+                        <AnimatedItem key={a.id}>
+                          <div className="application-item" onClick={() => openRequest(a.id)}>
+                            <div className="application-item-info">
+                              <div className="application-item-title">{a.projects?.title || 'Projet'}</div>
+                              <div className="application-item-meta">
+                                Voir la conversation →
+                              </div>
+                            </div>
+                            <span style={{ color: '#4ade80', fontSize: 12, fontWeight: 600 }}>Acceptée</span>
+                          </div>
+                        </AnimatedItem>
+                      ))}
+                    </AnimatedList>
+                  </div>
+                )}
+
+                {refusedApps.length > 0 && (
+                  <div className="application-status-group" style={{ opacity: 0.6 }}>
+                    <div style={{ fontSize: 12, color: '#f87171', marginBottom: 6 }}>Refusées ({refusedApps.length})</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {refusedApps.map((a) => (
+                        <div key={a.id} className="application-item">
+                          <div className="application-item-info">
+                            <div className="application-item-title">{a.projects?.title || 'Projet'}</div>
+                            <div className="application-item-meta">{formatDate(a.created_at)}</div>
+                          </div>
+                          <span style={{ color: '#f87171', fontSize: 12, fontWeight: 600 }}>Refusée</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}

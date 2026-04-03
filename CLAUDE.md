@@ -23,8 +23,8 @@ Three guard components wrap routes:
 ### Access rules
 | Role | Accessible pages |
 |------|-----------------|
-| **Creator** | `/catalog`, `/messaging`, `/messaging/:id`, `/offer/new`, `/offer/preview` |
-| **Editor** | `/projects`, `/editor`, `/messaging`, `/messaging/:id`, `/pipeline`, `/catalog` |
+| **Creator** | `/catalog`, `/messaging`, `/messaging/:id`, `/offer/new`, `/offer/preview`, `/project/new`, `/project/:id`, `/my-projects` |
+| **Editor** | `/projects`, `/editor`, `/messaging`, `/messaging/:id`, `/pipeline`, `/catalog`, `/project/:id` |
 | **Not logged in** | `/` (Landing), `/creator-signup`, `/onboarding/:step` (step 1 only for auth) |
 
 - Logged-in users cannot access the Landing page — they are auto-redirected to their home.
@@ -68,6 +68,9 @@ Demo credentials are in `src/lib/demoData.js`. Demo accounts (creator/editor) mu
 | `/pipeline` | EditorPipeline | AppLayout (fill) | RequireAuth + RequireRole(editor) |
 | `/offer/new` | OfferForm | AppLayout | RequireAuth + RequireRole(creator) |
 | `/offer/preview` | OfferPreview | AppLayout | RequireAuth + RequireRole(creator) |
+| `/project/new` | ProjectForm | AppLayout | RequireAuth + RequireRole(creator) |
+| `/project/:id` | ProjectDetail | AppLayout | RequireAuth |
+| `/my-projects` | MyProjects | AppLayout | RequireAuth + RequireRole(creator) |
 
 ## Layout system
 - **AppLayout** (`src/components/layout/AppLayout.jsx`): wraps authenticated routes. Contains TopNav + Outlet (with AnimatePresence) + BottomNav + Toast.
@@ -86,6 +89,7 @@ Demo credentials are in `src/lib/demoData.js`. Demo accounts (creator/editor) mu
 ## Key contexts
 - **OnboardingContext** (`src/context/OnboardingContext.jsx`): auth (Supabase), formData, goTo* navigation (uses navigateRef from React Router), saveProfile, loadProfile, demo mode, signOut with full cleanup.
 - **MessagingContext** (`src/context/MessagingContext.jsx`): requests, messages, offers, signUpCreator.
+- **ProjectContext** (`src/context/ProjectContext.jsx`): project CRUD, candidatures (via contact_requests with project_id), notifications (30s polling), application management (accept/refuse cascade). Auto-resets on logout.
 
 ## Navigation pattern
 - `navigateRef` in OnboardingContext is injected by `NavigationBridge` component (in main.jsx).

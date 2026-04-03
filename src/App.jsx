@@ -23,6 +23,9 @@ import OfferForm from './components/pages/OfferForm'
 import OfferPreview from './components/pages/OfferPreview'
 import MesProjetsMonteur from './components/pages/MesProjetsMonteur'
 import EditorPipeline from './components/pages/EditorPipeline'
+import ProjectForm from './components/pages/ProjectForm'
+import ProjectDetail from './components/pages/ProjectDetail'
+import MyProjects from './components/pages/MyProjects'
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -131,6 +134,11 @@ export default function App() {
         {/* Creator-only routes */}
         <Route path="/offer/new" element={<RequireRole allowed={['creator']}><OfferForm /></RequireRole>} />
         <Route path="/offer/preview" element={<RequireRole allowed={['creator']}><OfferPreview /></RequireRole>} />
+        <Route path="/project/new" element={<RequireRole allowed={['creator']}><ProjectForm /></RequireRole>} />
+        <Route path="/my-projects" element={<RequireRole allowed={['creator']}><MyProjects /></RequireRole>} />
+
+        {/* Shared routes (role-aware UI) */}
+        <Route path="/project/:id" element={<ProjectDetail />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

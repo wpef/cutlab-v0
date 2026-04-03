@@ -1,17 +1,11 @@
 import { useOnboarding } from '../../context/OnboardingContext'
+import { REVISION_OPTIONS, CAPACITY_OPTIONS } from '../../constants/options'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import HintBox from '../ui/HintBox'
 import Tag from '../ui/Tag'
 import SectionDivider from '../ui/SectionDivider'
 import StepNav from '../ui/StepNav'
-
-const REVISION_OPTIONS = ['1', '2', '3', '4', '5']
-const CAPACITY_OPTIONS = [
-  { key: '1',   label: '1 projet à la fois' },
-  { key: '2-3', label: '2–3 projets' },
-  { key: '4+',  label: '4 projets et plus' },
-]
 
 export default function Step5Pricing() {
   const { goToStep, formData, updateFormData } = useOnboarding()

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { uploadFile } from '../../lib/uploadFile'
+import { MISSION_TYPES, RESPONSE_TIMES } from '../../constants/options'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import Tag from '../ui/Tag'
@@ -9,19 +10,6 @@ import SectionDivider from '../ui/SectionDivider'
 import StepNav from '../ui/StepNav'
 
 const MAX_BIO = 280
-
-const MISSION_TYPES = [
-  { key: 'ponctuelle',   label: 'Mission ponctuelle' },
-  { key: 'long-terme',   label: 'Partenariat long terme' },
-]
-
-const RESPONSE_TIMES = [
-  { key: '<4h',  label: 'Moins de 4h' },
-  { key: '<12h', label: 'Moins de 12h' },
-  { key: '<24h', label: 'Moins de 24h' },
-  { key: '<48h', label: 'Moins de 48h' },
-  { key: '<1w',  label: "Moins d'1 semaine" },
-]
 
 export default function Step6Presentation() {
   const { goToStep, formData, updateFormData, user } = useOnboarding()

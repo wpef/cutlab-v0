@@ -1,52 +1,11 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
+import { SKILLS, FORMATS, NICHES, EXPERIENCE_OPTIONS, SOFTWARE } from '../../constants/options'
 import StepHeader from '../ui/StepHeader'
 import Tag from '../ui/Tag'
 import NicheTag from '../ui/NicheTag'
 import SectionDivider from '../ui/SectionDivider'
 import StepNav from '../ui/StepNav'
-
-const SKILLS = [
-  { key: 'video',   icon: '🎬', label: 'Montage vidéo' },
-  { key: 'thumb',   icon: '🖼️', label: 'Miniatures' },
-  { key: 'sound',   icon: '🎵', label: 'Sound design' },
-  { key: 'motion',  icon: '✨', label: 'Motion design' },
-  { key: 'voice',   icon: '🎙️', label: 'Traitement voix' },
-  { key: 'subs',    icon: '✏️', label: 'Sous-titrage' },
-  { key: 'color',   icon: '🎨', label: 'Color grading' },
-  { key: 'reels',   icon: '📱', label: 'Reels / Shorts' },
-]
-
-const FORMATS = [
-  { key: 'portrait',  label: '📱 Portrait / Shorts' },
-  { key: 'youtube',   label: '🖥️ YouTube long format' },
-  { key: 'pub',       label: '📺 Publicités & spots' },
-  { key: 'docu',      label: '🎞️ Documentaires' },
-  { key: 'corporate', label: '💼 Corporate / B2B' },
-  { key: 'clips',     label: '🎵 Clips musicaux' },
-  { key: 'gaming',    label: '🎮 Gaming' },
-  { key: 'sport',     label: '🏋️ Sport / Fitness' },
-]
-
-const NICHES = [
-  'Gaming', 'Finance', 'Lifestyle', 'Tech', 'Food', 'Sport',
-  'Mode', 'Éducation', 'Voyage', 'Musique', 'Business', 'Humour',
-  'Science', 'Politique',
-]
-
-const EXPERIENCE_OPTIONS = [
-  { key: '<6m',  label: 'Moins de 6 mois' },
-  { key: '6m1y', label: '6 mois – 1 an' },
-  { key: '1-3y', label: '1 – 3 ans' },
-  { key: '3-5y', label: '3 – 5 ans' },
-  { key: '5-7y', label: '5 – 7 ans' },
-  { key: '7y+',  label: '7 ans et plus' },
-]
-
-const SOFTWARE = [
-  'Premiere Pro', 'After Effects', 'DaVinci Resolve', 'Final Cut Pro',
-  'CapCut', 'Canva', 'Photoshop', 'Illustrator', 'Audition', 'Figma',
-]
 
 export default function Step3Skills() {
   const { goToStep, formData, updateFormData } = useOnboarding()

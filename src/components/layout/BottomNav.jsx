@@ -10,8 +10,9 @@ const EDITOR_TABS = [
 ]
 
 const CREATOR_TABS = [
-  { path: '/catalog',   label: 'Catalogue',  icon: '🔍' },
-  { path: '/messaging', label: 'Messages',   icon: '💬' },
+  { path: '/my-projects', label: 'Projets',   icon: '📋' },
+  { path: '/catalog',     label: 'Monteurs',  icon: '🔍' },
+  { path: '/messaging',   label: 'Messages',  icon: '💬' },
 ]
 
 export default function BottomNav() {
@@ -45,10 +46,20 @@ export default function BottomNav() {
         )
       })}
       {userRole === 'creator' && (
-        <button className="bottom-nav-tab bottom-nav-tab--logout" onClick={signOut}>
-          <span className="bottom-nav-tab-icon">↪</span>
-          <span className="bottom-nav-tab-label">Quitter</span>
-        </button>
+        <>
+          <button
+            className="bottom-nav-tab bottom-nav-tab--action"
+            onClick={() => navigate('/project/new')}
+            style={{ position: 'relative' }}
+          >
+            <span className="bottom-nav-tab-icon">＋</span>
+            <span className="bottom-nav-tab-label">Créer</span>
+          </button>
+          <button className="bottom-nav-tab bottom-nav-tab--logout" onClick={signOut}>
+            <span className="bottom-nav-tab-icon">↪</span>
+            <span className="bottom-nav-tab-label">Quitter</span>
+          </button>
+        </>
       )}
     </nav>
   )
