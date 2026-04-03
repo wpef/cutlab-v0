@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { computeScoreDetails } from '../lib/computeLevel'
 
 const OnboardingContext = createContext(null)
 
@@ -28,7 +29,6 @@ const INITIAL_FORM = {
 export function OnboardingProvider({ children }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [maxStepReached, setMaxStepReached] = useState(1)
-  const [assignedLevel, setAssignedLevel] = useState(2)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [user, setUser] = useState(null)
   const [authReady, setAuthReady] = useState(false) // true once initial session check is done
@@ -137,7 +137,6 @@ export function OnboardingProvider({ children }) {
     // Reset in-memory state
     setUser(null)
     setFormData(INITIAL_FORM)
-    setAssignedLevel(2)
     setCurrentStep(1)
     setDemoMode(null)
 
@@ -156,6 +155,7 @@ export function OnboardingProvider({ children }) {
   async function saveProfile(status = 'draft') {
     if (!user) return false
     setSaving(true)
+    const { levelIndex } = computeScoreDetails(formData)
     const { error } = await supabase.from('profiles').upsert({
       id: user.id,
       first_name: formData.firstName,
@@ -179,7 +179,7 @@ export function OnboardingProvider({ children }) {
       mission_types: formData.missionTypes,
       response_time: formData.responseTime,
       social_links: formData.socialLinks,
-      assigned_level: assignedLevel,
+      assigned_level: levelIndex,
       role: formData.role,
       certification_status: formData.certificationStatus ?? 'draft',
       presentation_video_url: formData.presentationVideoUrl || null,
@@ -194,8 +194,7 @@ export function OnboardingProvider({ children }) {
   async function publishProfile() {
     const ok = await saveProfile('published')
     if (ok) {
-      setCurrentStep(9)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      goToStep(9)
     }
     return ok
   }
@@ -204,34 +203,49 @@ export function OnboardingProvider({ children }) {
     if (!user) return
     const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     if (error || !data) return
-    if (data.assigned_level != null) setAssignedLevel(data.assigned_level)
-    setFormData((prev) => ({
-      ...prev,
-      firstName:       data.first_name        ?? prev.firstName,
-      lastName:        data.last_name         ?? prev.lastName,
-      username:        data.username          ?? prev.username,
-      avatarUrl:       data.avatar_url        ?? prev.avatarUrl,
-      languages:       data.languages         ?? prev.languages,
-      availability:    data.availability      ?? prev.availability,
-      skills:          data.skills            ?? prev.skills,
-      formats:         data.formats           ?? prev.formats,
-      niches:          data.niches            ?? prev.niches,
-      experience:      data.experience        ?? prev.experience,
-      software:        data.software          ?? prev.software,
-      portfolioLinks:  data.portfolio_links   ?? prev.portfolioLinks,
-      creditedChannels: data.credited_channels ?? prev.creditedChannels,
-      revisions:       data.revisions         ?? prev.revisions,
-      capacity:        data.capacity          ?? prev.capacity,
-      hourlyRate:      data.hourly_rate != null ? String(data.hourly_rate) : prev.hourlyRate,
-      deliveryTime:    data.delivery_time      ?? prev.deliveryTime,
-      bio:             data.bio               ?? prev.bio,
-      missionTypes:    data.mission_types     ?? prev.missionTypes,
-      responseTime:    data.response_time     ?? prev.responseTime,
-      socialLinks:             data.social_links            ?? prev.socialLinks,
-      presentationVideoUrl:    data.presentation_video_url  ?? prev.presentationVideoUrl,
-      certificationStatus:     data.certification_status    ?? prev.certificationStatus,
-      role:                    data.role                    ?? prev.role,
-    }))
+
+    // Legacy value migration (T006)
+    let experience = data.experience
+    if (experience === '5y+') experience = '7y+'
+
+    let responseTime = data.response_time
+    if (responseTime === '<1h') responseTime = '<4h'
+
+    const loadedFormData = {
+      firstName:       data.first_name        ?? INITIAL_FORM.firstName,
+      lastName:        data.last_name         ?? INITIAL_FORM.lastName,
+      username:        data.username          ?? INITIAL_FORM.username,
+      avatarUrl:       data.avatar_url        ?? INITIAL_FORM.avatarUrl,
+      languages:       data.languages         ?? INITIAL_FORM.languages,
+      availability:    data.availability      ?? INITIAL_FORM.availability,
+      skills:          data.skills            ?? INITIAL_FORM.skills,
+      formats:         data.formats           ?? INITIAL_FORM.formats,
+      niches:          data.niches            ?? INITIAL_FORM.niches,
+      experience:      experience             ?? INITIAL_FORM.experience,
+      software:        data.software          ?? INITIAL_FORM.software,
+      portfolioLinks:  data.portfolio_links   ?? INITIAL_FORM.portfolioLinks,
+      creditedChannels: data.credited_channels ?? INITIAL_FORM.creditedChannels,
+      revisions:       data.revisions         ?? INITIAL_FORM.revisions,
+      capacity:        data.capacity          ?? INITIAL_FORM.capacity,
+      hourlyRate:      data.hourly_rate != null ? String(data.hourly_rate) : INITIAL_FORM.hourlyRate,
+      deliveryTime:    data.delivery_time      ?? INITIAL_FORM.deliveryTime,
+      bio:             data.bio               ?? INITIAL_FORM.bio,
+      missionTypes:    data.mission_types     ?? INITIAL_FORM.missionTypes,
+      responseTime:    responseTime            ?? INITIAL_FORM.responseTime,
+      socialLinks:             data.social_links            ?? INITIAL_FORM.socialLinks,
+      presentationVideoUrl:    data.presentation_video_url  ?? INITIAL_FORM.presentationVideoUrl,
+      certificationStatus:     data.certification_status    ?? INITIAL_FORM.certificationStatus,
+      role:                    data.role                    ?? INITIAL_FORM.role,
+    }
+
+    // If legacy assigned_level exceeds new 7-level range (0-6), recalculate
+    if (data.assigned_level != null && data.assigned_level > 6) {
+      const { levelIndex } = computeScoreDetails(loadedFormData)
+      // Persist the recalculated level back to DB (best-effort)
+      supabase.from('profiles').update({ assigned_level: levelIndex, experience, response_time: responseTime }).eq('id', user.id).then(() => {})
+    }
+
+    setFormData((prev) => ({ ...prev, ...loadedFormData }))
   }
 
   async function loginAndRedirect(email, password) {
@@ -340,7 +354,6 @@ export function OnboardingProvider({ children }) {
         navigateRef,
         goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
         goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
-        assignedLevel, setAssignedLevel,
         formData, updateFormData,
         userRole: formData.role,
         pendingEditor, clearPendingEditor,

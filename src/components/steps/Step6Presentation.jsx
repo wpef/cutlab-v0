@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
+import { uploadFile } from '../../lib/uploadFile'
 import StepHeader from '../ui/StepHeader'
 import FormGroup from '../ui/FormGroup'
 import Tag from '../ui/Tag'
@@ -15,21 +16,32 @@ const MISSION_TYPES = [
 ]
 
 const RESPONSE_TIMES = [
-  { key: '<1h',  label: "Moins d'1h" },
   { key: '<4h',  label: 'Moins de 4h' },
+  { key: '<12h', label: 'Moins de 12h' },
   { key: '<24h', label: 'Moins de 24h' },
-  { key: '<48h', label: 'Sous 48h' },
+  { key: '<48h', label: 'Moins de 48h' },
+  { key: '<1w',  label: "Moins d'1 semaine" },
 ]
 
 export default function Step6Presentation() {
-  const { goToStep, formData, updateFormData } = useOnboarding()
+  const { goToStep, formData, updateFormData, user } = useOnboarding()
   const [error, setError] = useState('')
+  const [videoUploading, setVideoUploading] = useState(false)
 
   function handleNext() {
     if (formData.bio.trim().length < 10) { setError('Écris une bio d\'au moins 10 caractères.'); return }
     if (formData.missionTypes.length === 0) { setError('Sélectionne au moins un type de mission.'); return }
     setError('')
     goToStep(7)
+  }
+
+  async function handleVideoFile(file) {
+    if (!file || !user) return
+    setVideoUploading(true)
+    const ext = file.name.split('.').pop()
+    const url = await uploadFile('videos', `${user.id}/presentation.${ext}`, file)
+    setVideoUploading(false)
+    if (url) updateFormData({ presentationVideoUrl: url })
   }
 
   function toggleMission(key) {
@@ -58,7 +70,45 @@ export default function Step6Presentation() {
       </FormGroup>
 
       <FormGroup label="Vidéo de présentation" optional="très recommandé — les clients adorent">
-        <VideoRecordField />
+        {formData.presentationVideoUrl ? (
+          <div>
+            <video
+              src={formData.presentationVideoUrl}
+              controls
+              style={{
+                width: '100%',
+                maxHeight: 220,
+                borderRadius: 'var(--radius-sm)',
+                background: '#000',
+                border: '1px solid var(--border)',
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => updateFormData({ presentationVideoUrl: '' })}
+              style={{
+                marginTop: 6,
+                background: 'transparent',
+                border: 'none',
+                color: '#ff4d4d',
+                fontSize: 12,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              Supprimer la vidéo
+            </button>
+          </div>
+        ) : (
+          <>
+            {videoUploading && (
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>
+                Upload en cours...
+              </div>
+            )}
+            <VideoRecordField onFileReady={handleVideoFile} />
+          </>
+        )}
       </FormGroup>
 
       <SectionDivider>Préférences de collaboration</SectionDivider>

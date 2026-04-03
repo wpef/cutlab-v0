@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
+import { computeScoreDetails } from '../../lib/computeLevel'
 import EditorCard from '../ui/EditorCard'
 import StepHeader from '../ui/StepHeader'
 import StepNav from '../ui/StepNav'
@@ -15,7 +16,8 @@ const LEGEND_ITEMS = [
 
 
 export default function Step8Preview() {
-  const { goToStep, publishProfile, assignedLevel, saving, formData } = useOnboarding()
+  const { goToStep, publishProfile, saving, formData } = useOnboarding()
+  const { levelIndex } = computeScoreDetails(formData)
   const [error, setError] = useState('')
 
   async function handlePublish() {
@@ -49,7 +51,7 @@ export default function Step8Preview() {
             username: formData.username,
             availability: formData.availability,
             skills: formData.skills,
-            assigned_level: assignedLevel,
+            assigned_level: levelIndex,
             experience: formData.experience,
             languages: formData.languages,
             formats: formData.formats,

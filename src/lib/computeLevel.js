@@ -1,113 +1,139 @@
-import { computeCompletion } from './profileCompletion'
+import { getLevelByScore } from '../constants/levels'
 
 /**
- * computeLevel — calcule le niveau rapide basé sur le profil utilisateur.
+ * 7-parameter scoring engine for editor profiles.
  *
- * Retourne l'un des 3 niveaux automatiques :
- *   0 = Débutant
- *   3 = Confirmé (Pro)
- *   4 = Expert
+ * Total: 100 points (96 max in v1 — portfolio capped at 26, reviews at 0)
  *
- * Barème (total sur 100 points) :
- *   Expérience              : 0–30 pts
- *   Nombre de skills        : 0–20 pts
- *   Tarif horaire           : 0–20 pts
- *   Volume portfolio (liens): 0–15 pts
- *   Score de complétion     : 0–15 pts
- *
- * Seuils :
- *   < 35 pts  → Débutant  (index 0)
- *   35–64 pts → Pro       (index 3 "Confirmé")
- *   >= 65 pts → Expert    (index 4 "Expert")
+ * Parameters & weights:
+ *   Portfolio           : 0–26 pts (30 max in future with quality tagging)
+ *   Avis clients        : 0–20 pts (0 until review system built)
+ *   Expérience déclarée : 0–15 pts
+ *   Compétences + logiciels : 0–10 pts
+ *   Références externes : 0–10 pts
+ *   Complétion du profil: 0–8 pts
+ *   Réactivité déclarée : 0–7 pts
  */
 
-export const SCORE_RUBRIC = [
-  { label: 'Expérience déclarée', max: 30 },
-  { label: 'Compétences sélectionnées', max: 20 },
-  { label: 'Tarif horaire', max: 20 },
-  { label: 'Volume portfolio (liens)', max: 15 },
-  { label: 'Complétion du profil', max: 15 },
+export const SCORE_PARAMS = [
+  { key: 'portfolio',   label: 'Portfolio',              maxPoints: 26 },
+  { key: 'reviews',     label: 'Avis clients',           maxPoints: 20 },
+  { key: 'experience',  label: 'Expérience déclarée',    maxPoints: 15 },
+  { key: 'skills',      label: 'Compétences & logiciels', maxPoints: 10 },
+  { key: 'references',  label: 'Références externes',    maxPoints: 10 },
+  { key: 'completion',  label: 'Complétion du profil',   maxPoints: 8 },
+  { key: 'reactivity',  label: 'Réactivité déclarée',    maxPoints: 7 },
 ]
 
-/** Returns a human-readable explanation for the user's current score on each criterion */
-export function getScoreExplanation(formData) {
-  const expLabels = { '<6m': '< 6 mois', '6m1y': '6 mois – 1 an', '1-3y': '1–3 ans', '3-5y': '3–5 ans', '5y+': '5 ans+' }
-  const skillCount = (formData.skills ?? []).length
-  const rate = parseFloat(formData.hourlyRate)
-  const linkCount = (formData.portfolioLinks ?? []).filter((l) => l && l.trim()).length
+// --- Individual scoring functions ---
 
-  return [
-    expLabels[formData.experience] ?? 'Non renseigné',
-    `${skillCount} compétence${skillCount > 1 ? 's' : ''}`,
-    !rate || isNaN(rate) || rate <= 0 ? 'Non renseigné' : `${formData.hourlyRate}€/h`,
-    `${linkCount} lien${linkCount > 1 ? 's' : ''}`,
-    'Champs renseignés',
-  ]
-}
-
-/** Calcule le score d'expérience (0–30) */
-function scoreExperience(experience) {
-  const map = { '<6m': 5, '6m1y': 12, '1-3y': 20, '3-5y': 26, '5y+': 30 }
-  return map[experience] ?? 0
-}
-
-/** Calcule le score de compétences (0–20) */
-function scoreSkills(skills) {
-  const n = (skills ?? []).length
-  if (n >= 4) return 20
-  if (n === 3) return 15
-  if (n === 2) return 10
-  if (n === 1) return 5
+function scorePortfolio(formData) {
+  const count = (formData.portfolioLinks ?? []).filter((l) => l && l.trim()).length
+  if (count >= 8) return 26
+  if (count >= 6) return 22
+  if (count >= 4) return 18
+  if (count >= 2) return 10
   return 0
 }
 
-/** Calcule le score de tarif (0–20) */
-function scoreTarif(hourlyRate) {
-  const rate = parseFloat(hourlyRate)
-  if (!rate || isNaN(rate) || rate <= 0) return 0
-  if (rate > 60) return 20
-  if (rate >= 30) return 14
-  return 8
-}
-
-/** Calcule le score portfolio (0–15) */
-function scorePortfolio(portfolioLinks) {
-  const count = (portfolioLinks ?? []).filter((l) => l && l.trim()).length
-  if (count >= 3) return 15
-  if (count === 2) return 11
-  if (count === 1) return 6
+function scoreReviews(reviewData) {
+  const { count, avgRating } = reviewData
+  if (count <= 0) return 0
+  // Best qualifying bracket (fall-through)
+  if (count > 20 && avgRating >= 4.9) return 20
+  if (count >= 10 && avgRating >= 4.8) return 17
+  if (count >= 5 && avgRating >= 4.5) return 14
+  if (count >= 3 && avgRating >= 4.5) return 9
+  if (count >= 1 && avgRating >= 4.5) return 5
+  if (count >= 1) return 3 // 1+ reviews, rating below 4.5
   return 0
 }
 
-/** Calcule un score de complétion normalisé sur 15 */
-export function computeCompletionScore(formData) {
-  const { pct } = computeCompletion(formData)
-  return Math.round((pct / 100) * 15)
-}
-
-/** Retourne le score total (0–100) et les détails par critère */
-export function computeScoreDetails(formData) {
-  const expScore  = scoreExperience(formData.experience)
-  const skillScore = scoreSkills(formData.skills)
-  const tarifScore = scoreTarif(formData.hourlyRate)
-  const portfolioScore = scorePortfolio(formData.portfolioLinks)
-  const completionScore = computeCompletionScore(formData)
-
-  const total = expScore + skillScore + tarifScore + portfolioScore + completionScore
-
-  return {
-    total,
-    details: [expScore, skillScore, tarifScore, portfolioScore, completionScore],
+function scoreExperience(formData) {
+  const map = {
+    '<6m': 2, '6m1y': 5, '1-3y': 8,
+    '3-5y': 11, '5-7y': 13, '7y+': 15,
   }
+  return map[formData.experience] ?? 0
+}
+
+function scoreSkills(formData) {
+  const skillCount = (formData.skills ?? []).length
+  const softwareCount = (formData.software ?? []).length
+  const total = skillCount + softwareCount
+  if (total >= 10) return 10
+  if (total >= 8) return 8
+  if (total >= 6) return 6
+  if (total >= 4) return 4
+  return 0
+}
+
+function scoreReferences(formData) {
+  const raw = formData.creditedChannels ?? ''
+  const refs = raw
+    .split(/[,;\n]+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const count = refs.length
+  if (count >= 11) return 10
+  if (count >= 6) return 9
+  if (count >= 4) return 7
+  if (count >= 2) return 5
+  if (count === 1) return 3
+  return 0
+}
+
+function scoreCompletion(formData) {
+  let pts = 0
+  if (formData.bio && formData.bio.trim()) pts++
+  if (formData.avatarUrl && formData.avatarUrl.trim()) pts++
+  if (formData.availability && formData.availability.trim()) pts++
+  if (formData.hourlyRate && parseFloat(formData.hourlyRate) > 0) pts++
+  if (formData.responseTime && formData.responseTime.trim()) pts++
+  if (formData.socialLinks && formData.socialLinks.trim()) pts++
+  if (formData.presentationVideoUrl && formData.presentationVideoUrl.trim()) pts++
+  // Bonus: all 7 elements filled
+  if (pts === 7) pts = 8
+  return pts
+}
+
+function scoreReactivity(formData) {
+  const map = {
+    '<4h': 7, '<12h': 5, '<24h': 3,
+    '<48h': 2, '<1w': 1,
+  }
+  return map[formData.responseTime] ?? 0
+}
+
+// --- Main scoring function ---
+
+/**
+ * Compute the full score breakdown for an editor profile.
+ *
+ * @param {object} formData - Profile data from OnboardingContext
+ * @param {{ count: number, avgRating: number }} reviewData - Client reviews (defaults to 0)
+ * @returns {{ total: number, details: object, levelIndex: number }}
+ */
+export function computeScoreDetails(formData, reviewData = { count: 0, avgRating: 0 }) {
+  const details = {
+    portfolio:  scorePortfolio(formData),
+    reviews:    scoreReviews(reviewData),
+    experience: scoreExperience(formData),
+    skills:     scoreSkills(formData),
+    references: scoreReferences(formData),
+    completion: scoreCompletion(formData),
+    reactivity: scoreReactivity(formData),
+  }
+
+  const total = Object.values(details).reduce((sum, v) => sum + v, 0)
+  const levelIndex = getLevelByScore(total)
+
+  return { total, details, levelIndex }
 }
 
 /**
- * Retourne l'index LEVELS correspondant au niveau automatique calculé.
- * Uniquement 3 résultats possibles : 0 (Débutant), 3 (Confirmé/Pro), 4 (Expert)
+ * Quick helper: returns the LEVELS index for a given formData.
  */
-export function computeAutoLevel(formData) {
-  const { total } = computeScoreDetails(formData)
-  if (total >= 65) return 4 // Expert
-  if (total >= 35) return 3 // Confirmé (Pro)
-  return 0                   // Débutant
+export function computeAutoLevel(formData, reviewData) {
+  return computeScoreDetails(formData, reviewData).levelIndex
 }

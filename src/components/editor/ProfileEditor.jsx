@@ -2,8 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
+import { computeScoreDetails } from '../../lib/computeLevel'
+import { LEVELS } from '../../constants/levels'
 import { uploadFile } from '../../lib/uploadFile'
 import EditorCard from '../ui/EditorCard'
+import ScoreBreakdown from '../ui/ScoreBreakdown'
 import FormGroup from '../ui/FormGroup'
 import Tag from '../ui/Tag'
 import NicheTag from '../ui/NicheTag'
@@ -63,7 +66,8 @@ const EXPERIENCE_OPTIONS = [
   { key: '6m1y', label: '6 mois – 1 an' },
   { key: '1-3y', label: '1 – 3 ans' },
   { key: '3-5y', label: '3 – 5 ans' },
-  { key: '5y+',  label: '5 ans et plus' },
+  { key: '5-7y', label: '5 – 7 ans' },
+  { key: '7y+',  label: '7 ans et plus' },
 ]
 
 const SOFTWARE = [
@@ -85,10 +89,11 @@ const MISSION_TYPES = [
 ]
 
 const RESPONSE_TIMES = [
-  { key: '<1h',  label: "Moins d'1h" },
   { key: '<4h',  label: 'Moins de 4h' },
+  { key: '<12h', label: 'Moins de 12h' },
   { key: '<24h', label: 'Moins de 24h' },
-  { key: '<48h', label: 'Sous 48h' },
+  { key: '<48h', label: 'Moins de 48h' },
+  { key: '<1w',  label: "Moins d'1 semaine" },
 ]
 
 
@@ -100,11 +105,12 @@ const NAV_SECTIONS = [
   { id: 'section-portfolio',    label: 'Portfolio' },
   { id: 'section-pricing',      label: 'Tarifs' },
   { id: 'section-presentation', label: 'Présentation' },
+  { id: 'section-level',        label: 'Mon niveau' },
 ]
 
 
 export default function ProfileEditor() {
-  const { formData, updateFormData, saveProfile, loadProfile, saving, assignedLevel, user, signOut } = useOnboarding()
+  const { formData, updateFormData, saveProfile, loadProfile, saving, user, signOut } = useOnboarding()
   const { requests, loadRequests } = useMessaging()
   const [saveStatus, setSaveStatus] = useState(null)
   const [activeSection, setActiveSection] = useState('section-identity')
@@ -118,6 +124,7 @@ export default function ProfileEditor() {
   const [clipUploading, setClipUploading] = useState(false)
   const [clipUploadError, setClipUploadError] = useState(null)
   const [clipUploadSuccess, setClipUploadSuccess] = useState(false)
+  const [scoreDetails, setScoreDetails] = useState(() => computeScoreDetails(formData))
 
   async function handleAvatarUpload(files) {
     if (!files.length || !user) return
@@ -233,6 +240,7 @@ export default function ProfileEditor() {
     const ok = await saveProfile('published')
     setSaveStatus(ok ? 'saved' : 'error')
     if (ok) {
+      setScoreDetails(computeScoreDetails(formData))
       toast.success('Profil mis a jour !')
       setTimeout(() => setSaveStatus(null), 3000)
     } else {
@@ -292,7 +300,7 @@ export default function ProfileEditor() {
                   username: formData.username,
                   availability: formData.availability,
                   skills: formData.skills,
-                  assigned_level: assignedLevel,
+                  assigned_level: computeScoreDetails(formData).levelIndex,
                   experience: formData.experience,
                   languages: formData.languages,
                   formats: formData.formats,
@@ -320,7 +328,7 @@ export default function ProfileEditor() {
               username: formData.username,
               availability: formData.availability,
               skills: formData.skills,
-              assigned_level: assignedLevel,
+              assigned_level: computeScoreDetails(formData).levelIndex,
               experience: formData.experience,
               languages: formData.languages,
               formats: formData.formats,
@@ -760,6 +768,19 @@ export default function ProfileEditor() {
                 value={formData.socialLinks}
                 onChange={(e) => updateFormData({ socialLinks: e.target.value })} />
             </FormGroup>
+          </section>
+
+          {/* -- Section: Mon niveau -- */}
+          <section id="section-level" className="editor-section" style={{ scrollMarginTop: 80 }}>
+            <div className="editor-section-title">Mon niveau</div>
+            <div className="editor-score-section">
+              <div className="editor-score-level">
+                <span className="editor-score-level-emoji">{LEVELS[scoreDetails.levelIndex].emoji}</span>
+                <span className="editor-score-level-name">{LEVELS[scoreDetails.levelIndex].name}</span>
+              </div>
+              <div className="editor-score-total">{scoreDetails.total} / 100</div>
+              <ScoreBreakdown scoreDetails={scoreDetails} />
+            </div>
           </section>
 
           {/* -- Bottom save -- */}

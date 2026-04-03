@@ -39,7 +39,8 @@ const EXPERIENCE_OPTIONS = [
   { key: '6m1y', label: '6 mois – 1 an' },
   { key: '1-3y', label: '1 – 3 ans' },
   { key: '3-5y', label: '3 – 5 ans' },
-  { key: '5y+',  label: '5 ans et plus' },
+  { key: '5-7y', label: '5 – 7 ans' },
+  { key: '7y+',  label: '7 ans et plus' },
 ]
 
 const SOFTWARE = [

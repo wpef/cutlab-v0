@@ -1,4 +1,4 @@
-# CUTLAB — Context for Claude Code
+﻿# CUTLAB — Context for Claude Code
 
 ## Stack
 - Vite + React 18 (no TypeScript)
