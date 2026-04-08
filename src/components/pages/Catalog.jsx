@@ -1,22 +1,17 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
-import { useProjects } from '../../context/ProjectContext'
 import EditorCard from '../ui/EditorCard'
-import ProjectCard from '../projects/ProjectCard'
-import ProjectFilters from '../projects/ProjectFilters'
 import PageTitle from '../layout/PageTitle'
 import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 export default function Catalog() {
   const {
-    goToOnboarding, goToCreatorSignup, goToMessaging, goToProjectDetail,
+    goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
   } = useOnboarding()
-  const { requests, loadRequests, sendContactRequest } = useMessaging()
-  const { publishedProjects, fetchPublishedProjects, projectLoading } = useProjects()
+  const { loadRequests, sendContactRequest } = useMessaging()
 
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -24,11 +19,6 @@ export default function Catalog() {
   const [contactMsg, setContactMsg] = useState('')
   const [contactSending, setContactSending] = useState(false)
   const [contactError, setContactError] = useState('')
-
-  // Tab state for editors: 'editors' | 'projects'
-  const isEditor = userRole === 'editor'
-  const [activeTab, setActiveTab] = useState(isEditor ? 'projects' : 'editors')
-  const [projectFilters, setProjectFilters] = useState({})
 
   useEffect(() => {
     supabase
@@ -44,13 +34,6 @@ export default function Catalog() {
   useEffect(() => {
     if (user) loadRequests()
   }, [user])
-
-  // Fetch published projects when tab is active or filters change
-  useEffect(() => {
-    if (activeTab === 'projects') {
-      fetchPublishedProjects(projectFilters)
-    }
-  }, [activeTab, projectFilters])
 
   function handleContact(profile) {
     const displayName = [profile.first_name, profile.last_name ? profile.last_name[0] + '.' : ''].filter(Boolean).join(' ') || 'Monteur'
@@ -86,7 +69,7 @@ export default function Catalog() {
   return (
     <div className="catalog-page">
 
-      <PageTitle title={isEditor ? (activeTab === 'projects' ? 'Projets disponibles' : 'Les monteurs') : 'Les monteurs'}>
+      <PageTitle title="Les monteurs">
         {!user && (
           <>
             <button className="catalog-header-btn" onClick={() => goToCreatorSignup(null)}>
@@ -97,112 +80,39 @@ export default function Catalog() {
         )}
       </PageTitle>
 
-      {/* Editor tab switcher */}
-      {isEditor && (
-        <div className="catalog-tabs">
-          <button
-            className={`catalog-tab ${activeTab === 'projects' ? 'active' : ''}`}
-            onClick={() => setActiveTab('projects')}
-            style={{ position: 'relative' }}
-          >
-            Projets disponibles
-            {activeTab === 'projects' && (
-              <motion.div
-                className="catalog-tab-indicator"
-                layoutId="catalog-tab-indicator"
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              />
-            )}
-          </button>
-          <button
-            className={`catalog-tab ${activeTab === 'editors' ? 'active' : ''}`}
-            onClick={() => setActiveTab('editors')}
-            style={{ position: 'relative' }}
-          >
-            Monteurs
-            {activeTab === 'editors' && (
-              <motion.div
-                className="catalog-tab-indicator"
-                layoutId="catalog-tab-indicator"
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              />
-            )}
-          </button>
-        </div>
-      )}
-
       <div className="catalog-content">
-        {/* ─── Projects tab (editors only) ─────────────────────── */}
-        {activeTab === 'projects' && isEditor && (
+        {loading ? (
+          <div className="catalog-loading">Chargement...</div>
+        ) : profiles.length === 0 ? (
+          <div className="catalog-empty">
+            <div className="catalog-empty-icon">🎬</div>
+            <h3>Aucun monteur pour l'instant</h3>
+            <p>Les premiers profils arrivent bientôt.</p>
+            <button className="catalog-header-btn" style={{ marginTop: 24 }} onClick={goToOnboarding}>
+              Être le premier →
+            </button>
+          </div>
+        ) : (
           <>
-            <ProjectFilters filters={projectFilters} onFilterChange={setProjectFilters} />
-            {projectLoading ? (
-              <div className="catalog-loading">Chargement...</div>
-            ) : publishedProjects.length === 0 ? (
-              <div className="catalog-empty">
-                <div className="catalog-empty-icon">📝</div>
-                <h3>Aucun projet disponible</h3>
-                <p>
-                  {Object.keys(projectFilters).length > 0
-                    ? 'Aucun projet ne correspond à vos critères. Essayez d\'élargir votre recherche.'
-                    : 'Les premiers projets arrivent bientôt.'}
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="catalog-meta">{publishedProjects.length} projet{publishedProjects.length > 1 ? 's' : ''}</div>
-                <AnimatedList className="catalog-grid">
-                  {publishedProjects.map((p) => (
-                    <AnimatedItem key={p.id}>
-                      <ProjectCard
-                        project={p}
-                        onClick={() => goToProjectDetail(p.id)}
-                      />
-                    </AnimatedItem>
-                  ))}
-                </AnimatedList>
-              </>
-            )}
-          </>
-        )}
-
-        {/* ─── Editors tab (default for creators, second for editors) */}
-        {(activeTab === 'editors' || !isEditor) && (
-          <>
-            {loading ? (
-              <div className="catalog-loading">Chargement...</div>
-            ) : profiles.length === 0 ? (
-              <div className="catalog-empty">
-                <div className="catalog-empty-icon">🎬</div>
-                <h3>Aucun monteur pour l'instant</h3>
-                <p>Les premiers profils arrivent bientôt.</p>
-                <button className="catalog-header-btn" style={{ marginTop: 24 }} onClick={goToOnboarding}>
-                  Être le premier →
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="catalog-meta">{profiles.length} monteur{profiles.length > 1 ? 's' : ''}</div>
-                <AnimatedList className="catalog-grid">
-                  {profiles.map((p) => (
-                    <AnimatedItem key={p.id}>
-                      <ProfileCard
-                        profile={p}
-                        onContact={() => handleContact(p)}
-                        isContacting={contactingId === p.id}
-                        contactMsg={contactMsg}
-                        onContactMsgChange={setContactMsg}
-                        onSendContact={() => handleSendContact(p)}
-                        onCancelContact={() => setContactingId(null)}
-                        contactSending={contactSending}
-                        contactError={contactError}
-                        userRole={userRole}
-                      />
-                    </AnimatedItem>
-                  ))}
-                </AnimatedList>
-              </>
-            )}
+            <div className="catalog-meta">{profiles.length} monteur{profiles.length > 1 ? 's' : ''}</div>
+            <AnimatedList className="catalog-grid">
+              {profiles.map((p) => (
+                <AnimatedItem key={p.id}>
+                  <ProfileCard
+                    profile={p}
+                    onContact={() => handleContact(p)}
+                    isContacting={contactingId === p.id}
+                    contactMsg={contactMsg}
+                    onContactMsgChange={setContactMsg}
+                    onSendContact={() => handleSendContact(p)}
+                    onCancelContact={() => setContactingId(null)}
+                    contactSending={contactSending}
+                    contactError={contactError}
+                    userRole={userRole}
+                  />
+                </AnimatedItem>
+              ))}
+            </AnimatedList>
           </>
         )}
       </div>

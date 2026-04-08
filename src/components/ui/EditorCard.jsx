@@ -116,7 +116,6 @@ export default function EditorCard({ profile, hideName = false, stats, children 
         <div className="profile-footer">
           <div className="profile-price">
             {priceIndicator}
-            {profile.hourly_rate ? ` · ${profile.hourly_rate}€/h` : ''}
           </div>
           <div className="profile-rating">
             {stats

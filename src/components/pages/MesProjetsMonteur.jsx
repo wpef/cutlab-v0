@@ -5,10 +5,13 @@
  * Also shows the editor's project candidatures (applications).
  */
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { useProjects } from '../../context/ProjectContext'
+import ProjectCard from '../projects/ProjectCard'
+import ProjectFilters from '../projects/ProjectFilters'
 import ProjectStatusBadge from '../projects/ProjectStatusBadge'
 import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
@@ -35,16 +38,25 @@ function formatBudget(project) {
 export default function MesProjetsMonteur() {
   const { goToChat, goToEditor, goToProjectDetail, user } = useOnboarding()
   const { requests, loadRequests, setActiveRequestId } = useMessaging()
-  const { myApplications, fetchMyApplications } = useProjects()
+  const { myApplications, fetchMyApplications, publishedProjects, fetchPublishedProjects, projectLoading } = useProjects()
   const [offers, setOffers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('available')
+  const [projectFilters, setProjectFilters] = useState({})
 
   useEffect(() => {
     if (!user) return
     loadRequests()
     loadOffers()
     fetchMyApplications()
+    fetchPublishedProjects({})
   }, [user])
+
+  useEffect(() => {
+    if (activeTab === 'available') {
+      fetchPublishedProjects(projectFilters)
+    }
+  }, [projectFilters])
 
   async function loadOffers() {
     if (!user) return
@@ -77,9 +89,64 @@ export default function MesProjetsMonteur() {
   return (
     <div className="projects-page">
 
+      <div className="catalog-tabs">
+        <button
+          className={`catalog-tab ${activeTab === 'available' ? 'active' : ''}`}
+          onClick={() => setActiveTab('available')}
+          style={{ position: 'relative' }}
+        >
+          Projets disponibles
+          {activeTab === 'available' && (
+            <motion.div className="catalog-tab-indicator" layoutId="projects-tab-indicator" transition={{ type: 'spring', stiffness: 400, damping: 30 }} />
+          )}
+        </button>
+        <button
+          className={`catalog-tab ${activeTab === 'mine' ? 'active' : ''}`}
+          onClick={() => setActiveTab('mine')}
+          style={{ position: 'relative' }}
+        >
+          Mes candidatures
+          {activeTab === 'mine' && (
+            <motion.div className="catalog-tab-indicator" layoutId="projects-tab-indicator" transition={{ type: 'spring', stiffness: 400, damping: 30 }} />
+          )}
+        </button>
+      </div>
+
       <div className="projects-content">
 
-        {loading ? (
+        {/* ─── Available projects tab ─── */}
+        {activeTab === 'available' && (
+          <div style={{ padding: '24px 0' }}>
+            <ProjectFilters filters={projectFilters} onFilterChange={setProjectFilters} />
+            {projectLoading ? (
+              <div className="projects-empty">Chargement...</div>
+            ) : publishedProjects.length === 0 ? (
+              <div className="projects-empty">
+                <div style={{ fontSize: 48, marginBottom: 16 }}>📝</div>
+                <h3>Aucun projet disponible</h3>
+                <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
+                  {Object.keys(projectFilters).length > 0
+                    ? "Aucun projet ne correspond à vos critères. Essayez d'élargir votre recherche."
+                    : 'Les premiers projets arrivent bientôt.'}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="catalog-meta">{publishedProjects.length} projet{publishedProjects.length > 1 ? 's' : ''}</div>
+                <AnimatedList className="catalog-grid">
+                  {publishedProjects.map((p) => (
+                    <AnimatedItem key={p.id}>
+                      <ProjectCard project={p} onClick={() => goToProjectDetail(p.id)} />
+                    </AnimatedItem>
+                  ))}
+                </AnimatedList>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ─── My candidatures tab ─── */}
+        {activeTab === 'mine' && (loading ? (
           <div className="projects-empty">Chargement...</div>
         ) : !hasContent ? (
           <div className="projects-empty">
@@ -231,7 +298,7 @@ export default function MesProjetsMonteur() {
               </div>
             )}
           </>
-        )}
+        ))}
 
       </div>
     </div>
