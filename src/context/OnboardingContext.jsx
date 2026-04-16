@@ -55,6 +55,57 @@ export function OnboardingProvider({ children }) {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       const u = session?.user ?? null
       setUser(u)
+
+      // Handle OAuth callback: if oauthFlow is set, this is a return from Google/Apple
+      const oauthFlow = sessionStorage.getItem('oauthFlow')
+      if (u && oauthFlow) {
+        sessionStorage.removeItem('oauthFlow')
+        const savedEditor = sessionStorage.getItem('oauthPendingEditor')
+        sessionStorage.removeItem('oauthPendingEditor')
+
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', u.id).single()
+
+        if (profile?.role) {
+          // Existing user — redirect to role home
+          setFormData((prev) => ({ ...prev, role: profile.role }))
+          setAuthReady(true)
+          if (profile.role === 'creator') nav('/catalog')
+          else nav('/projects')
+          return
+        }
+
+        // New user — create minimal profile based on flow
+        const fullName = u.user_metadata?.full_name || u.user_metadata?.name || ''
+        const firstName = fullName.split(' ')[0] || ''
+        const role = oauthFlow === 'creator' ? 'creator' : 'editor'
+
+        await supabase.from('profiles').upsert({
+          id: u.id,
+          first_name: firstName,
+          role,
+          avatar_url: u.user_metadata?.avatar_url || '',
+          updated_at: new Date().toISOString(),
+        })
+        setFormData((prev) => ({ ...prev, firstName, role, avatarUrl: u.user_metadata?.avatar_url || '' }))
+        setAuthReady(true)
+
+        if (role === 'creator') {
+          if (savedEditor) {
+            setPendingEditor(JSON.parse(savedEditor))
+            nav('/creator-signup')
+          } else {
+            nav('/catalog')
+          }
+        } else {
+          // Editor — continue onboarding at step 2
+          setCurrentStep(2)
+          setMaxStepReached(2)
+          nav('/onboarding/2')
+        }
+        return
+      }
+
+      // Normal session restore (no OAuth)
       if (u) {
         const { data } = await supabase.from('profiles').select('role').eq('id', u.id).single()
         if (data?.role) setFormData((prev) => ({ ...prev, role: data.role }))
@@ -143,10 +194,23 @@ export function OnboardingProvider({ children }) {
     nav('/')
   }
 
-  async function signInWithGoogle() {
+  async function signInWithGoogle(flow = 'editor') {
     setAuthError(null)
+    sessionStorage.setItem('oauthFlow', flow)
+    if (pendingEditor) sessionStorage.setItem('oauthPendingEditor', JSON.stringify(pendingEditor))
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) setAuthError(error.message)
+  }
+
+  async function signInWithApple(flow = 'editor') {
+    setAuthError(null)
+    sessionStorage.setItem('oauthFlow', flow)
+    if (pendingEditor) sessionStorage.setItem('oauthPendingEditor', JSON.stringify(pendingEditor))
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
       options: { redirectTo: window.location.origin },
     })
     if (error) setAuthError(error.message)
@@ -363,7 +427,7 @@ export function OnboardingProvider({ children }) {
         pendingEditor, clearPendingEditor,
         user, authReady, authLoading, authError,
         demoMode,
-        signUpUser, signInUser, signInWithGoogle, signOut, loginAndRedirect,
+        signUpUser, signInUser, signInWithGoogle, signInWithApple, signOut, loginAndRedirect,
         loginDemoEditor, loginDemoCreator, startDemoOnboarding,
         clearAuthError: () => setAuthError(null),
         saveProfile, publishProfile, loadProfile,
