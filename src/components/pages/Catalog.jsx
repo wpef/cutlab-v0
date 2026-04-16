@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
@@ -7,6 +8,7 @@ import PageTitle from '../layout/PageTitle'
 import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 
 export default function Catalog() {
+  const navigate = useNavigate()
   const {
     goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
@@ -100,6 +102,7 @@ export default function Catalog() {
                 <AnimatedItem key={p.id}>
                   <ProfileCard
                     profile={p}
+                    onCardClick={() => navigate(`/editor/${p.id}`)}
                     onContact={() => handleContact(p)}
                     isContacting={contactingId === p.id}
                     contactMsg={contactMsg}
@@ -122,23 +125,23 @@ export default function Catalog() {
 }
 
 function ProfileCard({
-  profile, onContact, isContacting,
+  profile, onCardClick, onContact, isContacting,
   contactMsg, onContactMsgChange, onSendContact, onCancelContact,
   contactSending, contactError, userRole,
 }) {
   return (
-    <EditorCard profile={profile}>
+    <EditorCard profile={profile} onClick={onCardClick}>
 
       {/* Contact button */}
       {!isContacting && (
-        <button className="catalog-contact-btn" onClick={onContact}>
+        <button className="catalog-contact-btn" onClick={(e) => { e.stopPropagation(); onContact() }}>
           {userRole === 'editor' ? 'Messagerie →' : 'Contacter →'}
         </button>
       )}
 
       {/* Inline contact form */}
       {isContacting && (
-        <div className="catalog-contact-form">
+        <div className="catalog-contact-form" onClick={(e) => e.stopPropagation()}>
           <textarea
             className="catalog-contact-input"
             placeholder="Bonjour, je cherche un monteur pour..."
