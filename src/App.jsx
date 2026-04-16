@@ -26,6 +26,7 @@ import EditorPipeline from './components/pages/EditorPipeline'
 import ProjectForm from './components/pages/ProjectForm'
 import ProjectDetail from './components/pages/ProjectDetail'
 import MyProjects from './components/pages/MyProjects'
+import EditorDetail from './components/pages/EditorDetail'
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -119,6 +120,7 @@ export default function App() {
       {/* Public catalog — guests can browse, auth required only to contact */}
       <Route element={<AppLayout />}>
         <Route path="/catalog" element={<Catalog />} />
+        <Route path="/editor/:id" element={<EditorDetail />} />
       </Route>
 
       {/* Authenticated app routes */}
