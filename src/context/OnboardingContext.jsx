@@ -68,9 +68,9 @@ export function OnboardingProvider({ children }) {
         if (profile?.role) {
           // Existing user — redirect to role home
           setFormData((prev) => ({ ...prev, role: profile.role }))
-          setAuthReady(true)
           if (profile.role === 'creator') nav('/catalog')
           else nav('/projects')
+          setAuthReady(true)
           return
         }
 
@@ -87,7 +87,6 @@ export function OnboardingProvider({ children }) {
           updated_at: new Date().toISOString(),
         })
         setFormData((prev) => ({ ...prev, firstName, role, avatarUrl: u.user_metadata?.avatar_url || '' }))
-        setAuthReady(true)
 
         if (role === 'creator') {
           if (savedEditor) {
@@ -102,6 +101,7 @@ export function OnboardingProvider({ children }) {
           setMaxStepReached(2)
           nav('/onboarding/2')
         }
+        setAuthReady(true)
         return
       }
 
