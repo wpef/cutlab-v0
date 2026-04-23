@@ -187,7 +187,10 @@ export default function ProfileEditor() {
       loadProfile()
       loadRequests()
     }
-  }, [user])
+    // Dépend de l'id, pas de la référence d'objet : empêche reload
+    // (qui wipe les unsaved edits, ex: vidéo) quand Supabase émet un nouvel
+    // objet user pour le même id (TOKEN_REFRESHED / SIGNED_IN au focus d'onglet).
+  }, [user?.id])
 
   // Scrollspy: highlight active section in nav
   useEffect(() => {

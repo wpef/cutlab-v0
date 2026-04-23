@@ -24,11 +24,12 @@ Three guard components wrap routes:
 | Role | Accessible pages |
 |------|-----------------|
 | **Creator** | `/catalog`, `/messaging`, `/messaging/:id`, `/offer/new`, `/offer/preview`, `/project/new`, `/project/:id`, `/my-projects` |
-| **Editor** | `/projects`, `/editor`, `/messaging`, `/messaging/:id`, `/pipeline`, `/catalog`, `/project/:id` |
-| **Not logged in** | `/` (Landing), `/creator-signup`, `/onboarding/:step` (step 1 only for auth) |
+| **Editor** | `/projects`, `/editor`, `/messaging`, `/messaging/:id`, `/pipeline`, `/project/:id` |
+| **Not logged in** | `/` (Landing), `/catalog`, `/creator-signup`, `/onboarding/:step` (step 1 only for auth) |
 
 - Logged-in users cannot access the Landing page — they are auto-redirected to their home.
-- Logged-out users cannot access any app route — they are redirected to Landing.
+- Logged-out users cannot access most app routes — they are redirected to Landing. **Exception:** `/catalog` is open to guests (so they can browse monteurs before signing up).
+- **Editors are blocked from `/catalog`** (auto-redirected to `/projects`) — the catalog is a creator-facing discovery surface.
 - Each user only sees their own projects, messages, and offers (queries scoped by `user.id`).
 
 ### Auth state
