@@ -7,7 +7,11 @@
       "Bash(npm install:*)",
       "Bash(npx:*)",
       "Bash(git:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -PathsOnly)",
+      "Bash(powershell:*)",
+      "Bash(npm run:*)",
+      "Bash(sed:*)"
     ]
   }
 }

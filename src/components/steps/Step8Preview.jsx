@@ -45,10 +45,8 @@ export default function Step8Preview() {
         <EditorCard
           profile={{
             avatar_url: formData.avatarUrl,
-            presentation_video_url: formData.presentationVideoUrl,
             first_name: formData.firstName,
             last_name: formData.lastName,
-            username: formData.username,
             availability: formData.availability,
             skills: formData.skills,
             assigned_level: levelIndex,

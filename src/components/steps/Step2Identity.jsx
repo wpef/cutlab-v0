@@ -75,15 +75,6 @@ export default function Step2Identity() {
         </FormGroup>
       </div>
 
-      <FormGroup label="Pseudo / Nom de scène" optional="optionnel">
-        <input
-          type="text"
-          placeholder="Le nom affiché sur ton profil public"
-          value={formData.username}
-          onChange={(e) => updateFormData({ username: e.target.value })}
-        />
-      </FormGroup>
-
       <FormGroup label="Photo de profil" optional="optionnel — tu peux l'ajouter plus tard">
         {formData.avatarUrl && !avatarUploading ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>

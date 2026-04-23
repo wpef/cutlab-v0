@@ -91,9 +91,8 @@ function scoreCompletion(formData) {
   if (formData.hourlyRate && parseFloat(formData.hourlyRate) > 0) pts++
   if (formData.responseTime && formData.responseTime.trim()) pts++
   if (formData.socialLinks && formData.socialLinks.trim()) pts++
-  if (formData.presentationVideoUrl && formData.presentationVideoUrl.trim()) pts++
-  // Bonus: all 7 elements filled
-  if (pts === 7) pts = 8
+  // Bonus: all 6 elements filled
+  if (pts === 6) pts = 8
   return pts
 }
 

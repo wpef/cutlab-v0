@@ -30,8 +30,8 @@ const EXP_LABELS = { '<6m': '< 6 mois', '6m1y': '6 mois – 1 an', '1-3y': '1–
  * Shared profile card — same design as Step8Preview.
  *
  * Props:
- *   profile  — { avatar_url, presentation_video_url, first_name, last_name,
- *                username, availability, skills, assigned_level,
+ *   profile  — { avatar_url, first_name, last_name,
+ *                availability, skills, assigned_level,
  *                experience, languages, formats, hourly_rate }
  *   hideName — hides the full name (ProfileEditor sidebar)
  *   stats    — optional { received, active, done } for project counts
@@ -55,9 +55,7 @@ export default function EditorCard({ profile, hideName = false, stats, onClick, 
   return (
     <div className={`profile-preview${onClick ? ' profile-preview--clickable' : ''}`} onClick={onClick}>
       <div className="profile-thumb">
-        {profile.presentation_video_url
-          ? <video src={profile.presentation_video_url} autoPlay muted loop playsInline className="catalog-card-media" />
-          : profile.avatar_url
+        {profile.avatar_url
           ? <img src={profile.avatar_url} alt={name || 'Monteur'} className="catalog-card-media" />
           : <span style={{ fontSize: 48 }}>🎬</span>
         }
@@ -82,9 +80,6 @@ export default function EditorCard({ profile, hideName = false, stats, onClick, 
             </div>
           )}
         </div>
-        {profile.username && (
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: hideName ? 6 : 2 }}>@{profile.username}</div>
-        )}
         {expLabel && (
           <div className="profile-meta">{expLabel} d'exp.</div>
         )}

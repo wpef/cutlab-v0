@@ -8,7 +8,7 @@ const INITIAL_FORM = {
   // Step 1 (auth — not stored in DB directly)
   email: '',
   // Step 2
-  firstName: '', lastName: '', username: '', avatarUrl: '',
+  firstName: '', lastName: '', avatarUrl: '',
   languages: ['fr'], availability: 'Disponible',
   // Step 3
   skills: ['video'], formats: ['youtube'], niches: ['Gaming'],
@@ -19,7 +19,6 @@ const INITIAL_FORM = {
   revisions: '2', capacity: '2-3', hourlyRate: '', deliveryTime: '',
   // Step 6
   bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: '',
-  presentationVideoUrl: '',
   // Step 7
   certificationStatus: 'draft', // 'draft' | 'pending'
   // Role
@@ -228,7 +227,6 @@ export function OnboardingProvider({ children }) {
       id: user.id,
       first_name: formData.firstName,
       last_name: formData.lastName,
-      username: formData.username,
       avatar_url: formData.avatarUrl,
       languages: formData.languages,
       availability: formData.availability,
@@ -250,7 +248,6 @@ export function OnboardingProvider({ children }) {
       assigned_level: levelIndex,
       role: formData.role,
       certification_status: formData.certificationStatus ?? 'draft',
-      presentation_video_url: formData.presentationVideoUrl || null,
       status,
       updated_at: new Date().toISOString(),
     })
@@ -282,7 +279,6 @@ export function OnboardingProvider({ children }) {
     const loadedFormData = {
       firstName:       data.first_name        ?? INITIAL_FORM.firstName,
       lastName:        data.last_name         ?? INITIAL_FORM.lastName,
-      username:        data.username          ?? INITIAL_FORM.username,
       avatarUrl:       data.avatar_url        ?? INITIAL_FORM.avatarUrl,
       languages:       data.languages         ?? INITIAL_FORM.languages,
       availability:    data.availability      ?? INITIAL_FORM.availability,
@@ -301,7 +297,6 @@ export function OnboardingProvider({ children }) {
       missionTypes:    data.mission_types     ?? INITIAL_FORM.missionTypes,
       responseTime:    responseTime            ?? INITIAL_FORM.responseTime,
       socialLinks:             data.social_links            ?? INITIAL_FORM.socialLinks,
-      presentationVideoUrl:    data.presentation_video_url  ?? INITIAL_FORM.presentationVideoUrl,
       certificationStatus:     data.certification_status    ?? INITIAL_FORM.certificationStatus,
       role:                    data.role                    ?? INITIAL_FORM.role,
     }

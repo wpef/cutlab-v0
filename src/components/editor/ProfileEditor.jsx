@@ -117,9 +117,6 @@ export default function ProfileEditor() {
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [avatarUploadError, setAvatarUploadError] = useState(null)
   const [avatarUploadSuccess, setAvatarUploadSuccess] = useState(false)
-  const [videoUploading, setVideoUploading] = useState(false)
-  const [videoUploadError, setVideoUploadError] = useState(null)
-  const [videoUploadSuccess, setVideoUploadSuccess] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [clipUploading, setClipUploading] = useState(false)
   const [clipUploadError, setClipUploadError] = useState(null)
@@ -140,23 +137,6 @@ export default function ProfileEditor() {
       setTimeout(() => setAvatarUploadSuccess(false), 3000)
     } else {
       setAvatarUploadError("Erreur lors de l'upload.")
-    }
-  }
-
-  async function handleVideoUpload(files) {
-    if (!files.length || !user) return
-    setVideoUploading(true)
-    setVideoUploadError(null)
-    const file = files[0]
-    const ext = file.name.split('.').pop()
-    const url = await uploadFile('videos', `${user.id}/presentation.${ext}`, file)
-    setVideoUploading(false)
-    if (url) {
-      updateFormData({ presentationVideoUrl: url })
-      setVideoUploadSuccess(true)
-      setTimeout(() => setVideoUploadSuccess(false), 3000)
-    } else {
-      setVideoUploadError("Erreur lors de l'upload.")
     }
   }
 
@@ -297,10 +277,8 @@ export default function ProfileEditor() {
               <EditorCard
                 profile={{
                   avatar_url: formData.avatarUrl,
-                  presentation_video_url: formData.presentationVideoUrl,
                   first_name: formData.firstName,
                   last_name: formData.lastName,
-                  username: formData.username,
                   availability: formData.availability,
                   skills: formData.skills,
                   assigned_level: computeScoreDetails(formData).levelIndex,
@@ -325,10 +303,8 @@ export default function ProfileEditor() {
           <EditorCard
             profile={{
               avatar_url: formData.avatarUrl,
-              presentation_video_url: formData.presentationVideoUrl,
               first_name: formData.firstName,
               last_name: formData.lastName,
-              username: formData.username,
               availability: formData.availability,
               skills: formData.skills,
               assigned_level: computeScoreDetails(formData).levelIndex,
@@ -405,11 +381,6 @@ export default function ProfileEditor() {
                   onChange={(e) => updateFormData({ lastName: e.target.value })} />
               </FormGroup>
             </div>
-
-            <FormGroup label="Pseudo / Nom de scène" optional="optionnel">
-              <input type="text" placeholder="Le nom affiché sur ton profil public"
-                value={formData.username} onChange={(e) => updateFormData({ username: e.target.value })} />
-            </FormGroup>
 
             <FormGroup label="Photo de profil" optional="optionnel">
               {formData.avatarUrl ? (
@@ -698,51 +669,6 @@ export default function ProfileEditor() {
               <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'right', marginTop: 4 }}>
                 {formData.bio.length} / {MAX_BIO} caractères
               </div>
-            </FormGroup>
-
-            {/* Vidéo de présentation — avec VideoRecordField */}
-            <FormGroup label="Vidéo de présentation" optional="très recommandé — les clients adorent">
-              {formData.presentationVideoUrl ? (
-                <div>
-                  <video
-                    src={formData.presentationVideoUrl}
-                    controls
-                    style={{
-                      width: '100%',
-                      maxHeight: 200,
-                      borderRadius: 'var(--radius-sm)',
-                      background: '#000',
-                      border: '1px solid var(--border)',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => updateFormData({ presentationVideoUrl: '' })}
-                    style={{
-                      marginTop: 6,
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#ff4d4d',
-                      fontSize: 12,
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    Supprimer la vidéo actuelle
-                  </button>
-                </div>
-              ) : (
-                <UploadZone
-                  icon="🎥"
-                  title="Uploader une vidéo de présentation"
-                  hint="MP4 · Max 100 Mo"
-                  accept="video/mp4,video/quicktime,video/webm"
-                  maxSizeMB={100}
-                  onFilesChange={handleVideoUpload}
-                  uploading={videoUploading} uploadError={videoUploadError} uploadSuccess={videoUploadSuccess}
-                  style={{ padding: 24 }}
-                />
-              )}
             </FormGroup>
 
             <FormGroup label="Type de mission recherchée">

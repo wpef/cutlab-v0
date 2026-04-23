@@ -50,7 +50,7 @@ export default function EditorDetail() {
   useEffect(() => {
     supabase
       .from('profiles')
-      .select('id, first_name, last_name, username, availability, skills, assigned_level, bio, languages, avatar_url, presentation_video_url, experience, formats, hourly_rate')
+      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, hourly_rate')
       .eq('id', id)
       .single()
       .then(({ data, error }) => {
@@ -104,9 +104,7 @@ export default function EditorDetail() {
       <div className="editor-detail-content">
         {/* Media */}
         <div className="editor-detail-media">
-          {profile.presentation_video_url ? (
-            <video src={profile.presentation_video_url} controls playsInline className="editor-detail-video" />
-          ) : profile.avatar_url ? (
+          {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={name} className="editor-detail-img" />
           ) : (
             <div className="editor-detail-placeholder">🎬</div>
@@ -128,10 +126,7 @@ export default function EditorDetail() {
             )}
           </div>
 
-          {/* Username + experience */}
-          {profile.username && (
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>@{profile.username}</div>
-          )}
+          {/* Experience */}
           {expLabel && <div className="profile-meta">{expLabel}</div>}
 
           {/* Bio */}
