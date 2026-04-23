@@ -8,7 +8,6 @@ create table if not exists public.profiles (
   id               uuid references auth.users on delete cascade primary key,
   first_name       text,
   last_name        text,
-  username         text,
   avatar_url       text,
   languages        text[]   default '{}',
   availability     text     default 'Disponible',
@@ -131,9 +130,6 @@ alter table public.profiles add column if not exists role text default 'editor';
 
 -- Certification status: 'draft' (no request) | 'pending' (request sent) | 'certified' | 'refused'
 alter table public.profiles add column if not exists certification_status text default 'draft';
-
--- Presentation video URL (Supabase Storage or external)
-alter table public.profiles add column if not exists presentation_video_url text;
 
 -- Allow anyone to read published editor profiles (needed for Catalog)
 create policy "Anyone can read published profiles"
