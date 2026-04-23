@@ -10,7 +10,7 @@ import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 export default function Catalog() {
   const navigate = useNavigate()
   const {
-    goToOnboarding, goToCreatorSignup, goToMessaging,
+    goToOnboarding, goToCreatorSignup,
     user, userRole,
   } = useOnboarding()
   const { loadRequests, sendContactRequest } = useMessaging()
@@ -43,10 +43,7 @@ export default function Catalog() {
       goToCreatorSignup(profile.id, displayName)
       return
     }
-    if (userRole === 'editor') {
-      goToMessaging()
-      return
-    }
+    // Only creators reach here — editors are blocked from /catalog by route guard.
     setContactingId(profile.id)
     setContactMsg('')
     setContactError('')
@@ -111,7 +108,6 @@ export default function Catalog() {
                     onCancelContact={() => setContactingId(null)}
                     contactSending={contactSending}
                     contactError={contactError}
-                    userRole={userRole}
                   />
                 </AnimatedItem>
               ))}
@@ -127,15 +123,15 @@ export default function Catalog() {
 function ProfileCard({
   profile, onCardClick, onContact, isContacting,
   contactMsg, onContactMsgChange, onSendContact, onCancelContact,
-  contactSending, contactError, userRole,
+  contactSending, contactError,
 }) {
   return (
     <EditorCard profile={profile} onClick={onCardClick}>
 
-      {/* Contact button */}
+      {/* Contact button — only creators and guests reach this page (editors blocked by route guard) */}
       {!isContacting && (
         <button className="catalog-contact-btn" onClick={(e) => { e.stopPropagation(); onContact() }}>
-          {userRole === 'editor' ? 'Messagerie →' : 'Contacter →'}
+          Contacter →
         </button>
       )}
 

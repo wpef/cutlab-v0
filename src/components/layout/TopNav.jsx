@@ -8,7 +8,6 @@ const EDITOR_TABS = [
   { path: '/editor',    label: 'Mon profil',  icon: '✏️' },
   { path: '/messaging', label: 'Messagerie',  icon: '💬' },
   { path: '/pipeline',  label: 'Pipeline',    icon: '📊' },
-  { path: '/catalog',   label: 'Catalogue',   icon: '🔍' },
 ]
 
 const CREATOR_TABS = [

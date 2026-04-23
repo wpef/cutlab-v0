@@ -89,10 +89,20 @@ function RequireAuth({ children }) {
   return children
 }
 
-/** Redirects to role-appropriate home if user lacks the required role */
-function RequireRole({ allowed, children }) {
+/**
+ * Role-based guard with two modes:
+ *   - `allowed`: redirect to landing if userRole is NOT in the allowlist (existing behavior)
+ *   - `blocked`: redirect to role-specific home if userRole IS in the blocklist
+ *               (used for pages open to guests + some roles, e.g. /catalog: guests + creators only)
+ *
+ * `blocked` only applies to authenticated users — guests (no userRole) are allowed through.
+ */
+function RequireRole({ allowed, blocked, children }) {
   const { userRole } = useOnboarding()
-  if (!allowed.includes(userRole)) return <Navigate to="/" replace />
+  if (blocked && userRole && blocked.includes(userRole)) {
+    return <Navigate to={userRole === 'creator' ? '/catalog' : '/projects'} replace />
+  }
+  if (allowed && !allowed.includes(userRole)) return <Navigate to="/" replace />
   return children
 }
 
@@ -117,9 +127,9 @@ export default function App() {
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />
 
-      {/* Public catalog — guests can browse, auth required only to contact */}
+      {/* Public catalog — guests + creators can browse; editors are redirected to /projects */}
       <Route element={<AppLayout />}>
-        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/catalog" element={<RequireRole blocked={['editor']}><Catalog /></RequireRole>} />
         <Route path="/editor/:id" element={<EditorDetail />} />
       </Route>
 

@@ -113,7 +113,11 @@ export function OnboardingProvider({ children }) {
       setAuthReady(true)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+      const newUser = session?.user ?? null
+      // TOKEN_REFRESHED / SIGNED_IN au focus d'onglet renvoient un nouvel objet user
+      // pour la même identité — on garde la référence précédente pour ne pas
+      // re-déclencher les useEffect([user]) qui écrasent formData (ex: vidéo de présentation).
+      setUser((prev) => (prev?.id === newUser?.id ? prev : newUser))
     })
     return () => subscription.unsubscribe()
   }, [])
