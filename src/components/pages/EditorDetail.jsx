@@ -5,6 +5,7 @@ import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { LEVELS } from '../../constants/levels'
 import PageTitle from '../layout/PageTitle'
+import SocialLinksDisplay from '../ui/SocialLinksDisplay'
 
 const SKILL_LABELS = {
   video: 'Montage', thumb: 'Miniatures', sound: 'Sound',
@@ -50,7 +51,7 @@ export default function EditorDetail() {
   useEffect(() => {
     supabase
       .from('profiles')
-      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, hourly_rate')
+      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, hourly_rate, social_links')
       .eq('id', id)
       .single()
       .then(({ data, error }) => {
@@ -133,6 +134,9 @@ export default function EditorDetail() {
           {profile.bio && (
             <div className="editor-detail-bio">{profile.bio}</div>
           )}
+
+          {/* Social links */}
+          <SocialLinksDisplay socialLinks={profile.social_links} />
 
           {/* Skills */}
           {(profile.skills ?? []).length > 0 && (

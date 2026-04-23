@@ -6,17 +6,27 @@ import FormGroup from '../ui/FormGroup'
 import Tag from '../ui/Tag'
 import SectionDivider from '../ui/SectionDivider'
 import StepNav from '../ui/StepNav'
+import SocialLinksInput from '../ui/SocialLinksInput'
 
 const MAX_BIO = 280
 
 export default function Step6Presentation() {
   const { goToStep, formData, updateFormData } = useOnboarding()
   const [error, setError] = useState('')
+  // Initialize from context; coerce legacy string to empty object
+  const [socialLinks, setSocialLinks] = useState(
+    () => (formData.socialLinks && typeof formData.socialLinks === 'object') ? formData.socialLinks : {}
+  )
 
   function handleNext() {
     if (formData.bio.trim().length < 10) { setError('Écris une bio d\'au moins 10 caractères.'); return }
     if (formData.missionTypes.length === 0) { setError('Sélectionne au moins un type de mission.'); return }
     setError('')
+    // Filter out empty-string values before persisting to context
+    const cleanedLinks = Object.fromEntries(
+      Object.entries(socialLinks).filter(([, v]) => v && v.trim())
+    )
+    updateFormData({ socialLinks: cleanedLinks })
     goToStep(7)
   }
 
@@ -68,12 +78,7 @@ export default function Step6Presentation() {
       </FormGroup>
 
       <FormGroup label="Réseaux / site perso" optional="optionnel">
-        <input
-          type="text"
-          placeholder="Instagram, TikTok, site web..."
-          value={formData.socialLinks}
-          onChange={(e) => updateFormData({ socialLinks: e.target.value })}
-        />
+        <SocialLinksInput value={socialLinks} onChange={setSocialLinks} />
       </FormGroup>
 
       {error && <div className="step-error">{error}</div>}

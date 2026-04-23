@@ -16,6 +16,7 @@ import Button from '../ui/Button'
 import HintBox from '../ui/HintBox'
 import { toast } from '../ui/Toast'
 import { AnimatePresence, motion } from 'framer-motion'
+import SocialLinksInput from '../ui/SocialLinksInput'
 
 const LANGUAGES = [
   { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
@@ -122,6 +123,10 @@ export default function ProfileEditor() {
   const [clipUploadError, setClipUploadError] = useState(null)
   const [clipUploadSuccess, setClipUploadSuccess] = useState(false)
   const [scoreDetails, setScoreDetails] = useState(() => computeScoreDetails(formData))
+  // Local state for social links — coerce legacy string to empty object on init
+  const [socialLinks, setSocialLinks] = useState(
+    () => (formData.socialLinks && typeof formData.socialLinks === 'object') ? formData.socialLinks : {}
+  )
 
   async function handleAvatarUpload(files) {
     if (!files.length || !user) return
@@ -172,6 +177,13 @@ export default function ProfileEditor() {
     // objet user pour le même id (TOKEN_REFRESHED / SIGNED_IN au focus d'onglet).
   }, [user?.id])
 
+  // Sync local socialLinks when formData updates (e.g. after loadProfile)
+  useEffect(() => {
+    if (formData.socialLinks && typeof formData.socialLinks === 'object') {
+      setSocialLinks(formData.socialLinks)
+    }
+  }, [formData.socialLinks])
+
   // Scrollspy: highlight active section in nav
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -220,6 +232,11 @@ export default function ProfileEditor() {
 
   async function handleSave() {
     setSaveStatus(null)
+    // Flush local socialLinks (filter empties) to context before saving
+    const cleanedLinks = Object.fromEntries(
+      Object.entries(socialLinks).filter(([, v]) => v && v.trim())
+    )
+    updateFormData({ socialLinks: cleanedLinks })
     const ok = await saveProfile('published')
     setSaveStatus(ok ? 'saved' : 'error')
     if (ok) {
@@ -693,9 +710,7 @@ export default function ProfileEditor() {
             </FormGroup>
 
             <FormGroup label="Réseaux / site perso" optional="optionnel">
-              <input type="text" placeholder="Instagram, TikTok, site web..."
-                value={formData.socialLinks}
-                onChange={(e) => updateFormData({ socialLinks: e.target.value })} />
+              <SocialLinksInput value={socialLinks} onChange={setSocialLinks} />
             </FormGroup>
           </section>
 

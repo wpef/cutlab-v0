@@ -26,5 +26,5 @@ export const DEMO_FORM = {
   bio:              'Monteur YouTube depuis 4 ans, spé gaming et tech. J\'aime les transitions fluides et le storytelling percutant. Réponse garantie sous 4h.',
   missionTypes:     ['ponctuelle', 'long-terme'],
   responseTime:     '<4h',
-  socialLinks:      'instagram.com/lucasedits',
+  socialLinks:      { instagram: 'lucasedits' },
 }

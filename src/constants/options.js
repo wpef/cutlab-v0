@@ -97,3 +97,20 @@ export const QUALITY_OPTIONS = [
   { key: '2k',    label: '2K' },
   { key: '4k',    label: '4K (Ultra HD)' },
 ]
+
+// Social platforms for structured profile links
+export const SOCIAL_PLATFORMS = [
+  { key: 'instagram', label: 'Instagram', icon: '📷', placeholder: '@handle',                      prefix: 'https://instagram.com/',  type: 'handle' },
+  { key: 'tiktok',    label: 'TikTok',    icon: '🎵', placeholder: '@handle',                      prefix: 'https://tiktok.com/@',    type: 'handle' },
+  { key: 'youtube',   label: 'YouTube',   icon: '▶️', placeholder: '@handle',                      prefix: 'https://youtube.com/@',   type: 'handle' },
+  { key: 'portfolio', label: 'Portfolio', icon: '🌐', placeholder: 'https://...',                  prefix: '',                        type: 'url' },
+  { key: 'linkedin',  label: 'LinkedIn',  icon: '💼', placeholder: 'https://linkedin.com/in/...', prefix: '',                        type: 'url' },
+]
+
+export function buildSocialLinkUrl(platformKey, value) {
+  const p = SOCIAL_PLATFORMS.find((x) => x.key === platformKey)
+  if (!p || !value) return null
+  if (p.type === 'url') return value.startsWith('http') ? value : `https://${value}`
+  const clean = value.replace(/^@/, '').trim()
+  return clean ? `${p.prefix}${clean}` : null
+}

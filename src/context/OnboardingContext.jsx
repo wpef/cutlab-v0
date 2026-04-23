@@ -20,7 +20,7 @@ const INITIAL_FORM = {
   // Step 5
   revisions: '2', capacity: '2-3', hourlyRate: '', deliveryTime: '',
   // Step 6
-  bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: '',
+  bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: {},
   // Step 7
   certificationStatus: 'draft', // 'draft' | 'pending'
   // Computed level index (0-6), persisted after first save
@@ -254,7 +254,14 @@ export function OnboardingProvider({ children }) {
       bio: formData.bio,
       mission_types: formData.missionTypes,
       response_time: formData.responseTime,
-      social_links: formData.socialLinks,
+      social_links: (() => {
+        // Normalize: if legacy string (pre-migration), send empty object
+        if (typeof formData.socialLinks !== 'object' || formData.socialLinks === null) return {}
+        // Filter out empty-string values before writing to DB
+        return Object.fromEntries(
+          Object.entries(formData.socialLinks).filter(([, v]) => v && v.trim())
+        )
+      })(),
       assigned_level: levelIndex,
       role: formData.role,
       certification_status: formData.certificationStatus ?? 'draft',
@@ -321,7 +328,12 @@ export function OnboardingProvider({ children }) {
       bio:             data.bio               ?? INITIAL_FORM.bio,
       missionTypes:    data.mission_types     ?? INITIAL_FORM.missionTypes,
       responseTime:    responseTime            ?? INITIAL_FORM.responseTime,
-      socialLinks:             data.social_links            ?? INITIAL_FORM.socialLinks,
+      socialLinks:             (() => {
+        const raw = data.social_links
+        // Coerce legacy string values to empty object (migration may not have run yet)
+        if (!raw || typeof raw !== 'object') return INITIAL_FORM.socialLinks
+        return raw
+      })(),
       certificationStatus:     data.certification_status    ?? INITIAL_FORM.certificationStatus,
       role:                    data.role                    ?? INITIAL_FORM.role,
       // Store the persisted level so saveProfile can detect post-onboarding level-ups

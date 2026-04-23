@@ -35,7 +35,10 @@ export function computeCompletion(formData) {
     const val = formData[field.key]
     const filled = Array.isArray(val)
       ? val.filter(Boolean).length > 0
-      : Boolean(val && String(val).trim())
+      : val && typeof val === 'object'
+        // For objects (e.g. socialLinks jsonb): filled if at least one non-empty value
+        ? Object.values(val).some((v) => v && String(v).trim())
+        : Boolean(val && String(val).trim())
     if (filled) {
       earned += field.weight
     } else {

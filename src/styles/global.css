@@ -512,6 +512,27 @@ textarea { resize: vertical; min-height: 100px; }
   .editor-detail-content { grid-template-columns: 1fr; gap: 24px; padding: 24px 16px 80px; }
 }
 
+/* SOCIAL LINKS INPUT */
+.social-links-input { display: flex; flex-direction: column; gap: 10px; }
+.social-links-input-row { display: flex; align-items: center; gap: 10px; }
+.social-links-input-icon { font-size: 20px; width: 28px; flex-shrink: 0; text-align: center; }
+.social-links-input-label { font-size: 12px; color: var(--text-muted); width: 72px; flex-shrink: 0; }
+.social-links-input-field { flex: 1; }
+@media (max-width: 768px) {
+  .social-links-input-label { width: 60px; font-size: 11px; }
+}
+
+/* SOCIAL LINKS DISPLAY */
+.social-links-display { display: inline-flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.social-links-display-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 16px; text-decoration: none;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.social-links-display-icon:hover { opacity: 0.8; border-color: var(--accent); }
+
 /* PROFILE EDITOR */
 .editor-page { display: flex; flex-direction: column; background: var(--bg); overflow-x: hidden; flex: 1; min-height: 0; }
 .editor-mobile-preview { display: none; }

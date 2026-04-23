@@ -90,7 +90,10 @@ function scoreCompletion(formData) {
   if (formData.availability && formData.availability.trim()) pts++
   if (formData.hourlyRate && parseFloat(formData.hourlyRate) > 0) pts++
   if (formData.responseTime && formData.responseTime.trim()) pts++
-  if (formData.socialLinks && formData.socialLinks.trim()) pts++
+  const sl = formData.socialLinks
+  if (sl && (typeof sl === 'object'
+    ? Object.values(sl).some((v) => v && String(v).trim())
+    : String(sl).trim())) pts++
   // Bonus: all 6 elements filled
   if (pts === 6) pts = 8
   return pts

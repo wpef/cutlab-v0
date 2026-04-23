@@ -26,7 +26,7 @@ create table if not exists public.profiles (
   bio              text,
   mission_types    text[]   default '{}',
   response_time    text,
-  social_links     text,
+  social_links     jsonb    NOT NULL DEFAULT '{}'::jsonb,
   assigned_level   integer  default 2,
   status           text     default 'draft',   -- 'draft' | 'published'
   created_at       timestamptz default now(),
