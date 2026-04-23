@@ -32,13 +32,13 @@ export default function MyProjects() {
       </PageTitle>
 
       {projectLoading ? (
-        <div className="my-projects-empty">Chargement...</div>
+        <div className="my-projects-empty">Chargement en cours...</div>
       ) : myProjects.length === 0 ? (
         <div className="my-projects-empty">
           <div style={{ fontSize: 48, marginBottom: 16 }}>📝</div>
-          <h3>Aucun projet pour l'instant</h3>
+          <h3>Aucun projet pour le moment</h3>
           <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
-            Créez votre premier projet pour trouver un monteur.
+            Créez votre premier projet pour rencontrer un monteur.
           </p>
           <button className="catalog-header-btn" style={{ marginTop: 24 }} onClick={() => goToProjectForm()}>
             Créer un projet →

@@ -119,14 +119,14 @@ export default function MesProjetsMonteur() {
           <div style={{ padding: '24px 0' }}>
             <ProjectFilters filters={projectFilters} onFilterChange={setProjectFilters} />
             {projectLoading ? (
-              <div className="projects-empty">Chargement...</div>
+              <div className="projects-empty">Chargement en cours...</div>
             ) : publishedProjects.length === 0 ? (
               <div className="projects-empty">
                 <div style={{ fontSize: 48, marginBottom: 16 }}>📝</div>
                 <h3>Aucun projet disponible</h3>
                 <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
                   {Object.keys(projectFilters).length > 0
-                    ? "Aucun projet ne correspond à vos critères. Essayez d'élargir votre recherche."
+                    ? "Aucun projet ne correspond à vos critères. Élargissez votre recherche."
                     : 'Les premiers projets arrivent bientôt.'}
                 </p>
               </div>
@@ -147,13 +147,13 @@ export default function MesProjetsMonteur() {
 
         {/* ─── My candidatures tab ─── */}
         {activeTab === 'mine' && (loading ? (
-          <div className="projects-empty">Chargement...</div>
+          <div className="projects-empty">Chargement en cours...</div>
         ) : !hasContent ? (
           <div className="projects-empty">
             <div style={{ fontSize: 48, marginBottom: 16 }}>📂</div>
-            <h3>Aucun projet pour l'instant</h3>
+            <h3>Aucun projet pour le moment</h3>
             <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
-              Les créateurs te contacteront directement via le catalogue, ou consulte les projets disponibles.
+              Les créateurs vous contacteront via le catalogue ou vous pouvez consulter les projets disponibles.
             </p>
             <button className="catalog-header-btn" style={{ marginTop: 24 }} onClick={goToEditor}>
               Compléter mon profil →
@@ -204,7 +204,7 @@ export default function MesProjetsMonteur() {
             {/* Offres en attente */}
             {pendingOffers.length > 0 && (
               <section className="projects-section">
-                <div className="projects-section-title">Offres en attente de réponse</div>
+                <div className="projects-section-title">Offres en attente de validation</div>
                 <div className="projects-list">
                   {pendingOffers.map((o) => (
                     <OfferRow key={o.id} offer={o} onOpen={() => {

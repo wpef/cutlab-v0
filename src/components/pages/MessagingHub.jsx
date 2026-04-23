@@ -38,14 +38,14 @@ export default function MessagingHub() {
       <div className="messaging-content">
 
         {messagingLoading ? (
-          <div className="messaging-empty">Chargement...</div>
+          <div className="messaging-empty">Chargement en cours...</div>
         ) : requests.length === 0 ? (
           <div className="messaging-empty">
             <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
-            <p>Aucune conversation pour l'instant.</p>
+            <p>Aucune conversation pour le moment.</p>
             {userRole === 'creator' && (
               <button className="catalog-header-btn" style={{ marginTop: 20 }} onClick={goToCatalog}>
-                Trouver un monteur →
+                Parcourir les monteurs →
               </button>
             )}
           </div>

@@ -35,7 +35,7 @@ export default function OfferPreview() {
         <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
           <p>Aucune offre à afficher.</p>
           <button className="catalog-header-btn" style={{ marginTop: 16 }} onClick={goToOfferForm}>
-            ← Créer une offre
+            ← Retour à la proposition
           </button>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function OfferPreview() {
           onClick={handleConfirm}
           disabled={sending}
         >
-          {sending ? 'Envoi...' : 'Confirmer l\'envoi →'}
+          {sending ? 'Envoi...' : 'Envoyer la proposition →'}
         </button>
       </div>
 
@@ -76,7 +76,7 @@ export default function OfferPreview() {
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Plateforme de montage vidéo</div>
           </div>
           <div className="offer-doc-meta">
-            <div style={{ fontWeight: 600, marginBottom: 4 }}>Offre de projet</div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>Offre de mission</div>
             <div>Date : {today}</div>
           </div>
         </div>
@@ -101,7 +101,7 @@ export default function OfferPreview() {
         {/* Description */}
         {offer.description && (
           <div className="offer-doc-section">
-            <div className="offer-doc-section-label">Description du projet</div>
+            <div className="offer-doc-section-label">Description de la mission</div>
             <div className="offer-doc-section-value" style={{ whiteSpace: 'pre-wrap' }}>{offer.description}</div>
           </div>
         )}
@@ -161,7 +161,7 @@ export default function OfferPreview() {
         </div>
 
         <div style={{ marginTop: 40, fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6 }}>
-          Document généré via CUTLAB · Non contractuel sans signatures des deux parties
+          Document généré via CUTLAB — Non contractuel sans signatures des deux parties
         </div>
 
       </div>

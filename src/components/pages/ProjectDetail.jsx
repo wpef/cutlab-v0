@@ -61,7 +61,7 @@ export default function ProjectDetail() {
   }, [project, user])
 
   if (loading || !project) {
-    return <div className="project-detail" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Chargement...</div>
+    return <div className="project-detail" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Chargement en cours...</div>
   }
 
   const isCreator = user && project.creator_id === user.id
@@ -78,7 +78,7 @@ export default function ProjectDetail() {
     const req = await submitApplication(project)
     setAppLoading(false)
     if (req) {
-      toast.success('Candidature envoyée !')
+      toast.success('Candidature envoyée')
       setExistingApp({ id: req.id, status: 'pending' })
     } else {
       toast.error("Erreur lors de l'envoi de la candidature")
@@ -101,11 +101,11 @@ export default function ProjectDetail() {
   // ─── Creator actions ───────────────────────────────────────
   async function handlePublish() {
     if (new Date(project.deadline) <= new Date()) {
-      toast.error('La date limite doit être dans le futur')
+      toast.error('La date limite doit être à venir')
       return
     }
     const ok = await publishProject(project.id)
-    if (ok) toast.success('Projet publié !')
+    if (ok) toast.success('Projet publié')
   }
 
   async function handleCancel() {

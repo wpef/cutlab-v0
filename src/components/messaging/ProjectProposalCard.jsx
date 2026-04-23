@@ -41,7 +41,7 @@ export default function ProjectProposalCard({ offer, currentUserRole, isMine, on
     <div className={`project-proposal-card${isMine ? ' project-proposal-card--mine' : ''}`}>
       {/* Header row: label + status badge */}
       <div className="project-proposal-card__header">
-        <span className="project-proposal-card__eyebrow">Proposition de mission</span>
+        <span className="project-proposal-card__eyebrow">Offre de mission</span>
         <span className={`project-proposal-card__badge ${statusMeta.cls}`}>
           {statusMeta.label}
         </span>

@@ -93,7 +93,7 @@ export default function ChatView() {
         <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
           <p>Aucune conversation sélectionnée.</p>
           <button className="catalog-header-btn" style={{ marginTop: 16 }} onClick={goToMessaging}>
-            ← Messagerie
+            ← Retour à la messagerie
           </button>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function ChatView() {
       {request.status === 'pending' && userRole === 'editor' && (
         <div className="chat-request-actions">
           <div style={{ flex: 1, fontSize: 13, color: 'var(--text-muted)' }}>
-            <strong style={{ color: 'var(--text)' }}>{request.creator_name}</strong> souhaite te contacter.
+            <strong style={{ color: 'var(--text)' }}>{request.creator_name}</strong> souhaite entrer en contact.
           </div>
           <button className="chat-accept-btn" onClick={handleAccept} disabled={actionLoading}>
             ✓ Accepter
@@ -170,7 +170,7 @@ export default function ChatView() {
         ))}
 
         {messages.length === 0 && offers.length === 0 && !request.initial_message && (
-          <div className="chat-empty">Commence la conversation !</div>
+          <div className="chat-empty">Écrivez un message pour démarrer.</div>
         )}
 
         <div ref={messagesEndRef} />
@@ -185,7 +185,7 @@ export default function ChatView() {
         )}
         <textarea
           className="chat-input"
-          placeholder={request.status === 'refused' ? 'Cette demande a été refusée.' : 'Écris un message...'}
+          placeholder={request.status === 'refused' ? 'Cette demande a été refusée.' : 'Écrivez un message…'}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}

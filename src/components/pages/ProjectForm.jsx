@@ -114,7 +114,7 @@ export default function ProjectForm() {
     }
 
     if (!form.deadline) errs.deadline = 'Indiquez une date limite de livraison'
-    else if (forPublish && new Date(form.deadline) <= new Date()) errs.deadline = 'La date limite doit être dans le futur'
+    else if (forPublish && new Date(form.deadline) <= new Date()) errs.deadline = 'La date limite doit être à venir'
 
     setErrors(errs)
     return Object.keys(errs).length === 0

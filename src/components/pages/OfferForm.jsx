@@ -45,8 +45,8 @@ export default function OfferForm() {
 
   function handlePreview() {
     setError('')
-    if (!form.title.trim()) { setError('Le titre du projet est requis.'); return }
-    if (!form.budget) { setError('Indique le budget pour ce projet.'); return }
+    if (!form.title.trim()) { setError('Veuillez indiquer le titre de la mission.'); return }
+    if (!form.budget) { setError('Précisez le budget proposé.'); return }
     setOfferFormData({ ...form, requestId: activeRequestId })
     goToOfferPreview()
   }
@@ -57,14 +57,14 @@ export default function OfferForm() {
       <div className="offer-form-content">
 
         <div className="step-header">
-          <div className="step-tag">Offre de projet</div>
-          <h1>Décris ta mission</h1>
+          <div className="step-tag">Offre de mission</div>
+          <h1>Présentez votre proposition</h1>
           {request && (
             <p className="step-desc">Pour {request.editor_name || 'le monteur'}</p>
           )}
         </div>
 
-        <FormGroup label="Titre du projet">
+        <FormGroup label="Titre de la mission">
           <input
             type="text"
             placeholder="ex: Montage YouTube — Chaîne Tech"
@@ -75,7 +75,7 @@ export default function OfferForm() {
 
         <FormGroup label="Description" optional="optionnel">
           <textarea
-            placeholder="Décris le projet : type de contenu, ton univers, tes attentes..."
+            placeholder="Décrivez le projet : type de contenu, univers, attentes..."
             value={form.description}
             onChange={(e) => set('description', e.target.value)}
             style={{ minHeight: 100 }}
@@ -93,16 +93,16 @@ export default function OfferForm() {
 
         <FormGroup label="Format" optional="optionnel">
           <select value={form.format} onChange={(e) => set('format', e.target.value)}>
-            <option value="">— Sélectionner un format —</option>
+            <option value="">— Choisir un format —</option>
             {FORMATS.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
         </FormGroup>
 
         <div className="form-row">
-          <FormGroup label="Deadline" optional="optionnel">
+          <FormGroup label="Délai de livraison" optional="optionnel">
             <input
               type="text"
-              placeholder="ex: 15 mars 2026 ou sous 2 semaines"
+              placeholder="ex: 15 mars 2026 ou 2 semaines"
               value={form.deadline}
               onChange={(e) => set('deadline', e.target.value)}
             />
@@ -135,7 +135,7 @@ export default function OfferForm() {
 
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <button className="btn btn-primary" style={{ width: '100%', padding: '14px 0', fontSize: 15 }} onClick={handlePreview}>
-            Aperçu du document →
+            Aperçu de l'offre →
           </button>
         </div>
       </div>
