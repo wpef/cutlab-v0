@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
+import ProjectProposalCard from '../messaging/ProjectProposalCard'
 
 function formatTime(iso) {
   return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
@@ -158,11 +159,11 @@ export default function ChatView() {
 
         {/* Offer cards in chat */}
         {offers.map((offer) => (
-          <OfferCard
+          <ProjectProposalCard
             key={offer.id}
             offer={offer}
+            currentUserRole={userRole}
             isMine={offer.creator_id === user?.id}
-            userRole={userRole}
             onAccept={() => acceptOffer(offer.id)}
             onRefuse={() => refuseOffer(offer.id)}
           />
@@ -203,53 +204,3 @@ export default function ChatView() {
   )
 }
 
-function OfferCard({ offer, isMine, userRole, onAccept, onRefuse }) {
-  const [loading, setLoading] = useState(false)
-
-  async function handleAccept() {
-    setLoading(true)
-    await onAccept()
-    setLoading(false)
-  }
-
-  async function handleRefuse() {
-    setLoading(true)
-    await onRefuse()
-    setLoading(false)
-  }
-
-  const statusColor = offer.status === 'accepted' ? '#d4f000' : offer.status === 'refused' ? '#ff4d4d' : '#ffc800'
-
-  return (
-    <div className={`chat-offer-card ${isMine ? 'chat-offer-card--mine' : ''}`}>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>📋 Offre de projet</div>
-      <div className="chat-offer-title">{offer.title}</div>
-      {offer.description && (
-        <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 6, lineHeight: 1.5 }}>
-          {offer.description}
-        </div>
-      )}
-      {offer.budget != null && (
-        <div className="chat-offer-budget">{Number(offer.budget).toLocaleString('fr-FR')} €</div>
-      )}
-      {offer.deadline && (
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Deadline : {offer.deadline}</div>
-      )}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-        <span className="chat-offer-status" style={{ color: statusColor, fontSize: 12, fontWeight: 600 }}>
-          {offer.status === 'pending' ? '⏳ En attente' : offer.status === 'accepted' ? '✓ Acceptée' : '✗ Refusée'}
-        </span>
-        {offer.status === 'pending' && userRole === 'editor' && (
-          <div className="chat-offer-actions">
-            <button className="chat-accept-btn" style={{ padding: '7px 14px', fontSize: 12 }} onClick={handleAccept} disabled={loading}>
-              ✓ Accepter
-            </button>
-            <button className="chat-refuse-btn" style={{ padding: '7px 14px', fontSize: 12 }} onClick={handleRefuse} disabled={loading}>
-              ✗ Refuser
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
