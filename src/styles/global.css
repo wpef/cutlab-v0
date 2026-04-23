@@ -207,6 +207,158 @@ textarea { resize: vertical; min-height: 100px; }
 .step7-score-track { background: var(--surface2); border-radius: 100px; height: 6px; overflow: hidden; }
 .step7-score-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width 0.8s ease; }
 
+/* LEVEL UNLOCK ANIMATION (LevelUnlockAnimation.jsx) */
+.lua-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0 24px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Subtle atmospheric overlay */
+.lua-overlay {
+  position: absolute;
+  inset: -40px -60px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+/* Badge area — positions particles relative to badge center */
+.lua-badge-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Accent particles: small luminous dots */
+.lua-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+  pointer-events: none;
+}
+
+/* Badge circle — accent border + inner glow */
+.lua-badge {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: rgba(212, 240, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Glow pulse overlay inside the badge */
+.lua-badge-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(212,240,0,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.lua-emoji {
+  font-size: 48px;
+  line-height: 1;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* "Niveau débloqué" label */
+.lua-unlocked-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 8px;
+}
+
+/* Large level name */
+.lua-level-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  line-height: 1;
+}
+
+/* Score counter block */
+.lua-score-wrap {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-top: 4px;
+}
+
+.lua-score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.lua-score-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.lua-score-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  color: var(--accent);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  min-width: 72px;
+  text-align: right;
+}
+
+.lua-bar-track {
+  background: var(--surface2);
+  border-radius: 100px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.lua-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 100px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .lua-container { padding: 32px 0 16px; }
+  .lua-badge-wrap,
+  .lua-badge { width: 100px; height: 100px; }
+  .lua-emoji { font-size: 40px; }
+  .lua-level-name { font-size: 30px; }
+  .lua-score-value { font-size: 20px; }
+  .lua-score-wrap { padding: 14px 16px; }
+}
+
 /* CERTIF */
 .certif-banner { background: rgba(212,240,0,0.05); border: 1px solid rgba(212,240,0,0.2); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 13px; color: var(--text-dim); display: flex; align-items: flex-start; gap: 12px; margin-top: 4px; line-height: 1.6; }
 .certif-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }

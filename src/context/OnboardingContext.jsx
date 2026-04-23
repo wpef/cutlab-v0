@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { computeScoreDetails } from '../lib/computeLevel'
+import { LEVELS } from '../constants/levels'
+import { toast } from '../components/ui/Toast'
 
 const OnboardingContext = createContext(null)
 
@@ -21,6 +23,8 @@ const INITIAL_FORM = {
   bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: '',
   // Step 7
   certificationStatus: 'draft', // 'draft' | 'pending'
+  // Computed level index (0-6), persisted after first save
+  assignedLevel: null,
   // Role
   role: 'editor',
 }
@@ -222,7 +226,13 @@ export function OnboardingProvider({ children }) {
   async function saveProfile(status = 'draft') {
     if (!user) return false
     setSaving(true)
+
     const { levelIndex } = computeScoreDetails(formData)
+
+    // Capture the level before save so we can detect a post-onboarding level-up.
+    // We only toast when the profile is already published to avoid firing during onboarding itself.
+    const prevLevelIndex = formData.assignedLevel ?? null
+
     const { error } = await supabase.from('profiles').upsert({
       id: user.id,
       first_name: formData.firstName,
@@ -253,6 +263,21 @@ export function OnboardingProvider({ children }) {
     })
     setSaving(false)
     if (error) { console.error('[Supabase] saveProfile:', error.message); return false }
+
+    // Update in-memory assignedLevel so subsequent saves use the latest saved value as baseline
+    setFormData((prev) => ({ ...prev, assignedLevel: levelIndex }))
+
+    // Post-onboarding level-up toast: only fires when the profile is already published
+    // and the newly computed level is strictly higher than the previous one.
+    if (
+      status === 'published' &&
+      prevLevelIndex !== null &&
+      levelIndex > prevLevelIndex
+    ) {
+      const lvl = LEVELS[levelIndex]
+      toast.success(`Niveau débloqué : ${lvl.emoji} ${lvl.name}`)
+    }
+
     return true
   }
 
@@ -299,6 +324,8 @@ export function OnboardingProvider({ children }) {
       socialLinks:             data.social_links            ?? INITIAL_FORM.socialLinks,
       certificationStatus:     data.certification_status    ?? INITIAL_FORM.certificationStatus,
       role:                    data.role                    ?? INITIAL_FORM.role,
+      // Store the persisted level so saveProfile can detect post-onboarding level-ups
+      assignedLevel:           data.assigned_level          ?? null,
     }
 
     // If legacy assigned_level exceeds new 7-level range (0-6), recalculate

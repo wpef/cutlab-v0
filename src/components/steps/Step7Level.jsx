@@ -4,6 +4,7 @@ import { useOnboarding } from '../../context/OnboardingContext'
 import { LEVELS } from '../../constants/levels'
 import { computeScoreDetails } from '../../lib/computeLevel'
 import ScoreBreakdown from '../ui/ScoreBreakdown'
+import LevelUnlockAnimation from '../ui/LevelUnlockAnimation'
 import StepHeader from '../ui/StepHeader'
 import StepNav from '../ui/StepNav'
 
@@ -21,21 +22,19 @@ const LOADING_MESSAGES = [
 export default function Step7Level() {
   const { goToStep, formData, updateFormData, saveProfile, user } = useOnboarding()
 
-  const [phase,       setPhase]       = useState('loading') // 'loading' | 'result'
+  // 'loading' → 'reveal' → 'result'
+  const [phase,       setPhase]       = useState('loading')
   const [progress,    setProgress]    = useState(0)
   const [loadingText, setLoadingText] = useState('Lecture du profil...')
   const [certifSent,  setCertifSent]  = useState(formData.certificationStatus === 'pending')
+  const [showBreakdown, setShowBreakdown] = useState(false)
 
   // Compute score from formData (read-only, no picker)
   const scoreDetails = computeScoreDetails(formData)
   const { total: scoreTotal, levelIndex } = scoreDetails
   const level = LEVELS[levelIndex]
 
-  // Animated score bar width — starts at 0, animates to scoreTotal after reveal
-  const [animatedScore, setAnimatedScore] = useState(0)
-  const [showBreakdown, setShowBreakdown] = useState(false)
-
-  // Run the progress animation once on mount
+  // Run the circular-progress loading animation once on mount
   useEffect(() => {
     let pct = 0
     const interval = setInterval(() => {
@@ -51,11 +50,7 @@ export default function Step7Level() {
 
       if (pct >= 100) {
         clearInterval(interval)
-        setTimeout(() => {
-          setPhase('result')
-          // Trigger score bar animation after a short delay
-          setTimeout(() => setAnimatedScore(scoreTotal), 50)
-        }, 500)
+        setTimeout(() => setPhase('reveal'), 500)
       }
     }, 25)
 
@@ -66,7 +61,6 @@ export default function Step7Level() {
     updateFormData({ certificationStatus: 'pending' })
     setCertifSent(true)
     if (user) {
-      // Persist immediately to DB
       await saveProfile()
     }
   }
@@ -81,7 +75,7 @@ export default function Step7Level() {
         desc="On analyse ton profil pour te placer au bon endroit dans la communauté."
       />
 
-      {/* LOADING */}
+      {/* LOADING — circular progress (unchanged) */}
       {phase === 'loading' && (
         <div className="level-loading">
           <div className="circle-wrap">
@@ -105,75 +99,93 @@ export default function Step7Level() {
         </div>
       )}
 
-      {/* RESULT */}
-      {phase === 'result' && (
-        <div className="step7-level-result">
-          {/* Level badge */}
-          <div className="step7-level-badge">
-            <div className="level-badge-big">
-              <div className="level-badge-emoji">{level.emoji}</div>
-            </div>
-            <div className="level-badge-name">{level.name}</div>
-          </div>
-
-          {/* Score bar */}
-          <div className="step7-score-bar">
-            <div className="step7-score-text">
-              <span className="step7-score-label">Score calculé</span>
-              <span className="step7-score-value">{scoreTotal} / 100</span>
-            </div>
-            <div className="step7-score-track">
-              <div
-                className="step7-score-fill"
-                style={{ width: `${animatedScore}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Score breakdown toggle */}
-          <button
-            className="score-breakdown-toggle"
-            onClick={() => setShowBreakdown((v) => !v)}
-          >
-            {showBreakdown ? 'Masquer le détail' : 'Voir le détail du score'}
-          </button>
-
-          <AnimatePresence initial={false}>
-            {showBreakdown && (
-              <motion.div
-                key="breakdown"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
-                style={{ overflow: 'hidden' }}
-              >
-                <ScoreBreakdown scoreDetails={scoreDetails} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Level description */}
-          <div className="level-desc">{level.desc}</div>
-
-          {/* Actions */}
-          <div className="level-actions">
-            {!certifSent ? (
-              <button className="level-certify-btn" onClick={handleRequestCertif}>
-                Demander un profil certifié
-              </button>
-            ) : (
-              <div className="certif-banner">
-                <span className="certif-icon">✓</span>
-                <span>
-                  Demande envoyée ! Notre équipe vérifie ton profil dans les 48h.
-                  Une fois certifié, un badge apparaît sur ta carte.
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* REVEAL — gamified animation sequence */}
+      {phase === 'reveal' && (
+        <LevelUnlockAnimation
+          levelIndex={levelIndex}
+          score={scoreTotal}
+          onComplete={() => setPhase('result')}
+        />
       )}
+
+      {/* RESULT — breakdown + CTA (fades in after animation completes) */}
+      <AnimatePresence>
+        {phase === 'result' && (
+          <motion.div
+            className="step7-level-result"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            {/* Level badge (static summary, not animated) */}
+            <div className="step7-level-badge">
+              <div className="level-badge-big">
+                <div className="level-badge-emoji">{level.emoji}</div>
+              </div>
+              <div className="level-badge-name">{level.name}</div>
+            </div>
+
+            {/* Score bar */}
+            <div className="step7-score-bar">
+              <div className="step7-score-text">
+                <span className="step7-score-label">Score calculé</span>
+                <span className="step7-score-value">{scoreTotal} / 100</span>
+              </div>
+              <div className="step7-score-track">
+                <motion.div
+                  className="step7-score-fill"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${scoreTotal}%` }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                />
+              </div>
+            </div>
+
+            {/* Score breakdown toggle */}
+            <button
+              className="score-breakdown-toggle"
+              onClick={() => setShowBreakdown((v) => !v)}
+            >
+              {showBreakdown ? 'Masquer le détail' : 'Voir le détail du score'}
+            </button>
+
+            <AnimatePresence initial={false}>
+              {showBreakdown && (
+                <motion.div
+                  key="breakdown"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <ScoreBreakdown scoreDetails={scoreDetails} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Level description */}
+            <div className="level-desc">{level.desc}</div>
+
+            {/* Actions */}
+            <div className="level-actions">
+              {!certifSent ? (
+                <button className="level-certify-btn" onClick={handleRequestCertif}>
+                  Demander un profil certifié
+                </button>
+              ) : (
+                <div className="certif-banner">
+                  <span className="certif-icon">✓</span>
+                  <span>
+                    Demande envoyée ! Notre équipe vérifie ton profil dans les 48h.
+                    Une fois certifié, un badge apparaît sur ta carte.
+                  </span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {phase === 'result' && (
         <StepNav onBack={() => goToStep(6)} onNext={() => goToStep(8)} nextLabel="Voir mon profil →" />
