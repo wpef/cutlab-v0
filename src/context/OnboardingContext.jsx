@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { computeScoreDetails } from '../lib/computeLevel'
 import { LEVELS } from '../constants/levels'
 import { toast } from '../components/ui/Toast'
+import { emptyPricingAdjustments } from '../lib/pricing'
 
 const OnboardingContext = createContext(null)
 
@@ -18,7 +19,8 @@ const INITIAL_FORM = {
   // Step 4
   portfolioLinks: ['', ''], creditedChannels: '',
   // Step 5
-  revisions: '2', capacity: '2-3', hourlyRate: '', deliveryTime: '',
+  revisions: '2', capacity: '2-3',
+  pricing: { baselineLevel: null, adjustments: emptyPricingAdjustments() },
   // Step 6
   bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: {},
   // Step 7
@@ -249,8 +251,10 @@ export function OnboardingProvider({ children }) {
       credited_channels: formData.creditedChannels,
       revisions: formData.revisions,
       capacity: formData.capacity,
-      hourly_rate: formData.hourlyRate ? Number(formData.hourlyRate) : null,
-      delivery_time: formData.deliveryTime,
+      pricing: {
+        baseline_level: formData.pricing?.baselineLevel ?? null,
+        adjustments: formData.pricing?.adjustments ?? {},
+      },
       bio: formData.bio,
       mission_types: formData.missionTypes,
       response_time: formData.responseTime,
@@ -323,8 +327,14 @@ export function OnboardingProvider({ children }) {
       creditedChannels: data.credited_channels ?? INITIAL_FORM.creditedChannels,
       revisions:       data.revisions         ?? INITIAL_FORM.revisions,
       capacity:        data.capacity          ?? INITIAL_FORM.capacity,
-      hourlyRate:      data.hourly_rate != null ? String(data.hourly_rate) : INITIAL_FORM.hourlyRate,
-      deliveryTime:    data.delivery_time      ?? INITIAL_FORM.deliveryTime,
+      pricing: (() => {
+        const raw = data.pricing
+        if (!raw || typeof raw !== 'object') return INITIAL_FORM.pricing
+        return {
+          baselineLevel: raw.baseline_level ?? null,
+          adjustments: raw.adjustments ?? emptyPricingAdjustments(),
+        }
+      })(),
       bio:             data.bio               ?? INITIAL_FORM.bio,
       missionTypes:    data.mission_types     ?? INITIAL_FORM.missionTypes,
       responseTime:    responseTime            ?? INITIAL_FORM.responseTime,

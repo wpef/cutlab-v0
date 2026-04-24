@@ -88,7 +88,10 @@ function scoreCompletion(formData) {
   if (formData.bio && formData.bio.trim()) pts++
   if (formData.avatarUrl && formData.avatarUrl.trim()) pts++
   if (formData.availability && formData.availability.trim()) pts++
-  if (formData.hourlyRate && parseFloat(formData.hourlyRate) > 0) pts++
+  // "pricing configured" = at least one non-zero adjustment OR baselineLevel locked
+  const pr = formData.pricing
+  const hasPricing = !!(pr && (pr.baselineLevel !== null || Object.values(pr.adjustments ?? {}).some((v) => v !== 0)))
+  if (hasPricing) pts++
   if (formData.responseTime && formData.responseTime.trim()) pts++
   const sl = formData.socialLinks
   if (sl && (typeof sl === 'object'
