@@ -10,7 +10,7 @@ import SocialLinksInput from '../ui/SocialLinksInput'
 
 const MAX_BIO = 280
 
-export default function Step6Presentation() {
+export default function Step5Presentation() {
   const { goToStep, formData, updateFormData } = useOnboarding()
   const [error, setError] = useState('')
   // Initialize from context; coerce legacy string to empty object
@@ -27,7 +27,7 @@ export default function Step6Presentation() {
       Object.entries(socialLinks).filter(([, v]) => v && v.trim())
     )
     updateFormData({ socialLinks: cleanedLinks })
-    goToStep(7)
+    goToStep(6)
   }
 
   function toggleMission(key) {
@@ -38,7 +38,7 @@ export default function Step6Presentation() {
   return (
     <div className="step-screen">
       <StepHeader
-        tag="Étape 6 sur 8"
+        tag="Étape 5 sur 7"
         title="Ta présentation"
         desc="En 2–3 phrases : qui tu es, ta patte, ce qui te différencie."
       />
@@ -83,7 +83,7 @@ export default function Step6Presentation() {
 
       {error && <div className="step-error">{error}</div>}
       <StepNav
-        onBack={() => goToStep(5)}
+        onBack={() => goToStep(4)}
         onNext={handleNext}
         nextLabel="Calculer mon niveau →"
       />

@@ -2,7 +2,7 @@
  * profileCompletion — calcule le pourcentage de complétion du profil
  * et génère les suggestions d'amélioration.
  *
- * Partagé entre Step8Preview et ProfileEditor.
+ * Partagé entre Step7Preview et ProfileEditor.
  */
 
 const COMPLETION_FIELDS = [

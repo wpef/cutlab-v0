@@ -1,7 +1,7 @@
 /**
  * StepHeader — displays the step label, title and description.
  *
- * @param {string} tag    e.g. "Étape 1 sur 8"
+ * @param {string} tag    e.g. "Étape 1 sur 7"
  * @param {string} title  main h1 heading
  * @param {string} desc   subtitle / description
  */

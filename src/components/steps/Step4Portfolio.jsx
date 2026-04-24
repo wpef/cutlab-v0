@@ -72,7 +72,7 @@ export default function Step4Portfolio() {
   return (
     <div className="step-screen">
       <StepHeader
-        tag="Étape 4 sur 8"
+        tag="Étape 4 sur 7"
         title="Ton portfolio"
         desc="Des clips de 15 à 45 secondes suffisent. Les clients veulent voir ta patte, pas un film."
       />

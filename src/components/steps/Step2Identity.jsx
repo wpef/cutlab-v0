@@ -51,7 +51,7 @@ export default function Step2Identity() {
   return (
     <div className="step-screen">
       <StepHeader
-        tag="Étape 2 sur 8"
+        tag="Étape 2 sur 7"
         title="Qui es-tu ?"
         desc="Ces infos seront visibles sur ton profil public."
       />

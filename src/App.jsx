@@ -8,11 +8,10 @@ import Step1Account from './components/steps/Step1Account'
 import Step2Identity from './components/steps/Step2Identity'
 import Step3Skills from './components/steps/Step3Skills'
 import Step4Portfolio from './components/steps/Step4Portfolio'
-import Step5Pricing from './components/steps/Step5Pricing'
-import Step6Presentation from './components/steps/Step6Presentation'
-import Step7Level from './components/steps/Step7Level'
-import Step8Preview from './components/steps/Step8Preview'
-import Step9Success from './components/steps/Step9Success'
+import Step5Presentation from './components/steps/Step5Presentation'
+import Step6Level from './components/steps/Step6Level'
+import Step7Preview from './components/steps/Step7Preview'
+import Step8Success from './components/steps/Step8Success'
 import ProfileEditor from './components/editor/ProfileEditor'
 import Landing from './components/pages/Landing'
 import Catalog from './components/pages/Catalog'
@@ -33,11 +32,10 @@ const STEP_COMPONENTS = {
   2: Step2Identity,
   3: Step3Skills,
   4: Step4Portfolio,
-  5: Step5Pricing,
-  6: Step6Presentation,
-  7: Step7Level,
-  8: Step8Preview,
-  9: Step9Success,
+  5: Step5Presentation,
+  6: Step6Level,
+  7: Step7Preview,
+  8: Step8Success,
 }
 
 function OnboardingLayout() {
@@ -47,7 +45,7 @@ function OnboardingLayout() {
 
   useEffect(() => {
     // Sync currentStep to URL (browser back/forward) — must be in effect, not render body
-    if (stepNum >= 1 && stepNum <= 9 && stepNum !== currentStep) goToStep(stepNum)
+    if (stepNum >= 1 && stepNum <= 8 && stepNum !== currentStep) goToStep(stepNum)
   }, [stepNum])
 
   useEffect(() => {
@@ -55,8 +53,8 @@ function OnboardingLayout() {
     if (authReady && user && stepNum === 1) goToStep(2)
   }, [authReady, user, stepNum])
 
-  const displayStep = stepNum >= 1 && stepNum <= 9 ? stepNum : currentStep
-  const progress = displayStep === 9 ? 100 : Math.round((displayStep / 8) * 100)
+  const displayStep = stepNum >= 1 && stepNum <= 8 ? stepNum : currentStep
+  const progress = displayStep === 8 ? 100 : Math.round((displayStep / 7) * 100)
   const StepComponent = STEP_COMPONENTS[displayStep] || Step1Account
   const stepInfo = STEPS.find((s) => s.id === displayStep)
 
@@ -68,7 +66,7 @@ function OnboardingLayout() {
       <nav className="mobile-nav">
         <div className="mobile-nav-logo">CUT<span>LAB</span></div>
         <div className="mobile-step-pill">
-          {displayStep === 9 ? '✓ Publie' : `${displayStep} / 8 — ${stepInfo?.label ?? ''}`}
+          {displayStep === 8 ? '✓ Publie' : `${displayStep} / 7 — ${stepInfo?.label ?? ''}`}
         </div>
       </nav>
       <div className="app">

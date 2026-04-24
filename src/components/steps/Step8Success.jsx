@@ -1,7 +1,7 @@
 import { useOnboarding } from '../../context/OnboardingContext'
 import Button from '../ui/Button'
 
-export default function Step9Success() {
+export default function Step8Success() {
   const { goToEditor, goToProjects } = useOnboarding()
 
   return (

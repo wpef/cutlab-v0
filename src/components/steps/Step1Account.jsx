@@ -68,7 +68,7 @@ export default function Step1Account() {
       </div>
 
       <StepHeader
-        tag={mode === 'signup' ? 'Étape 1 sur 8' : 'Connexion'}
+        tag={mode === 'signup' ? 'Étape 1 sur 7' : 'Connexion'}
         title={mode === 'signup' ? 'Crée ton compte' : 'Connecte-toi'}
         desc={mode === 'signup'
           ? '30 secondes et c\'est parti. Pas besoin de CB, pas d\'engagement.'

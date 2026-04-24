@@ -19,7 +19,7 @@ const LOADING_MESSAGES = [
   { pct: 95, text: 'Finalisation du niveau...' },
 ]
 
-export default function Step7Level() {
+export default function Step6Level() {
   const { goToStep, formData, updateFormData, saveProfile, user } = useOnboarding()
 
   // 'loading' → 'reveal' → 'result'
@@ -70,7 +70,7 @@ export default function Step7Level() {
   return (
     <div className="step-screen">
       <StepHeader
-        tag="Étape 7 sur 8"
+        tag="Étape 6 sur 7"
         title="Ton niveau"
         desc="On analyse ton profil pour te placer au bon endroit dans la communauté."
       />
@@ -188,7 +188,7 @@ export default function Step7Level() {
       </AnimatePresence>
 
       {phase === 'result' && (
-        <StepNav onBack={() => goToStep(6)} onNext={() => goToStep(8)} nextLabel="Voir mon profil →" />
+        <StepNav onBack={() => goToStep(5)} onNext={() => goToStep(7)} nextLabel="Voir mon profil →" />
       )}
     </div>
   )

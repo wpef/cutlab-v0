@@ -295,7 +295,7 @@ export function OnboardingProvider({ children }) {
   async function publishProfile() {
     const ok = await saveProfile('published')
     if (ok) {
-      goToStep(9)
+      goToStep(8)
     }
     return ok
   }

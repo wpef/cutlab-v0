@@ -15,7 +15,7 @@ const LEGEND_ITEMS = [
 ]
 
 
-export default function Step8Preview() {
+export default function Step7Preview() {
   const { goToStep, publishProfile, saving, formData } = useOnboarding()
   const { levelIndex } = computeScoreDetails(formData)
   const [error, setError] = useState('')
@@ -35,7 +35,7 @@ export default function Step8Preview() {
   return (
     <div className="step-screen">
       <StepHeader
-        tag="Étape 8 sur 8"
+        tag="Étape 7 sur 7"
         title="Voici ta carte profil"
         desc="C'est comme ça que les clients te voient dans le catalogue."
       />
@@ -124,7 +124,7 @@ export default function Step8Preview() {
 
       {error && <div className="step-error">{error}</div>}
       <StepNav
-        onBack={() => goToStep(7)}
+        onBack={() => goToStep(6)}
         backLabel="Modifier"
         onNext={handlePublish}
         nextLabel={saving ? 'Publication...' : 'Publier mon profil'}

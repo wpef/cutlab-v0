@@ -33,7 +33,7 @@ export default function Step3Skills() {
   return (
     <div className="step-screen">
       <StepHeader
-        tag="Étape 3 sur 8"
+        tag="Étape 3 sur 7"
         title="Ton métier"
         desc="Sélectionne tout ce que tu sais faire."
       />
