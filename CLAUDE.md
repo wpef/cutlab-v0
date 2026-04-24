@@ -59,7 +59,7 @@ Demo credentials are in `src/lib/demoData.js`. Demo accounts (creator/editor) mu
 | Path | Component | Layout | Guard |
 |------|-----------|--------|-------|
 | `/` | Landing | none | PublicOnly |
-| `/onboarding/:step` | OnboardingLayout (Sidebar + Steps 1-9) | none | none (step 1 handles auth) |
+| `/onboarding/:step` | OnboardingLayout (Sidebar + Steps 1-8) | none | none (step 1 handles auth) |
 | `/creator-signup` | CreatorSignup | none | none (handles both logged-in and anonymous) |
 | `/catalog` | Catalog | AppLayout | RequireAuth |
 | `/projects` | MesProjetsMonteur | AppLayout | RequireAuth + RequireRole(editor) |
@@ -78,7 +78,7 @@ Demo credentials are in `src/lib/demoData.js`. Demo accounts (creator/editor) mu
 - **TopNav**: desktop only, role-based tabs, animated indicator (layoutId).
 - **BottomNav**: mobile = in-flow flex child (NOT position:fixed). Desktop = hidden.
 - **PageTitle**: sticky sub-header with title + action buttons (`position: sticky; top: 0`).
-- **OnboardingLayout**: Sidebar + Steps 1-9 with progress bar. Separate from AppLayout.
+- **OnboardingLayout**: Sidebar + Steps 1-7 (+ Step 8 success) with progress bar. Separate from AppLayout.
 
 ### Mobile viewport strategy
 - `.app-layout` is `position: fixed` on mobile (no `bottom`, height via JS).
@@ -115,6 +115,46 @@ Demo credentials are in `src/lib/demoData.js`. Demo accounts (creator/editor) mu
 - `.catalog-header-btn` is a shared utility button class (not tied to catalog)
 - Fill pages use `flex: 1; min-height: 0; overflow: hidden` — internal scroll via child elements
 - Chat: `flex-shrink: 0` on header/input/actions to survive keyboard resize
+
+## Onboarding flow (7 steps + success)
+1. **Step1Account** — auth (email/password or OAuth)
+2. **Step2Identity** — prénom, nom, avatar, langues, disponibilité
+3. **Step3Skills** — compétences, formats, niches, expérience, logiciels
+4. **Step4Portfolio** — liens clips, chaînes créditées
+5. **Step5Presentation** — bio, types de mission, délai de réponse, **liens sociaux structurés** (Instagram, TikTok, YouTube, Portfolio, LinkedIn)
+6. **Step6Level** — révélation du niveau avec animation "unlock" (badge + particules + score counter) via [LevelUnlockAnimation](src/components/ui/LevelUnlockAnimation.jsx). Respecte `prefers-reduced-motion`.
+7. **Step7Preview** — aperçu du profil avant publication
+8. **Step8Success** — écran post-publication
+
+Les tarifs ne sont PAS demandés pendant l'onboarding. Ils sont configurés depuis ProfileEditor (section-pricing) après révélation du niveau.
+
+## Pricing system
+- Grille officielle (7 niveaux × 7 tarifs) dans [`src/constants/pricing.js`](src/constants/pricing.js) : `PRICING_ROWS`, `PRICING_GRID`, `ADJUSTMENT_OPTIONS` (-10, 0, +10).
+- Fonctions pures dans [`src/lib/pricing.js`](src/lib/pricing.js) : `computePricing(levelIndex, adjustments)`, `computePricingRange`, `applyAdjustment`, `emptyPricingAdjustments`.
+- Stockage DB : `profiles.pricing` (jsonb) = `{ baseline_level, adjustments }`. Prix finaux calculés côté client (source de vérité = grille officielle).
+- Edition : ProfileEditor section-pricing affiche 7 lignes (3 montage + 3 motion + miniature) avec toggle 3 positions ±10%.
+- Catalog : `EditorCard` affiche fourchette "X – Y €" via `computePricingRange`. Pas de range si `assigned_level` null.
+- EditorDetail : grille complète affichée (7 lignes).
+
+## Social links system
+- Stockage DB : `profiles.social_links` (jsonb) = `{ instagram?, tiktok?, youtube?, portfolio?, linkedin? }`.
+- Config dans [`src/constants/options.js`](src/constants/options.js) : `SOCIAL_PLATFORMS` + `buildSocialLinkUrl`.
+- Composants : [`SocialLinksInput`](src/components/ui/SocialLinksInput.jsx) (éditeur, 5 champs), [`SocialLinksDisplay`](src/components/ui/SocialLinksDisplay.jsx) (icônes cliquables).
+- Icônes affichées uniquement sur EditorDetail (page profil), pas sur EditorCard (catalog).
+
+## Messaging & proposals
+- **ProjectProposalCard** ([src/components/messaging/ProjectProposalCard.jsx](src/components/messaging/ProjectProposalCard.jsx)) : card structurée affichée dans ChatView avec tous les détails d'une offer (title, description, deliverables, format, deadline, budget, revisions, status badge).
+- Wording pro : "Offre de mission" (pas "projet"), "Envoyer la proposition" (pas "Confirmer l'envoi"), vouvoiement dans les formulaires.
+
+## Post-onboarding level-up
+- Quand `saveProfile('published')` détecte `levelIndex > prevLevelIndex`, un `toast.success("Niveau débloqué : [emoji] [nom]")` est émis. Pas de rejeu d'animation (réservée au 1er unlock onboarding).
+
+## DB migrations (ordered, destructive)
+Migrations SQL à la racine du repo, à exécuter dans cet ordre avec backup préalable :
+1. [`supabase-migration-social-links-jsonb.sql`](supabase-migration-social-links-jsonb.sql) — `social_links` text → jsonb
+2. [`cleanup-videos-bucket.md`](cleanup-videos-bucket.md) + [`scripts/cleanup-videos-bucket.mjs`](scripts/cleanup-videos-bucket.mjs) — wipe orphelins du bucket `videos`
+3. [`supabase-migration-drop-legacy-fields.sql`](supabase-migration-drop-legacy-fields.sql) — DROP `username` + `presentation_video_url`
+4. [`supabase-migration-pricing.sql`](supabase-migration-pricing.sql) — ADD `pricing` jsonb + DROP `hourly_rate` + DROP `delivery_time`
 
 ## Conventions
 - Each step: reads from `formData` context, calls `save()` + `goToStep()` on navigation.
