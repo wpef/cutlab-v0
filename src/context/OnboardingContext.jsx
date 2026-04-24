@@ -274,7 +274,6 @@ export function OnboardingProvider({ children }) {
     })
     setSaving(false)
     if (error) { console.error('[Supabase] saveProfile:', error.message); return false }
-
     // Update in-memory assignedLevel so subsequent saves use the latest saved value as baseline
     setFormData((prev) => ({ ...prev, assignedLevel: levelIndex }))
 

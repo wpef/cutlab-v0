@@ -40,7 +40,6 @@ export default function ApplicationCard({ application, onAccept, onRefuse }) {
 
       <div className="application-card-meta">
         {expLabel && <span>{expLabel}</span>}
-        {profile.hourly_rate && <span>{profile.hourly_rate} €/h</span>}
       </div>
 
       {isPending && (

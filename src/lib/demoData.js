@@ -1,3 +1,5 @@
+import { emptyPricingAdjustments } from './pricing'
+
 // Demo accounts
 export const DEMO_EMAIL    = 'demo@cutlab.io'
 export const DEMO_PASSWORD = 'cutlab-demo-2024!'
@@ -21,8 +23,7 @@ export const DEMO_FORM = {
   creditedChannels: '@PewDiePie, @MrBeast',
   revisions:        '3',
   capacity:         '2-3',
-  hourlyRate:       '45',
-  deliveryTime:     '48–72h après réception des rushs',
+  pricing:          { baselineLevel: 2, adjustments: emptyPricingAdjustments() },
   bio:              'Monteur YouTube depuis 4 ans, spé gaming et tech. J\'aime les transitions fluides et le storytelling percutant. Réponse garantie sous 4h.',
   missionTypes:     ['ponctuelle', 'long-terme'],
   responseTime:     '<4h',

@@ -100,12 +100,40 @@ textarea { resize: vertical; min-height: 100px; }
 .upload-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
 .upload-hint { font-size: 13px; color: var(--text-muted); }
 
-/* TARIF */
+/* TARIF (legacy — kept for reference) */
 .tarif-table { width: 100%; border-collapse: collapse; }
 .tarif-table th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 0 12px 12px 0; }
 .tarif-table td { padding: 6px 12px 6px 0; }
 .tarif-label { font-size: 13px; color: var(--text-dim); white-space: nowrap; padding-right: 16px; }
 .tarif-table input { width: 120px; text-align: center; }
+
+/* PRICING EDITOR */
+.pricing-editor { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.pricing-locked-hint { font-size: 13px; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; line-height: 1.5; }
+.pricing-subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
+.pricing-rows-list { display: flex; flex-direction: column; gap: 2px; }
+.pricing-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.pricing-row:hover { border-color: var(--border-hover, var(--border)); }
+.pricing-row__label { flex: 1; font-size: 13px; color: var(--text-dim); min-width: 0; }
+.pricing-row__controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.pricing-toggle-group { display: flex; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.pricing-toggle-btn { background: transparent; border: none; border-right: 1px solid var(--border); color: var(--text-muted); font-size: 11px; font-family: inherit; padding: 5px 9px; cursor: pointer; transition: background 0.12s, color 0.12s; white-space: nowrap; min-height: 30px; }
+.pricing-toggle-btn:last-child { border-right: none; }
+.pricing-toggle-btn:hover { background: var(--surface2); color: var(--text); }
+.pricing-toggle-btn--active { background: var(--accent); color: #0a0a0a; font-weight: 600; }
+.pricing-price-block { display: flex; flex-direction: column; align-items: flex-end; min-width: 58px; }
+.pricing-price { font-size: 14px; font-weight: 700; color: var(--text); }
+.pricing-baseline-hint { font-size: 10px; color: var(--text-muted); }
+.pricing-grid-note { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+/* PROFILE CARD — pricing range */
+.profile-pricing-range { font-size: 12px; color: var(--text-dim); margin-top: 6px; font-weight: 500; }
+
+/* EDITOR DETAIL — pricing grid */
+.editor-detail-pricing-grid { display: flex; flex-direction: column; gap: 6px; }
+.editor-detail-pricing-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.editor-detail-pricing-label { font-size: 13px; color: var(--text-dim); flex: 1; }
+.editor-detail-pricing-price { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; margin-left: 12px; }
 
 /* AVAILABILITY */
 .availability-group { display: flex; gap: 12px; }
@@ -818,6 +846,11 @@ textarea { resize: vertical; min-height: 100px; }
   .step-nav { flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 32px; padding-top: 24px; }
   .tarif-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
   .tarif-table input { width: 80px; }
+  .pricing-row { flex-wrap: wrap; gap: 8px; }
+  .pricing-row__label { flex-basis: 100%; }
+  .pricing-row__controls { justify-content: space-between; width: 100%; }
+  .editor-detail-pricing-row { flex-wrap: wrap; gap: 4px; }
+  .editor-detail-pricing-label { flex-basis: 100%; }
   h1 { font-size: 26px; }
   .step-header { margin-bottom: 32px; }
   .step-desc { font-size: 14px; }

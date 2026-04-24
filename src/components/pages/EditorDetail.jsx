@@ -4,6 +4,8 @@ import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { LEVELS } from '../../constants/levels'
+import { PRICING_ROWS } from '../../constants/pricing'
+import { computePricing } from '../../lib/pricing'
 import PageTitle from '../layout/PageTitle'
 import SocialLinksDisplay from '../ui/SocialLinksDisplay'
 
@@ -51,7 +53,7 @@ export default function EditorDetail() {
   useEffect(() => {
     supabase
       .from('profiles')
-      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, hourly_rate, social_links')
+      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing, social_links')
       .eq('id', id)
       .single()
       .then(({ data, error }) => {
@@ -173,6 +175,28 @@ export default function EditorDetail() {
               </div>
             </div>
           )}
+
+          {/* Pricing grid — Option A: full table */}
+          {(() => {
+            const levelIdx = typeof profile.assigned_level === 'number' && profile.assigned_level >= 0 && profile.assigned_level < LEVELS.length
+              ? profile.assigned_level : null
+            const adjustments = profile.pricing?.adjustments
+            if (levelIdx == null || !adjustments) return null
+            const prices = computePricing(levelIdx, adjustments)
+            return (
+              <div className="editor-detail-section">
+                <div className="editor-detail-section-title">Tarifs</div>
+                <div className="editor-detail-pricing-grid">
+                  {PRICING_ROWS.map((row) => (
+                    <div key={row.key} className="editor-detail-pricing-row">
+                      <span className="editor-detail-pricing-label">{row.label}</span>
+                      <span className="editor-detail-pricing-price">{prices[row.key]} €</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Contact */}
           {!contactOpen ? (

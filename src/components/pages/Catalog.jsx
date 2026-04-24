@@ -25,7 +25,7 @@ export default function Catalog() {
   useEffect(() => {
     supabase
       .from('profiles')
-      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, hourly_rate')
+      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing')
       .eq('status', 'published')
       .then(({ data }) => {
         setProfiles(data ?? [])

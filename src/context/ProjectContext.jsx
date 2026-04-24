@@ -230,7 +230,7 @@ export function ProjectProvider({ children }) {
   const fetchProjectApplications = useCallback(async (projectId) => {
     const { data, error } = await supabase
       .from('contact_requests')
-      .select('*, profiles!editor_id(first_name, last_name, username, avatar_url, skills, formats, niches, experience, software, assigned_level, hourly_rate, bio)')
+      .select('*, profiles!editor_id(first_name, last_name, username, avatar_url, skills, formats, niches, experience, software, assigned_level, bio)')
       .eq('project_id', projectId)
       .order('created_at', { ascending: false })
     if (error) { console.error('[Projects] fetchApplications:', error.message); return [] }

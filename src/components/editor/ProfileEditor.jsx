@@ -4,6 +4,8 @@ import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
 import { computeScoreDetails } from '../../lib/computeLevel'
 import { LEVELS } from '../../constants/levels'
+import { PRICING_ROWS } from '../../constants/pricing'
+import { computePricing, applyAdjustment } from '../../lib/pricing'
 import { uploadFile } from '../../lib/uploadFile'
 import EditorCard from '../ui/EditorCard'
 import ScoreBreakdown from '../ui/ScoreBreakdown'
@@ -99,6 +101,79 @@ const RESPONSE_TIMES = [
 
 
 const MAX_BIO = 280
+
+const ADJUSTMENT_LABELS = { '-10': '-10%', '0': 'Baseline', '10': '+10%' }
+
+/**
+ * Pricing editor sub-component — shown in section-pricing of ProfileEditor.
+ * Props:
+ *   assignedLevel — null | number (0-6)
+ *   pricing       — { baselineLevel, adjustments }
+ *   onUpdate      — (newPricing) => void
+ */
+function PricingEditor({ assignedLevel, pricing, onUpdate }) {
+  const adjustments = pricing?.adjustments ?? {}
+
+  // Level not set — show info block
+  if (assignedLevel == null) {
+    return (
+      <div className="pricing-editor">
+        <div className="pricing-locked-hint">
+          Ton niveau n'est pas encore défini — complète ton profil pour débloquer la grille de tarifs.
+        </div>
+      </div>
+    )
+  }
+
+  const level = LEVELS[assignedLevel]
+  const prices = computePricing(assignedLevel, adjustments)
+
+  function handleToggle(key, value) {
+    const newAdjustments = { ...adjustments, [key]: value }
+    onUpdate({ baselineLevel: assignedLevel, adjustments: newAdjustments })
+  }
+
+  return (
+    <div className="pricing-editor">
+      <div className="pricing-subtitle">
+        Baseline — {level.emoji} {level.name}. Ajuste chaque tarif de ±10% si besoin.
+      </div>
+      <div className="pricing-rows-list">
+        {PRICING_ROWS.map((row) => {
+          const baseline = computePricing(assignedLevel, {})[row.key]
+          const finalPrice = prices[row.key]
+          const adj = adjustments[row.key] ?? 0
+          return (
+            <div key={row.key} className="pricing-row">
+              <div className="pricing-row__label">{row.label}</div>
+              <div className="pricing-row__controls">
+                <div className="pricing-toggle-group">
+                  {[-10, 0, 10].map((val) => (
+                    <button
+                      key={val}
+                      type="button"
+                      className={`pricing-toggle-btn${adj === val ? ' pricing-toggle-btn--active' : ''}`}
+                      onClick={() => handleToggle(row.key, val)}
+                    >
+                      {ADJUSTMENT_LABELS[String(val)]}
+                    </button>
+                  ))}
+                </div>
+                <div className="pricing-price-block">
+                  <div className="pricing-price">{finalPrice} €</div>
+                  {adj !== 0 && (
+                    <div className="pricing-baseline-hint">base {baseline} €</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <div className="pricing-grid-note">La grille se met à jour si ton niveau évolue.</div>
+    </div>
+  )
+}
 
 const NAV_SECTIONS = [
   { id: 'section-identity',     label: 'Identité' },
@@ -302,7 +377,7 @@ export default function ProfileEditor() {
                   experience: formData.experience,
                   languages: formData.languages,
                   formats: formData.formats,
-                  hourly_rate: formData.hourlyRate,
+                  pricing: formData.pricing,
                 }}
                 stats={{ received: pendingCount }}
               />
@@ -328,7 +403,7 @@ export default function ProfileEditor() {
               experience: formData.experience,
               languages: formData.languages,
               formats: formData.formats,
-              hourly_rate: formData.hourlyRate,
+              pricing: formData.pricing,
             }}
             hideName
             stats={{ received: pendingCount }}
@@ -613,48 +688,11 @@ export default function ProfileEditor() {
           <section id="section-pricing" className="editor-section" style={{ scrollMarginTop: 80 }}>
             <div className="editor-section-title">Tarifs</div>
 
-            <table className="tarif-table" style={{ marginBottom: 24 }}>
-              <thead>
-                <tr>
-                  <th />
-                  <th>Court (&lt; 5 min)</th>
-                  <th>Moyen (5–15 min)</th>
-                  <th>Long (15 min+)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="tarif-label">Montage brut</td>
-                  <td><input type="number" placeholder="€" /></td>
-                  <td><input type="number" placeholder="€" /></td>
-                  <td><input type="number" placeholder="€" /></td>
-                </tr>
-                <tr>
-                  <td className="tarif-label">Avec motion</td>
-                  <td><input type="number" placeholder="€" /></td>
-                  <td><input type="number" placeholder="€" /></td>
-                  <td><input type="number" placeholder="€" /></td>
-                </tr>
-                <tr>
-                  <td className="tarif-label">Miniature incluse</td>
-                  <td><input type="number" placeholder="+€" /></td>
-                  <td><input type="number" placeholder="+€" /></td>
-                  <td><input type="number" placeholder="+€" /></td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div className="form-row">
-              <FormGroup label="Tarif horaire" optional="optionnel">
-                <input type="number" placeholder="€ / heure" value={formData.hourlyRate}
-                  onChange={(e) => updateFormData({ hourlyRate: e.target.value })} />
-              </FormGroup>
-              <FormGroup label="Délai de livraison habituel" optional="optionnel">
-                <input type="text" placeholder="ex: 48–72h après réception des rushs"
-                  value={formData.deliveryTime}
-                  onChange={(e) => updateFormData({ deliveryTime: e.target.value })} />
-              </FormGroup>
-            </div>
+            <PricingEditor
+              assignedLevel={formData.assignedLevel}
+              pricing={formData.pricing}
+              onUpdate={(newPricing) => updateFormData({ pricing: newPricing })}
+            />
 
             <FormGroup label="Retours inclus par défaut">
               <div className="tag-group">

@@ -1,4 +1,5 @@
 import { LEVELS } from '../../constants/levels'
+import { computePricingRange } from '../../lib/pricing'
 
 const SKILL_LABELS = {
   video: 'Montage', thumb: 'Miniatures', sound: 'Sound',
@@ -32,7 +33,7 @@ const EXP_LABELS = { '<6m': '< 6 mois', '6m1y': '6 mois – 1 an', '1-3y': '1–
  * Props:
  *   profile  — { avatar_url, first_name, last_name,
  *                availability, skills, assigned_level,
- *                experience, languages, formats, hourly_rate }
+ *                experience, languages, formats, pricing }
  *   hideName — hides the full name (ProfileEditor sidebar)
  *   stats    — optional { received, active, done } for project counts
  *   onClick  — optional click handler for the card (navigation)
@@ -40,8 +41,8 @@ const EXP_LABELS = { '<6m': '< 6 mois', '6m1y': '6 mois – 1 an', '1-3y': '1–
  */
 export default function EditorCard({ profile, hideName = false, stats, onClick, children }) {
   const rawIdx = profile.assigned_level
-  const levelIdx = (typeof rawIdx === 'number' && rawIdx >= 0 && rawIdx < LEVELS.length) ? rawIdx : 0
-  const level = LEVELS[levelIdx]
+  const levelIdx = (typeof rawIdx === 'number' && rawIdx >= 0 && rawIdx < LEVELS.length) ? rawIdx : null
+  const level = levelIdx != null ? LEVELS[levelIdx] : null
   const skillTags = (profile.skills ?? []).slice(0, 3).map((k) => SKILL_LABELS[k] ?? k)
   const langFlags = (profile.languages ?? []).slice(0, 5)
   const formatBadges = (profile.formats ?? []).slice(0, 3)
@@ -51,6 +52,14 @@ export default function EditorCard({ profile, hideName = false, stats, onClick, 
     profile.first_name,
     profile.last_name ? profile.last_name[0] + '.' : '',
   ].filter(Boolean).join(' ')
+
+  // Pricing range — only show if level is set and pricing data exists
+  const pricingRange = (() => {
+    if (levelIdx == null) return null
+    const adjustments = profile.pricing?.adjustments
+    if (!adjustments) return null
+    return computePricingRange(levelIdx, adjustments)
+  })()
 
   return (
     <div className={`profile-preview${onClick ? ' profile-preview--clickable' : ''}`} onClick={onClick}>
@@ -108,6 +117,11 @@ export default function EditorCard({ profile, hideName = false, stats, onClick, 
             }
           </div>
         </div>
+        {pricingRange && (
+          <div className="profile-pricing-range">
+            {pricingRange.min} – {pricingRange.max} €
+          </div>
+        )}
         {children}
       </div>
     </div>
