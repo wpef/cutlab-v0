@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { computeScoreDetails } from '../lib/computeLevel'
 import { LEVELS } from '../constants/levels'
 import { toast } from '../components/ui/Toast'
-import { emptyPricingAdjustments } from '../lib/pricing'
+import { emptyPrices } from '../lib/pricing'
 
 const OnboardingContext = createContext(null)
 
@@ -20,7 +20,7 @@ const INITIAL_FORM = {
   portfolioLinks: ['', ''], creditedChannels: '',
   // Step 5
   revisions: '2', capacity: '2-3',
-  pricing: { baselineLevel: null, adjustments: emptyPricingAdjustments() },
+  pricing: { baselineLevel: null, prices: emptyPrices() },
   // Step 6
   bio: '', missionTypes: ['ponctuelle', 'long-terme'], responseTime: '<4h', socialLinks: {},
   // Step 7
@@ -253,7 +253,15 @@ export function OnboardingProvider({ children }) {
       capacity: formData.capacity,
       pricing: {
         baseline_level: formData.pricing?.baselineLevel ?? null,
-        adjustments: formData.pricing?.adjustments ?? {},
+        // Sparse object — only entries the user explicitly customized.
+        prices: (() => {
+          const p = formData.pricing?.prices
+          if (!p || typeof p !== 'object') return {}
+          // Drop empty/invalid entries
+          return Object.fromEntries(
+            Object.entries(p).filter(([, v]) => typeof v === 'number' && Number.isFinite(v) && v >= 0)
+          )
+        })(),
       },
       bio: formData.bio,
       mission_types: formData.missionTypes,
@@ -331,7 +339,7 @@ export function OnboardingProvider({ children }) {
         if (!raw || typeof raw !== 'object') return INITIAL_FORM.pricing
         return {
           baselineLevel: raw.baseline_level ?? null,
-          adjustments: raw.adjustments ?? emptyPricingAdjustments(),
+          prices: (raw.prices && typeof raw.prices === 'object') ? raw.prices : emptyPrices(),
         }
       })(),
       bio:             data.bio               ?? INITIAL_FORM.bio,

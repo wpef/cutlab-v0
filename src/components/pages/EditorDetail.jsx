@@ -180,9 +180,9 @@ export default function EditorDetail() {
           {(() => {
             const levelIdx = typeof profile.assigned_level === 'number' && profile.assigned_level >= 0 && profile.assigned_level < LEVELS.length
               ? profile.assigned_level : null
-            const adjustments = profile.pricing?.adjustments
-            if (levelIdx == null || !adjustments) return null
-            const prices = computePricing(levelIdx, adjustments)
+            if (levelIdx == null) return null
+            const customPrices = profile.pricing?.prices ?? {}
+            const prices = computePricing(levelIdx, customPrices)
             return (
               <div className="editor-detail-section">
                 <div className="editor-detail-section-title">Tarifs</div>

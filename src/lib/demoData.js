@@ -1,4 +1,4 @@
-import { emptyPricingAdjustments } from './pricing'
+import { emptyPrices } from './pricing'
 
 // Demo accounts
 export const DEMO_EMAIL    = 'demo@cutlab.io'
@@ -10,7 +10,6 @@ export const DEMO_CREATOR_PASSWORD = 'cutlab-creator-2024!'
 export const DEMO_FORM = {
   firstName:        'Lucas',
   lastName:         'Martin',
-  username:         'lucasedits',
   avatarUrl:        '',
   languages:        ['fr', 'en'],
   availability:     'Disponible',
@@ -23,7 +22,7 @@ export const DEMO_FORM = {
   creditedChannels: '@PewDiePie, @MrBeast',
   revisions:        '3',
   capacity:         '2-3',
-  pricing:          { baselineLevel: 2, adjustments: emptyPricingAdjustments() },
+  pricing:          { baselineLevel: 2, prices: emptyPrices() },
   bio:              'Monteur YouTube depuis 4 ans, spé gaming et tech. J\'aime les transitions fluides et le storytelling percutant. Réponse garantie sous 4h.',
   missionTypes:     ['ponctuelle', 'long-terme'],
   responseTime:     '<4h',

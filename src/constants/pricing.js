@@ -22,6 +22,3 @@ export const PRICING_GRID = {
   5: { montage_court: 250, montage_moyen: 400, montage_long: 600, motion_court: 400, motion_moyen: 600, motion_long:  900, thumbnail: 30 }, // Elite
   6: { montage_court: 350, montage_moyen: 550, montage_long: 800, motion_court: 550, motion_moyen: 800, motion_long: 1200, thumbnail: 30 }, // Légende
 }
-
-// Allowed adjustments: -10, 0, +10 (percent).
-export const ADJUSTMENT_OPTIONS = [-10, 0, 10]

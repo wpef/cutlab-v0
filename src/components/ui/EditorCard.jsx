@@ -53,12 +53,12 @@ export default function EditorCard({ profile, hideName = false, stats, onClick, 
     profile.last_name ? profile.last_name[0] + '.' : '',
   ].filter(Boolean).join(' ')
 
-  // Pricing range — only show if level is set and pricing data exists
+  // Pricing range — show baseline range as long as level is set;
+  // user's custom prices (if any) override the corresponding rows.
   const pricingRange = (() => {
     if (levelIdx == null) return null
-    const adjustments = profile.pricing?.adjustments
-    if (!adjustments) return null
-    return computePricingRange(levelIdx, adjustments)
+    const customPrices = profile.pricing?.prices ?? {}
+    return computePricingRange(levelIdx, customPrices)
   })()
 
   return (

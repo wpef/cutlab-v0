@@ -34,8 +34,11 @@ export function computeCompletion(formData) {
     const val = formData[field.key]
     let filled
     if (field.key === 'pricing') {
-      // Pricing is "filled" when the adjustments object exists (even all-zero is valid)
-      filled = val != null && typeof val === 'object' && val.adjustments != null
+      // Pricing is "filled" when there's either a baselineLevel locked or any custom price set
+      filled = !!(val && typeof val === 'object' && (
+        val.baselineLevel != null ||
+        (val.prices && Object.values(val.prices).some((v) => typeof v === 'number' && v > 0))
+      ))
     } else if (Array.isArray(val)) {
       filled = val.filter(Boolean).length > 0
     } else if (val && typeof val === 'object') {

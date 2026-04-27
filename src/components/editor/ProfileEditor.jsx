@@ -4,8 +4,8 @@ import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
 import { computeScoreDetails } from '../../lib/computeLevel'
 import { LEVELS } from '../../constants/levels'
-import { PRICING_ROWS } from '../../constants/pricing'
-import { computePricing, applyAdjustment } from '../../lib/pricing'
+import { PRICING_ROWS, PRICING_GRID } from '../../constants/pricing'
+import { baselinePrices } from '../../lib/pricing'
 import { uploadFile } from '../../lib/uploadFile'
 import EditorCard from '../ui/EditorCard'
 import ScoreBreakdown from '../ui/ScoreBreakdown'
@@ -102,17 +102,19 @@ const RESPONSE_TIMES = [
 
 const MAX_BIO = 280
 
-const ADJUSTMENT_LABELS = { '-10': '-10%', '0': 'Baseline', '10': '+10%' }
-
 /**
  * Pricing editor sub-component — shown in section-pricing of ProfileEditor.
+ * Free-input model: each row has a numeric input. Empty input = use baseline.
+ * Custom prices are stored as absolute values; the baseline is shown alongside
+ * for reference (with a delta in € and %).
+ *
  * Props:
  *   assignedLevel — null | number (0-6)
- *   pricing       — { baselineLevel, adjustments }
+ *   pricing       — { baselineLevel, prices }
  *   onUpdate      — (newPricing) => void
  */
 function PricingEditor({ assignedLevel, pricing, onUpdate }) {
-  const adjustments = pricing?.adjustments ?? {}
+  const customPrices = pricing?.prices ?? {}
 
   // Level not set — show info block
   if (assignedLevel == null) {
@@ -126,51 +128,67 @@ function PricingEditor({ assignedLevel, pricing, onUpdate }) {
   }
 
   const level = LEVELS[assignedLevel]
-  const prices = computePricing(assignedLevel, adjustments)
+  const baseline = baselinePrices(assignedLevel)
 
-  function handleToggle(key, value) {
-    const newAdjustments = { ...adjustments, [key]: value }
-    onUpdate({ baselineLevel: assignedLevel, adjustments: newAdjustments })
+  function handleChange(key, raw) {
+    const next = { ...customPrices }
+    if (raw === '' || raw == null) {
+      delete next[key]
+    } else {
+      const num = Number(raw)
+      if (!Number.isFinite(num) || num < 0) return
+      next[key] = Math.round(num)
+    }
+    onUpdate({ baselineLevel: assignedLevel, prices: next })
   }
 
   return (
     <div className="pricing-editor">
       <div className="pricing-subtitle">
-        Baseline — {level.emoji} {level.name}. Ajuste chaque tarif de ±10% si besoin.
+        Baseline — {level.emoji} {level.name}. Saisis le prix de ton choix ; la baseline reste affichée pour repère.
       </div>
       <div className="pricing-rows-list">
         {PRICING_ROWS.map((row) => {
-          const baseline = computePricing(assignedLevel, {})[row.key]
-          const finalPrice = prices[row.key]
-          const adj = adjustments[row.key] ?? 0
+          const base = baseline[row.key]
+          const custom = customPrices[row.key]
+          const hasCustom = typeof custom === 'number' && Number.isFinite(custom) && custom >= 0
+          const final = hasCustom ? custom : base
+          const delta = final - base
+          const deltaPct = base > 0 ? Math.round((delta / base) * 100) : 0
           return (
             <div key={row.key} className="pricing-row">
               <div className="pricing-row__label">{row.label}</div>
               <div className="pricing-row__controls">
-                <div className="pricing-toggle-group">
-                  {[-10, 0, 10].map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      className={`pricing-toggle-btn${adj === val ? ' pricing-toggle-btn--active' : ''}`}
-                      onClick={() => handleToggle(row.key, val)}
-                    >
-                      {ADJUSTMENT_LABELS[String(val)]}
-                    </button>
-                  ))}
+                <div className="pricing-input-group">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    step={5}
+                    className="pricing-input"
+                    value={hasCustom ? custom : ''}
+                    placeholder={String(base)}
+                    onChange={(e) => handleChange(row.key, e.target.value)}
+                    aria-label={`${row.label} (€)`}
+                  />
+                  <span className="pricing-input-suffix">€</span>
                 </div>
-                <div className="pricing-price-block">
-                  <div className="pricing-price">{finalPrice} €</div>
-                  {adj !== 0 && (
-                    <div className="pricing-baseline-hint">base {baseline} €</div>
+                <div className="pricing-baseline-block">
+                  {hasCustom ? (
+                    <span className={`pricing-delta pricing-delta--${delta > 0 ? 'up' : delta < 0 ? 'down' : 'equal'}`}>
+                      {delta > 0 ? '+' : ''}{deltaPct}%
+                    </span>
+                  ) : (
+                    <span className="pricing-delta pricing-delta--equal">baseline</span>
                   )}
+                  <span className="pricing-baseline-label">Réf. {base} €</span>
                 </div>
               </div>
             </div>
           )
         })}
       </div>
-      <div className="pricing-grid-note">La grille se met à jour si ton niveau évolue.</div>
+      <div className="pricing-grid-note">La baseline se met à jour si ton niveau évolue. Laisser vide = utiliser la baseline.</div>
     </div>
   )
 }

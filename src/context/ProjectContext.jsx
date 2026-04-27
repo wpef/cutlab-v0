@@ -70,7 +70,7 @@ export function ProjectProvider({ children }) {
     setProjectLoading(true)
     let query = supabase
       .from('projects')
-      .select('*, profiles!creator_id(first_name, last_name, username, avatar_url)')
+      .select('*, profiles!creator_id(first_name, last_name, avatar_url)')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
 
@@ -92,7 +92,7 @@ export function ProjectProvider({ children }) {
   const fetchProjectById = useCallback(async (id) => {
     const { data, error } = await supabase
       .from('projects')
-      .select('*, profiles!creator_id(first_name, last_name, username, avatar_url)')
+      .select('*, profiles!creator_id(first_name, last_name, avatar_url)')
       .eq('id', id)
       .single()
     if (error) { console.error('[Projects] fetchById:', error.message); return null }
@@ -230,7 +230,7 @@ export function ProjectProvider({ children }) {
   const fetchProjectApplications = useCallback(async (projectId) => {
     const { data, error } = await supabase
       .from('contact_requests')
-      .select('*, profiles!editor_id(first_name, last_name, username, avatar_url, skills, formats, niches, experience, software, assigned_level, bio)')
+      .select('*, profiles!editor_id(first_name, last_name, avatar_url, skills, formats, niches, experience, software, assigned_level, bio)')
       .eq('project_id', projectId)
       .order('created_at', { ascending: false })
     if (error) { console.error('[Projects] fetchApplications:', error.message); return [] }
