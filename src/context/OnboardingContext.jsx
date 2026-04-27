@@ -462,6 +462,7 @@ export function OnboardingProvider({ children }) {
   function goToMyProjects() { nav('/my-projects') }
   function goToProjectForm(id) { nav(id ? `/project/new?edit=${id}` : '/project/new') }
   function goToProjectDetail(id) { nav(`/project/${id}`) }
+  function goToEditorDetail(id) { nav(`/editor/${id}`) }
 
   /** Navigate to the role-appropriate home: Monteur -> projects, Createur -> catalog */
   function goToHome() {
@@ -476,7 +477,7 @@ export function OnboardingProvider({ children }) {
         navigateRef,
         goToLanding, goToOnboarding, goToCatalog, goToEditor, goToProjects, goToHome,
         goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
-        goToMyProjects, goToProjectForm, goToProjectDetail,
+        goToMyProjects, goToProjectForm, goToProjectDetail, goToEditorDetail,
         formData, updateFormData,
         // Only expose userRole when authenticated; otherwise route guards
         // would treat guests as if they had INITIAL_FORM.role (default 'editor')

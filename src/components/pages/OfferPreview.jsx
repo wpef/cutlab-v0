@@ -116,10 +116,10 @@ export default function OfferPreview() {
 
         {/* Details row */}
         <div className="offer-doc-details">
-          {offer.format && (
+          {(offer.content_format || offer.format) && (
             <div className="offer-doc-section" style={{ marginBottom: 0 }}>
               <div className="offer-doc-section-label">Format</div>
-              <div className="offer-doc-section-value">{offer.format}</div>
+              <div className="offer-doc-section-value">{offer.content_format ?? offer.format}</div>
             </div>
           )}
           {offer.deadline && (
@@ -142,7 +142,12 @@ export default function OfferPreview() {
         <div className="offer-doc-section">
           <div className="offer-doc-section-label">Budget total</div>
           <div className="offer-doc-budget">
-            {Number(offer.budget).toLocaleString('fr-FR')} €
+            {offer.budget_type === 'range' && offer.budget_min && offer.budget_max
+              ? `${Number(offer.budget_min).toLocaleString('fr-FR')} – ${Number(offer.budget_max).toLocaleString('fr-FR')} €`
+              : offer.budget != null
+                ? `${Number(offer.budget).toLocaleString('fr-FR')} €`
+                : '—'
+            }
           </div>
         </div>
 

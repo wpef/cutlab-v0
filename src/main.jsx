@@ -5,6 +5,7 @@ import App from './App'
 import { OnboardingProvider } from './context/OnboardingContext'
 import { MessagingProvider } from './context/MessagingContext'
 import { ProjectProvider } from './context/ProjectContext'
+import { CollabProvider } from './context/CollabContext'
 import NavigationBridge from './NavigationBridge'
 import './styles/global.css'
 
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <NavigationBridge />
         <MessagingProvider>
           <ProjectProvider>
-            <App />
+            <CollabProvider>
+              <App />
+            </CollabProvider>
           </ProjectProvider>
         </MessagingProvider>
       </OnboardingProvider>

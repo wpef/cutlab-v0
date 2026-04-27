@@ -141,9 +141,9 @@ export default function App() {
         <Route path="/editor" element={<RequireRole allowed={['editor']}><ProfileEditor /></RequireRole>} />
         <Route path="/pipeline" element={<RequireRole allowed={['editor']}><EditorPipeline /></RequireRole>} />
 
-        {/* Creator-only routes */}
-        <Route path="/offer/new" element={<RequireRole allowed={['creator']}><OfferForm /></RequireRole>} />
-        <Route path="/offer/preview" element={<RequireRole allowed={['creator']}><OfferPreview /></RequireRole>} />
+        {/* Offer routes — accessible to both roles */}
+        <Route path="/offer/new" element={<OfferForm />} />
+        <Route path="/offer/preview" element={<OfferPreview />} />
         <Route path="/project/new" element={<RequireRole allowed={['creator']}><ProjectForm /></RequireRole>} />
         <Route path="/my-projects" element={<RequireRole allowed={['creator']}><MyProjects /></RequireRole>} />
 

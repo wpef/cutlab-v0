@@ -11,6 +11,19 @@ const NOTIF_ICONS = {
   project_filled: '🏁',
   project_cancelled: '🚫',
   project_modified: '📝',
+  // Offer / request notifications
+  offer_received:   '📨',
+  offer_accepted:   '✅',
+  offer_refused:    '❌',
+  request_accepted: '🤝',
+  request_refused:  '🚫',
+  // Collab tracker notifications
+  deliverable_shared:    '📦',
+  revision_requested:    '🔁',
+  deliverables_validated: '✅',
+  payment_sent:          '💳',
+  payment_received:      '💰',
+  review_received:       '⭐',
 }
 
 function formatTime(iso) {
@@ -33,6 +46,19 @@ function notifText(n) {
     case 'project_filled': return <>Le projet <strong>{n.project_title}</strong> a été pourvu</>
     case 'project_cancelled': return <>Le projet <strong>{n.project_title}</strong> a été annulé</>
     case 'project_modified': return <>Le projet <strong>{n.project_title}</strong> a été modifié</>
+    // Offer / request notifications
+    case 'offer_received':   return <><strong>{n.actor_name}</strong> vous a envoyé une offre de mission</>
+    case 'offer_accepted':   return <><strong>{n.actor_name}</strong> a accepté votre offre</>
+    case 'offer_refused':    return <><strong>{n.actor_name}</strong> a refusé votre offre</>
+    case 'request_accepted': return <><strong>{n.actor_name}</strong> a accepté votre demande de contact</>
+    case 'request_refused':  return <><strong>{n.actor_name}</strong> a refusé votre demande de contact</>
+    // Collab tracker
+    case 'deliverable_shared':    return <><strong>{n.actor_name}</strong> a partagé les livrables pour <strong>{n.project_title || 'votre collaboration'}</strong></>
+    case 'revision_requested':    return <><strong>{n.actor_name}</strong> a demandé un retour sur <strong>{n.project_title || 'votre collaboration'}</strong></>
+    case 'deliverables_validated': return <><strong>{n.actor_name}</strong> a validé les livrables de <strong>{n.project_title || 'votre collaboration'}</strong></>
+    case 'payment_sent':          return <><strong>{n.actor_name}</strong> a marqué le paiement comme envoyé</>
+    case 'payment_received':      return <><strong>{n.actor_name}</strong> a confirmé la réception du paiement</>
+    case 'review_received':       return <>Vous avez reçu un avis de <strong>{n.actor_name}</strong></>
     default: return 'Notification'
   }
 }
@@ -58,10 +84,18 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
+  const CHAT_NOTIF_TYPES = new Set([
+    'application_accepted',
+    'offer_received', 'offer_accepted', 'offer_refused',
+    'request_accepted', 'request_refused',
+    'deliverable_shared', 'revision_requested', 'deliverables_validated',
+    'payment_sent', 'payment_received', 'review_received',
+  ])
+
   function handleClick(n) {
     markAsRead(n.id)
     setOpen(false)
-    if (n.type === 'application_accepted' && n.request_id) {
+    if (n.request_id && CHAT_NOTIF_TYPES.has(n.type)) {
       goToChat(n.request_id)
     } else if (n.project_id) {
       goToProjectDetail(n.project_id)

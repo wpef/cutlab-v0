@@ -5,7 +5,7 @@ import { useOnboarding } from './OnboardingContext'
 const MessagingContext = createContext(null)
 
 export function MessagingProvider({ children }) {
-  const { user, updateFormData } = useOnboarding()
+  const { user, formData, updateFormData } = useOnboarding()
 
   const [requests, setRequests] = useState([])
   const [messages, setMessages] = useState([])
@@ -16,6 +16,19 @@ export function MessagingProvider({ children }) {
   const [offerFormData, setOfferFormData] = useState(null)
   const [signupError, setSignupError] = useState(null)
   const [signupLoading, setSignupLoading] = useState(false)
+
+  async function notify({ userId, type, requestId, projectId, actorName, title }) {
+    await supabase.from('notifications').insert({
+      user_id: userId,
+      type,
+      request_id: requestId ?? null,
+      project_id: projectId ?? null,
+      actor_id: user.id,
+      actor_name: actorName,
+      project_title: title ?? null,
+      read: false,
+    })
+  }
 
   async function signUpCreator(firstName, email, password) {
     setSignupLoading(true)
@@ -93,6 +106,12 @@ export function MessagingProvider({ children }) {
       .eq('id', requestId)
     if (!error) {
       setRequests((prev) => prev.map((r) => r.id === requestId ? { ...r, status: 'accepted' } : r))
+      const request = requests.find((r) => r.id === requestId)
+      if (request) {
+        const recipientId = request.creator_id === user.id ? request.editor_id : request.creator_id
+        const actorName = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || user.email
+        await notify({ userId: recipientId, type: 'request_accepted', requestId, actorName })
+      }
     }
     return !error
   }
@@ -104,6 +123,12 @@ export function MessagingProvider({ children }) {
       .eq('id', requestId)
     if (!error) {
       setRequests((prev) => prev.map((r) => r.id === requestId ? { ...r, status: 'refused' } : r))
+      const request = requests.find((r) => r.id === requestId)
+      if (request) {
+        const recipientId = request.creator_id === user.id ? request.editor_id : request.creator_id
+        const actorName = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || user.email
+        await notify({ userId: recipientId, type: 'request_refused', requestId, actorName })
+      }
     }
     return !error
   }
@@ -145,15 +170,30 @@ export function MessagingProvider({ children }) {
       .from('offers')
       .insert({
         request_id: requestId,
-        creator_id: user.id,
-        editor_id: request.editor_id,
+        creator_id: request.creator_id,   // always the content creator (not the sender)
+        editor_id: request.editor_id,     // always the video editor
+        sent_by: offerData.sent_by || 'creator', // who actually sent this offer
         title: offerData.title,
         description: offerData.description,
         deliverables: offerData.deliverables,
-        format: offerData.format,
+        content_format: offerData.content_format || null,
         deadline: offerData.deadline,
-        budget: offerData.budget ? Number(offerData.budget) : null,
+        budget: offerData.budget_type === 'fixed' && offerData.budget ? Number(offerData.budget) : null,
+        budget_type: offerData.budget_type || 'fixed',
+        budget_min: offerData.budget_min ? Number(offerData.budget_min) : null,
+        budget_max: offerData.budget_max ? Number(offerData.budget_max) : null,
         revisions: offerData.revisions ? Number(offerData.revisions) : 2,
+        mission_start: offerData.mission_start || null,
+        quality: offerData.quality || null,
+        video_count: offerData.video_count ? Number(offerData.video_count) : null,
+        video_duration: offerData.video_duration || null,
+        thumbnail_included: offerData.thumbnail_included ?? false,
+        niches: offerData.niches ?? [],
+        preferred_software: offerData.preferred_software ?? [],
+        required_languages: offerData.required_languages ?? [],
+        experience_level: offerData.experience_level || null,
+        mission_type: offerData.mission_type || null,
+        rushes_info: offerData.rushes_info || null,
         status: 'pending',
         creator_name: request.creator_name,
         editor_name: request.editor_name,
@@ -161,16 +201,48 @@ export function MessagingProvider({ children }) {
       .select()
       .single()
     if (error) return null
+    const sent_by = offerData.sent_by || 'creator'
+    const recipient = sent_by === 'creator' ? request.editor_id : request.creator_id
+    const actorName = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || user.email
+    await notify({ userId: recipient, type: 'offer_received', requestId, actorName, title: offerData.title })
     return data
   }
 
   async function acceptOffer(offerId) {
+    const offer = offers.find((o) => o.id === offerId)
+    if (offer?.status !== 'pending') return false
+
     const { error } = await supabase
       .from('offers')
       .update({ status: 'accepted' })
       .eq('id', offerId)
     if (!error) {
       setOffers((prev) => prev.map((o) => o.id === offerId ? { ...o, status: 'accepted' } : o))
+
+      const actorName = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || user.email
+
+      // Notify the offer sender
+      const recipientId = offer.sent_by === 'editor' ? offer.editor_id : offer.creator_id
+      await notify({ userId: recipientId, type: 'offer_accepted', requestId: offer.request_id, actorName, title: offer.title })
+
+      // Cascade auto-decline if project_id exists
+      const request = requests.find((r) => r.id === offer.request_id)
+      if (request?.project_id) {
+        const { data: otherRequests } = await supabase
+          .from('contact_requests').select('id, editor_id')
+          .eq('project_id', request.project_id).neq('id', request.id)
+
+        if (otherRequests?.length) {
+          const ids = otherRequests.map((r) => r.id)
+          await supabase.from('contact_requests').update({ status: 'refused' }).in('id', ids)
+          await supabase.from('offers').update({ status: 'refused' }).in('request_id', ids).eq('status', 'pending')
+          await supabase.from('projects').update({ status: 'filled' }).eq('id', request.project_id)
+          await Promise.all(otherRequests.map((r) =>
+            notify({ userId: r.editor_id, type: 'project_filled', projectId: request.project_id,
+                     requestId: r.id, actorName, title: offer.title })
+          ))
+        }
+      }
     }
     return !error
   }
@@ -215,12 +287,18 @@ export function MessagingProvider({ children }) {
   }
 
   async function refuseOffer(offerId) {
+    const offer = offers.find((o) => o.id === offerId)
+    if (offer?.status !== 'pending') return false
+
     const { error } = await supabase
       .from('offers')
       .update({ status: 'refused' })
       .eq('id', offerId)
     if (!error) {
       setOffers((prev) => prev.map((o) => o.id === offerId ? { ...o, status: 'refused' } : o))
+      const actorName = [formData.firstName, formData.lastName].filter(Boolean).join(' ') || user.email
+      const recipientId = offer.sent_by === 'editor' ? offer.editor_id : offer.creator_id
+      await notify({ userId: recipientId, type: 'offer_refused', requestId: offer.request_id, actorName, title: offer.title })
     }
     return !error
   }
