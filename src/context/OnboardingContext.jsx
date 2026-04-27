@@ -470,7 +470,10 @@ export function OnboardingProvider({ children }) {
         goToCreatorSignup, goToMessaging, goToChat, goToPipeline, goToOfferForm, goToOfferPreview,
         goToMyProjects, goToProjectForm, goToProjectDetail,
         formData, updateFormData,
-        userRole: formData.role,
+        // Only expose userRole when authenticated; otherwise route guards
+        // would treat guests as if they had INITIAL_FORM.role (default 'editor')
+        // and incorrectly block them from /catalog.
+        userRole: user ? formData.role : null,
         pendingEditor, clearPendingEditor,
         user, authReady, authLoading, authError,
         demoMode,
