@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
@@ -197,7 +197,9 @@ export default function ProfileEditor() {
   const [clipUploading, setClipUploading] = useState(false)
   const [clipUploadError, setClipUploadError] = useState(null)
   const [clipUploadSuccess, setClipUploadSuccess] = useState(false)
-  const [scoreDetails, setScoreDetails] = useState(() => computeScoreDetails(formData))
+  // Live score: recomputes on every formData change so section-level + pricing
+  // editor reflect changes in real time (e.g. swapping experience level).
+  const scoreDetails = useMemo(() => computeScoreDetails(formData), [formData])
   // Local state for social links — coerce legacy string to empty object on init
   const [socialLinks, setSocialLinks] = useState(
     () => (formData.socialLinks && typeof formData.socialLinks === 'object') ? formData.socialLinks : {}
@@ -315,7 +317,6 @@ export default function ProfileEditor() {
     const ok = await saveProfile('published')
     setSaveStatus(ok ? 'saved' : 'error')
     if (ok) {
-      setScoreDetails(computeScoreDetails(formData))
       toast.success('Profil mis a jour !')
       setTimeout(() => setSaveStatus(null), 3000)
     } else {
@@ -689,7 +690,7 @@ export default function ProfileEditor() {
             <div className="editor-section-title">Tarifs</div>
 
             <PricingEditor
-              assignedLevel={formData.assignedLevel}
+              assignedLevel={scoreDetails.levelIndex}
               pricing={formData.pricing}
               onUpdate={(newPricing) => updateFormData({ pricing: newPricing })}
             />
