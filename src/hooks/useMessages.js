@@ -11,7 +11,7 @@ export function useMessages(contactRequestId) {
     const { data } = await supabase
       .from('messages')
       .select('*')
-      .eq('contact_request_id', contactRequestId)
+      .eq('request_id', contactRequestId)
       .order('created_at', { ascending: true })
     setMessages(data ?? [])
     setLoading(false)

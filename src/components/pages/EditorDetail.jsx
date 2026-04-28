@@ -76,6 +76,10 @@ export default function EditorDetail() {
       .then(({ data }) => setReviews(data ?? []))
   }, [id])
 
+  // Derive name early so it's available in toggleFavorite and handleShare
+  // (profile may be null before data loads; optional chaining keeps it safe)
+  const name = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ')
+
   // Check favorite status for logged-in creators
   useEffect(() => {
     if (!user || userRole !== 'creator' || !id) return
@@ -111,7 +115,6 @@ export default function EditorDetail() {
   if (loading) return <div className="catalog-loading">Chargement...</div>
   if (!profile) return null
 
-  const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ')
   const rawIdx = profile.assigned_level
   const levelIdx = (typeof rawIdx === 'number' && rawIdx >= 0 && rawIdx < LEVELS.length) ? rawIdx : 0
   const level = LEVELS[levelIdx]

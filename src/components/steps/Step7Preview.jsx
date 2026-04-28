@@ -53,7 +53,7 @@ export default function Step7Preview() {
             experience: formData.experience,
             languages: formData.languages,
             formats: formData.formats,
-            hourly_rate: formData.hourlyRate,
+            pricing: formData.pricing,
           }}
         />
 

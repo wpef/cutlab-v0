@@ -10,7 +10,7 @@ import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 export default function Catalog() {
   const navigate = useNavigate()
   const {
-    goToOnboarding, goToCreatorSignup,
+    goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
   } = useOnboarding()
   const { loadRequests, sendContactRequest } = useMessaging()
