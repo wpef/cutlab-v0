@@ -55,7 +55,7 @@ function formatDate(iso) {
   const d = new Date(iso)
   const now = new Date()
   const diff = now - d
-  if (diff < 60000) return "a l'instant"
+  if (diff < 60000) return "à l'instant"
   if (diff < 3600000) return `il y a ${Math.floor(diff / 60000)} min`
   if (diff < 86400000) return `il y a ${Math.floor(diff / 3600000)}h`
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
@@ -138,7 +138,7 @@ export default function EditorPipeline() {
           <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
           <p>Aucune demande pour l'instant.</p>
           <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 8 }}>
-            Les createurs te contacteront depuis le catalogue.
+            Les créateurs te contacteront depuis le catalogue.
           </p>
         </div>
       ) : (
@@ -196,7 +196,7 @@ function PipelineCard({ request, offer, stage, onAccept, onRefuse, onAcceptOffer
       </div>
 
       <div className="pipeline-card-meta">
-        {offer?.budget && <span className="pipeline-card-budget">{offer.budget} &euro;</span>}
+        {offer?.budget && <span className="pipeline-card-budget">{offer.budget} €</span>}
         {isRefused && <span className="pipeline-card-refused">Contact refuse</span>}
         <span>{formatDate(request.created_at)}</span>
       </div>
@@ -216,7 +216,7 @@ function PipelineCard({ request, offer, stage, onAccept, onRefuse, onAcceptOffer
       {stage === 'conversation_en_cours' && (
         <div className="pipeline-card-actions">
           <button className="pipeline-btn pipeline-btn--chat" onClick={(e) => { e.stopPropagation(); onOpenChat(request.id) }}>
-            Acceder a la conversation
+            Accéder à la conversation
           </button>
         </div>
       )}

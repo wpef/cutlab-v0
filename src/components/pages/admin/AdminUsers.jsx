@@ -48,7 +48,7 @@ export default function AdminUsers() {
                 <tr key={u.id} className={u.status === 'suspended' ? 'admin-row--suspended' : ''}>
                   <td>{u.first_name} {u.last_name}</td>
                   <td><span className="admin-badge">{u.role}</span></td>
-                  <td><span className={`admin-badge admin-badge--${u.status}`}>{u.status}</span></td>
+                  <td><span className={`admin-badge admin-badge--${u.status ?? 'unknown'}`}>{u.status}</span></td>
                   <td>{u.assigned_level ?? '—'}</td>
                   <td>{new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
                   <td>

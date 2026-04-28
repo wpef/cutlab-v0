@@ -63,7 +63,7 @@ export default function TopNav() {
       </nav>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <NotificationBell />
-        <button className="top-nav-logout" onClick={signOut}>Deconnexion</button>
+        <button className="top-nav-logout" onClick={signOut}>Déconnexion</button>
       </div>
     </header>
   )
