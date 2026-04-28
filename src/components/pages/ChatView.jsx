@@ -44,7 +44,7 @@ export default function ChatView() {
   const messagesEndRef = useRef(null)
 
   const request = requests.find((r) => r.id === requestId)
-  const offer = offers.find((o) => o.status === 'accepted') ?? offers[0] ?? null
+  const offer = offers.find((o) => o.status === 'accepted') ?? null
   const otherName = request
     ? (userRole === 'creator' ? request.editor_name : request.creator_name)
     : 'Conversation'

@@ -22,6 +22,8 @@ export default function Catalog() {
   const [contactSending, setContactSending] = useState(false)
   const [contactError, setContactError] = useState('')
 
+  useEffect(() => { document.title = 'CUTLAB — Catalogue' }, [])
+
   useEffect(() => {
     async function load() {
       const { data: profiles } = await supabase

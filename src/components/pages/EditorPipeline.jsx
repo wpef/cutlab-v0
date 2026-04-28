@@ -73,6 +73,8 @@ export default function EditorPipeline() {
   usePipelineSwipe(boardRef)
   const [localOffers, setLocalOffers] = useState([])
 
+  useEffect(() => { document.title = 'CUTLAB — Pipeline' }, [])
+
   useEffect(() => {
     loadPipelineData().then(({ allOffers }) => {
       if (allOffers) setLocalOffers(allOffers)

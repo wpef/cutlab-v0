@@ -10,6 +10,8 @@ export default function AdminReports() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
 
+  useEffect(() => { document.title = 'CUTLAB — Admin · Signalements' }, [])
+
   if (userRole !== 'admin') return <Navigate to="/" replace />
 
   useEffect(() => {

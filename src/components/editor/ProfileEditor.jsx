@@ -290,6 +290,8 @@ export default function ProfileEditor() {
     }
   }
 
+  useEffect(() => { document.title = 'CUTLAB — Mon profil' }, [])
+
   useEffect(() => {
     if (user) {
       loadProfile()
@@ -367,6 +369,7 @@ export default function ProfileEditor() {
       setTimeout(() => setSaveStatus(null), 3000)
     } else {
       toast.error('Erreur lors de la sauvegarde')
+      setTimeout(() => setSaveStatus(null), 3000)
     }
   }
 

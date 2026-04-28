@@ -10,6 +10,8 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
 
+  useEffect(() => { document.title = 'CUTLAB — Admin · Utilisateurs' }, [])
+
   if (userRole !== 'admin') return <Navigate to="/" replace />
 
   useEffect(() => {

@@ -6,17 +6,17 @@
  */
 
 const COMPLETION_FIELDS = [
-  { key: 'firstName',       weight: 1,   suggestion: 'Ajoute ton prénom (Step 2)' },
-  { key: 'lastName',        weight: 1,   suggestion: 'Ajoute ton nom (Step 2)' },
+  { key: 'firstName',       weight: 1,   suggestion: 'Ajoute ton prénom' },
+  { key: 'lastName',        weight: 1,   suggestion: 'Ajoute ton nom' },
   { key: 'avatarUrl',       weight: 1.5, suggestion: 'Uploade une photo de profil pour +15% de clics' },
-  { key: 'bio',             weight: 1.5, suggestion: 'Rédige une bio courte pour te présenter (Step 5)' },
-  { key: 'skills',          weight: 1,   suggestion: 'Sélectionne tes compétences (Step 3)' },
-  { key: 'formats',         weight: 0.5, suggestion: 'Ajoute tes formats de prédilection (Step 3)' },
-  { key: 'niches',          weight: 0.5, suggestion: 'Indique tes niches de contenu (Step 3)' },
-  { key: 'experience',      weight: 1,   suggestion: "Précise ton niveau d'expérience (Step 3)" },
+  { key: 'bio',             weight: 1.5, suggestion: 'Rédige une bio courte pour te présenter' },
+  { key: 'skills',          weight: 1,   suggestion: 'Sélectionne tes compétences' },
+  { key: 'formats',         weight: 0.5, suggestion: 'Ajoute tes formats de prédilection' },
+  { key: 'niches',          weight: 0.5, suggestion: 'Indique tes niches de contenu' },
+  { key: 'experience',      weight: 1,   suggestion: "Précise ton niveau d'expérience" },
   { key: 'pricing',         weight: 1,   suggestion: 'Configure tes tarifs depuis ton profil pour apparaître dans les recherches filtrées' },
-  { key: 'portfolioLinks',  weight: 1.5, suggestion: 'Ajoute au moins un lien portfolio ou clip (Step 4)' },
-  { key: 'socialLinks',     weight: 0.5, suggestion: 'Ajoute un lien vers tes réseaux pour rassurer les clients (Step 5)' },
+  { key: 'portfolioLinks',  weight: 1.5, suggestion: 'Ajoute au moins un lien portfolio ou clip' },
+  { key: 'socialLinks',     weight: 0.5, suggestion: 'Ajoute un lien vers tes réseaux pour rassurer les clients' },
 ]
 
 /**

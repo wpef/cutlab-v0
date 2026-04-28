@@ -20,6 +20,8 @@ export default function MessagingHub() {
   const { goToChat, goToCatalog, userRole, user } = useOnboarding()
   const { requests, messagingLoading, loadRequests, setActiveRequestId } = useMessaging()
 
+  useEffect(() => { document.title = 'CUTLAB — Messages' }, [])
+
   useEffect(() => {
     loadRequests()
   }, [user])
