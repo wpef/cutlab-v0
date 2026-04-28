@@ -10,7 +10,7 @@ import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 export default function Catalog() {
   const navigate = useNavigate()
   const {
-    goToOnboarding, goToCreatorSignup,
+    goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
   } = useOnboarding()
   const { loadRequests, sendContactRequest } = useMessaging()
@@ -21,6 +21,8 @@ export default function Catalog() {
   const [contactMsg, setContactMsg] = useState('')
   const [contactSending, setContactSending] = useState(false)
   const [contactError, setContactError] = useState('')
+
+  useEffect(() => { document.title = 'CUTLAB — Catalogue' }, [])
 
   useEffect(() => {
     async function load() {

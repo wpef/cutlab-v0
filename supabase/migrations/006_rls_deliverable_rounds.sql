@@ -11,7 +11,7 @@ CREATE POLICY "deliverable_rounds_select_parties"
   USING (
     EXISTS (
       SELECT 1 FROM contact_requests cr
-      WHERE cr.id = deliverable_rounds.contact_request_id
+      WHERE cr.id = deliverable_rounds.request_id
         AND (cr.user_id = auth.uid() OR cr.editor_id = auth.uid())
     )
   );
@@ -21,7 +21,7 @@ CREATE POLICY "deliverable_rounds_insert_parties"
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM contact_requests cr
-      WHERE cr.id = deliverable_rounds.contact_request_id
+      WHERE cr.id = deliverable_rounds.request_id
         AND (cr.user_id = auth.uid() OR cr.editor_id = auth.uid())
     )
   );
@@ -31,7 +31,7 @@ CREATE POLICY "deliverable_rounds_update_parties"
   USING (
     EXISTS (
       SELECT 1 FROM contact_requests cr
-      WHERE cr.id = deliverable_rounds.contact_request_id
+      WHERE cr.id = deliverable_rounds.request_id
         AND (cr.user_id = auth.uid() OR cr.editor_id = auth.uid())
     )
   );

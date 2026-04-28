@@ -290,6 +290,8 @@ export default function ProfileEditor() {
     }
   }
 
+  useEffect(() => { document.title = 'CUTLAB — Mon profil' }, [])
+
   useEffect(() => {
     if (user) {
       loadProfile()
@@ -363,10 +365,11 @@ export default function ProfileEditor() {
     const ok = await saveProfile('published')
     setSaveStatus(ok ? 'saved' : 'error')
     if (ok) {
-      toast.success('Profil mis a jour !')
+      toast.success('Profil mis à jour !')
       setTimeout(() => setSaveStatus(null), 3000)
     } else {
       toast.error('Erreur lors de la sauvegarde')
+      setTimeout(() => setSaveStatus(null), 3000)
     }
   }
 
@@ -401,7 +404,7 @@ export default function ProfileEditor() {
           className="editor-preview-toggle"
           onClick={() => setPreviewOpen((v) => !v)}
         >
-          <span>{previewOpen ? '▾' : '▸'} Apercu de ma carte</span>
+          <span>{previewOpen ? '▾' : '▸'} Aperçu de ma carte</span>
           <span className="editor-preview-completion" style={{ color: completionColor }}>{completionPct}%</span>
         </button>
         <AnimatePresence>
@@ -823,7 +826,7 @@ export default function ProfileEditor() {
               {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
             </Button>
             <button className="editor-logout-mobile" onClick={signOut}>
-              Se deconnecter
+              Se déconnecter
             </button>
             <div className="editor-account-actions">
               <button className="editor-account-btn" onClick={handleExportData}>

@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react'
+import { Navigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabase'
 import { toast } from '../../ui/Toast'
 import PageTitle from '../../layout/PageTitle'
+import { useOnboarding } from '../../../context/OnboardingContext'
 
 export default function AdminReports() {
+  const { userRole } = useOnboarding()
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => { document.title = 'CUTLAB — Admin · Signalements' }, [])
+
+  if (userRole !== 'admin') return <Navigate to="/" replace />
 
   useEffect(() => {
     supabase

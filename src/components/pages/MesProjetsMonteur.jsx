@@ -44,6 +44,8 @@ export default function MesProjetsMonteur() {
   const [activeTab, setActiveTab] = useState('available')
   const [projectFilters, setProjectFilters] = useState({})
 
+  useEffect(() => { document.title = 'CUTLAB — Mes projets' }, [])
+
   useEffect(() => {
     if (!user) return
     loadRequests()
@@ -250,7 +252,7 @@ export default function MesProjetsMonteur() {
                                 {a.projects && ` · ${formatBudget(a.projects)}`}
                               </div>
                             </div>
-                            <ProjectStatusBadge status="published" />
+                            <ProjectStatusBadge status={a.status} />
                           </div>
                         </AnimatedItem>
                       ))}

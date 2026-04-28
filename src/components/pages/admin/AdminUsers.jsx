@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react'
+import { Navigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabase'
 import { toast } from '../../ui/Toast'
 import PageTitle from '../../layout/PageTitle'
+import { useOnboarding } from '../../../context/OnboardingContext'
 
 export default function AdminUsers() {
+  const { userRole } = useOnboarding()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => { document.title = 'CUTLAB — Admin · Utilisateurs' }, [])
+
+  if (userRole !== 'admin') return <Navigate to="/" replace />
 
   useEffect(() => {
     supabase
@@ -41,7 +48,7 @@ export default function AdminUsers() {
                 <tr key={u.id} className={u.status === 'suspended' ? 'admin-row--suspended' : ''}>
                   <td>{u.first_name} {u.last_name}</td>
                   <td><span className="admin-badge">{u.role}</span></td>
-                  <td><span className={`admin-badge admin-badge--${u.status}`}>{u.status}</span></td>
+                  <td><span className={`admin-badge admin-badge--${u.status ?? 'unknown'}`}>{u.status}</span></td>
                   <td>{u.assigned_level ?? '—'}</td>
                   <td>{new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
                   <td>
