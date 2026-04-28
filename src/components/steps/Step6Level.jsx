@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { LEVELS } from '../../constants/levels'
 import { computeScoreDetails } from '../../lib/computeLevel'
-import { PRICING_ROWS, PRICING_GRID } from '../../constants/pricing'
+import PricingEditor from '../ui/PricingEditor'
 import ScoreBreakdown from '../ui/ScoreBreakdown'
 import LevelUnlockAnimation from '../ui/LevelUnlockAnimation'
 import StepHeader from '../ui/StepHeader'
@@ -29,7 +29,7 @@ export default function Step6Level() {
   const [loadingText, setLoadingText] = useState('Lecture du profil...')
   const [certifSent,  setCertifSent]  = useState(formData.certificationStatus === 'pending')
   const [showBreakdown, setShowBreakdown] = useState(false)
-  const [customPrices, setCustomPrices] = useState(formData.pricing?.prices ?? {})
+  const [pricing, setPricing] = useState(formData.pricing ?? {})
 
   // Compute score from formData (read-only, no picker)
   const scoreDetails = computeScoreDetails(formData)
@@ -194,33 +194,14 @@ export default function Step6Level() {
         <div className="step6-pricing-section">
           <div className="step6-pricing-title">Configurez vos tarifs</div>
           <p className="step6-pricing-desc">
-            Basé sur votre niveau <strong>{level.name}</strong>, voici votre grille de référence.
-            Vous pouvez ajuster chaque tarif avant publication.
+            Basé sur votre niveau <strong>{level.name}</strong>.
+            Laissez vide pour utiliser la baseline — ajustable depuis votre profil à tout moment.
           </p>
-          <div className="step6-pricing-table">
-            {PRICING_ROWS.map((row) => {
-              const baseline = (PRICING_GRID[levelIndex] ?? PRICING_GRID[0])[row.key]
-              const current = customPrices[row.key] ?? baseline
-              return (
-                <div key={row.key} className="step6-pricing-row">
-                  <span className="step6-pricing-label">{row.label}</span>
-                  <div className="step6-pricing-input-wrap">
-                    <input
-                      type="number"
-                      min={1}
-                      className="step6-pricing-input"
-                      value={current}
-                      onChange={(e) => {
-                        const val = Number(e.target.value) || baseline
-                        setCustomPrices((prev) => ({ ...prev, [row.key]: val }))
-                      }}
-                    />
-                    <span className="step6-pricing-currency">€</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+          <PricingEditor
+            assignedLevel={levelIndex}
+            pricing={pricing}
+            onUpdate={(p) => setPricing(p)}
+          />
         </div>
       )}
 
@@ -228,7 +209,7 @@ export default function Step6Level() {
         <StepNav
           onBack={() => goToStep(5)}
           onNext={() => {
-            updateFormData({ pricing: { prices: customPrices } })
+            updateFormData({ pricing })
             goToStep(7)
           }}
           nextLabel="Voir mon profil →"

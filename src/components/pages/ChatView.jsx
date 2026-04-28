@@ -215,21 +215,6 @@ export default function ChatView() {
           </div>
         )}
 
-        {/* Create offer CTA — shown to both roles when accepted + no offer yet */}
-        {request.status === 'accepted' && offers.length === 0 && (
-          <div className="chat-request-actions">
-            <div style={{ flex: 1, fontSize: 13, color: 'var(--text-muted)' }}>
-              Candidature acceptée — formalisez la collaboration avec une offre.
-            </div>
-            <button
-              className="chat-accept-btn"
-              onClick={() => navigate('/offer/new')}
-            >
-              Créer une offre →
-            </button>
-          </div>
-        )}
-
         {/* Messages + Offers unified chronological timeline */}
         <div className="chat-messages">
           {/* Initial contact message (pinned at top, before timeline) */}

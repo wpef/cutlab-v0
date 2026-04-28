@@ -43,7 +43,10 @@ export function CollabProvider({ children }) {
       return 'candidature_sent'
     }
 
-    return 'offer_sent' // direct contact pending offer
+    // direct contact — derive from request status
+    if (request.status === 'pending') return 'contact_pending'
+    if (request.status === 'accepted') return 'contact_accepted'
+    return 'offer_sent' // fallback
   }
 
   // ─── Data loading ─────────────────────────────────────────────
