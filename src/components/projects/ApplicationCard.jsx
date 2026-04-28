@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
 import { SKILLS, EXPERIENCE_OPTIONS } from '../../constants/options'
 import { LEVELS } from '../../constants/levels'
+import { useOnboarding } from '../../context/OnboardingContext'
 
 export default function ApplicationCard({ application, onAccept, onRefuse }) {
+  const { goToEditorDetail } = useOnboarding()
   const profile = application.profiles || {}
   const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Monteur'
   const level = LEVELS[profile.assigned_level] || LEVELS[0]
@@ -42,16 +44,25 @@ export default function ApplicationCard({ application, onAccept, onRefuse }) {
         {expLabel && <span>{expLabel}</span>}
       </div>
 
-      {isPending && (
-        <div className="application-card-actions">
-          <button className="btn btn-primary" onClick={() => onAccept(application.id)}>
-            Accepter
-          </button>
-          <button className="btn btn-ghost" style={{ color: '#f87171', borderColor: '#f87171' }} onClick={() => onRefuse(application.id)}>
-            Refuser
-          </button>
-        </div>
-      )}
+      <div className="application-card-actions">
+        <button
+          className="btn btn-ghost"
+          style={{ fontSize: 12, padding: '6px 12px' }}
+          onClick={() => goToEditorDetail(profile.id)}
+        >
+          Voir le profil →
+        </button>
+        {isPending && (
+          <>
+            <button className="btn btn-primary" onClick={() => onAccept(application.id)}>
+              Accepter
+            </button>
+            <button className="btn btn-ghost" style={{ color: '#f87171', borderColor: '#f87171' }} onClick={() => onRefuse(application.id)}>
+              Refuser
+            </button>
+          </>
+        )}
+      </div>
 
       {application.status === 'accepted' && (
         <div style={{ textAlign: 'center', color: '#4ade80', fontSize: 13, fontWeight: 600 }}>Acceptée</div>

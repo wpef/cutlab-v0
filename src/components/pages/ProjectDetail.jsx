@@ -184,24 +184,30 @@ export default function ProjectDetail() {
         </div>
       )}
 
+      {/* Budget + dates hero */}
+      <div className="project-detail-hero">
+        <div className="project-detail-hero-item">
+          <div className="project-detail-hero-label">Budget</div>
+          <div className="project-detail-hero-value">{formatBudget(project)}</div>
+        </div>
+        {project.deadline && (
+          <div className="project-detail-hero-item">
+            <div className="project-detail-hero-label">Date limite</div>
+            <div className="project-detail-hero-value">{formatDate(project.deadline)}</div>
+          </div>
+        )}
+        {project.start_date && (
+          <div className="project-detail-hero-item">
+            <div className="project-detail-hero-label">Début souhaité</div>
+            <div className="project-detail-hero-value">{formatDate(project.start_date)}</div>
+          </div>
+        )}
+      </div>
+
       {/* Key info grid */}
       <div className="project-detail-section">
         <div className="project-detail-section-title">Détails</div>
         <div className="project-detail-grid">
-          <div className="project-detail-field">
-            <div className="project-detail-field-label">Budget</div>
-            <div className="project-detail-field-value">{formatBudget(project)}</div>
-          </div>
-          <div className="project-detail-field">
-            <div className="project-detail-field-label">Date limite</div>
-            <div className="project-detail-field-value">{formatDate(project.deadline)}</div>
-          </div>
-          {project.start_date && (
-            <div className="project-detail-field">
-              <div className="project-detail-field-label">Date de début</div>
-              <div className="project-detail-field-value">{formatDate(project.start_date)}</div>
-            </div>
-          )}
           {project.content_format && (
             <div className="project-detail-field">
               <div className="project-detail-field-label">Format</div>
@@ -232,22 +238,6 @@ export default function ProjectDetail() {
               <div className="project-detail-field-value">{project.revision_count}</div>
             </div>
           )}
-          {project.video_count && (
-            <div className="project-detail-field">
-              <div className="project-detail-field-label">Nb vidéos</div>
-              <div className="project-detail-field-value">{project.video_count}</div>
-            </div>
-          )}
-          {project.video_duration && (
-            <div className="project-detail-field">
-              <div className="project-detail-field-label">Durée par vidéo</div>
-              <div className="project-detail-field-value">{project.video_duration}</div>
-            </div>
-          )}
-          <div className="project-detail-field">
-            <div className="project-detail-field-label">Miniature</div>
-            <div className="project-detail-field-value">{project.thumbnail_included ? 'Oui' : 'Non'}</div>
-          </div>
         </div>
       </div>
 
@@ -257,14 +247,6 @@ export default function ProjectDetail() {
           <div className="project-detail-section-title">Niches</div>
           <div className="project-detail-tags">
             {project.niches.map((n) => <span key={n} className="project-detail-tag">{n}</span>)}
-          </div>
-        </div>
-      )}
-      {project.preferred_software?.length > 0 && (
-        <div className="project-detail-section">
-          <div className="project-detail-section-title">Logiciels</div>
-          <div className="project-detail-tags">
-            {project.preferred_software.map((s) => <span key={s} className="project-detail-tag">{s}</span>)}
           </div>
         </div>
       )}

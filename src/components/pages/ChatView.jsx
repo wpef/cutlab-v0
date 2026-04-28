@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
@@ -15,6 +15,7 @@ function formatTime(iso) {
 
 export default function ChatView() {
   const { id: urlId } = useParams()
+  const navigate = useNavigate()
   const { goToMessaging, goToEditorDetail, goToProjectDetail, userRole, user } = useOnboarding()
   const {
     activeRequestId, setActiveRequestId, requests,
@@ -210,6 +211,21 @@ export default function ChatView() {
             </button>
             <button className="chat-refuse-btn" onClick={handleRefuse} disabled={actionLoading}>
               ✗ Refuser
+            </button>
+          </div>
+        )}
+
+        {/* Create offer CTA — shown to both roles when accepted + no offer yet */}
+        {request.status === 'accepted' && offers.length === 0 && (
+          <div className="chat-request-actions">
+            <div style={{ flex: 1, fontSize: 13, color: 'var(--text-muted)' }}>
+              Candidature acceptée — formalisez la collaboration avec une offre.
+            </div>
+            <button
+              className="chat-accept-btn"
+              onClick={() => navigate('/offer/new')}
+            >
+              Créer une offre →
             </button>
           </div>
         )}
