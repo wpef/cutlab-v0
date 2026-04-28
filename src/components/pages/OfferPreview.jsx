@@ -107,10 +107,17 @@ export default function OfferPreview() {
         )}
 
         {/* Deliverables */}
-        {offer.deliverables && (
+        {offer.deliverables?.length > 0 && (
           <div className="offer-doc-section">
             <div className="offer-doc-section-label">Livrables attendus</div>
-            <div className="offer-doc-section-value" style={{ whiteSpace: 'pre-wrap' }}>{offer.deliverables}</div>
+            <div className="offer-doc-section-value">
+              {Array.isArray(offer.deliverables)
+                ? offer.deliverables.map((d, i) => (
+                    <div key={i}>{d.quantity}× {d.type}{d.duration ? ` (${d.duration})` : ''}</div>
+                  ))
+                : offer.deliverables
+              }
+            </div>
           </div>
         )}
 
