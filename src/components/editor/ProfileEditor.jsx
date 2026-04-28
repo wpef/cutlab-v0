@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
@@ -211,6 +212,33 @@ export default function ProfileEditor() {
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [avatarUploadError, setAvatarUploadError] = useState(null)
   const [avatarUploadSuccess, setAvatarUploadSuccess] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
+
+  async function handleExportData() {
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    const { data: requests } = await supabase.from('contact_requests').select('*').eq('user_id', user.id)
+    const blob = new Blob([JSON.stringify({ profile, contact_requests: requests }, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = 'cutlab-my-data.json'; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleDeleteAccount() {
+    if (!window.confirm('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')) return
+    setDeletingAccount(true)
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    })
+    if (res.ok) {
+      await signOut()
+    } else {
+      setDeletingAccount(false)
+      alert('Erreur lors de la suppression. Contactez privacy@cutlab.io.')
+    }
+  }
   const [previewOpen, setPreviewOpen] = useState(false)
   const [clipUploading, setClipUploading] = useState(false)
   const [clipUploadError, setClipUploadError] = useState(null)
@@ -797,6 +825,14 @@ export default function ProfileEditor() {
             <button className="editor-logout-mobile" onClick={signOut}>
               Se deconnecter
             </button>
+            <div className="editor-account-actions">
+              <button className="editor-account-btn" onClick={handleExportData}>
+                Exporter mes données (JSON)
+              </button>
+              <button className="editor-account-btn editor-account-btn--danger" onClick={handleDeleteAccount} disabled={deletingAccount}>
+                {deletingAccount ? 'Suppression...' : 'Supprimer mon compte'}
+              </button>
+            </div>
           </div>
 
         </div>

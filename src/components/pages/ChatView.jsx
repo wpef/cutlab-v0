@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { useCollab } from '../../context/CollabContext'
@@ -58,22 +59,28 @@ export default function ChatView() {
   // Show whenever request exists (even pending), but tracker renders contextually
   const showTracker = !!request
 
-  // Initial load + polling every 5s
+  // Initial load
   useEffect(() => {
     if (!requestId) return
     loadRequests()
     fetchMessages(requestId)
     loadOffers(requestId)
     loadCollabData(requestId)
+  }, [requestId])
 
-    const interval = setInterval(() => {
-      fetchMessages(requestId)
-      loadOffers(requestId)
-      loadCollabData(requestId)
-      loadRequests()
-    }, 5000)
-
-    return () => clearInterval(interval)
+  // Realtime: new messages trigger a fetch instead of polling 5s
+  useEffect(() => {
+    if (!requestId) return
+    const channel = supabase
+      .channel(`messages:${requestId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `contact_request_id=eq.${requestId}`,
+      }, () => fetchMessages(requestId))
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [requestId])
 
   // Scroll to bottom when messages change

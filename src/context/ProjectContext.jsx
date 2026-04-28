@@ -415,12 +415,20 @@ export function ProjectProvider({ children }) {
     setUnreadCount(0)
   }, [user])
 
-  // Polling: fetch unread count every 30s
+  // Realtime: react to new notifications instead of polling
   useEffect(() => {
     if (!user) return
     fetchUnreadCount()
-    pollRef.current = setInterval(fetchUnreadCount, 30000)
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => fetchUnreadCount())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [user, fetchUnreadCount])
 
   // Auto-reset on logout (user becomes null)
@@ -438,7 +446,7 @@ export function ProjectProvider({ children }) {
     setMyApplications([])
     setNotifications([])
     setUnreadCount(0)
-    if (pollRef.current) clearInterval(pollRef.current)
+    if (pollRef.current) clearInterval(pollRef.current) // legacy cleanup
   }, [])
 
   return (
