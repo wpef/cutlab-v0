@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
+import { MockupOnboarding } from '../../mockups'
 
 export default function LandingEtudiantAudiovisuel() {
   return (
@@ -16,11 +17,15 @@ export default function LandingEtudiantAudiovisuel() {
         </h1>
         <p>
           Tu sors de formation, tu maîtrises Premiere ou DaVinci, mais tu n'as pas encore de
-          clients. CUTLAB t'offre une vitrine gratuite pour commencer.
+          clients. CUTLAB t'offre une vitrine pour te faire trouver.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Commencer gratuitement →
+          Lancer mon profil →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupOnboarding />
       </section>
 
       <div className="persona-divider" />
@@ -92,7 +97,7 @@ export default function LandingEtudiantAudiovisuel() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Inscris-toi gratuitement</h3>
+              <h3>Inscris-toi</h3>
               <p>Crée ton compte en 2 minutes. Email et mot de passe, c'est tout.</p>
             </div>
           </li>
@@ -124,12 +129,12 @@ export default function LandingEtudiantAudiovisuel() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Niveau adapté</span>
+            <span className="persona-stat-label">À ton expérience</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">Vitrine</span>
+            <span className="persona-stat-label">Pour se faire trouver</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">10 min</span>
@@ -142,9 +147,9 @@ export default function LandingEtudiantAudiovisuel() {
 
       <section className="persona-cta-section">
         <h2>Prêt à lancer ta carrière ?</h2>
-        <p>Inscription gratuite, profil guidé, premiers clients. C'est le moment.</p>
+        <p>Inscription rapide, profil guidé, premiers clients. C'est le moment.</p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Commencer gratuitement →
+          Lancer mon profil →
         </Link>
       </section>
     </div>

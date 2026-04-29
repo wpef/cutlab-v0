@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupChat } from '../../mockups'
 
 export default function LandingCoachEntrepreneur() {
   return (
@@ -23,6 +24,10 @@ export default function LandingCoachEntrepreneur() {
         <Link to="/catalog" className="persona-hero-cta">
           Trouver mon monteur →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupChat />
       </section>
 
       <div className="persona-divider" />
@@ -131,12 +136,12 @@ export default function LandingCoachEntrepreneur() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Brief structuré</span>
+            <span className="persona-stat-label">Pas de devis flou</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">Vérifiés</span>
+            <span className="persona-stat-label">Profils</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">15 min</span>
@@ -149,7 +154,7 @@ export default function LandingCoachEntrepreneur() {
 
       <section className="persona-cta-section">
         <h2>Prêt à professionnaliser votre contenu ?</h2>
-        <p>Trouvez un monteur fiable et expérimenté. Sans agence, sans commission.</p>
+        <p>Trouvez un monteur fiable et expérimenté. Sans agence, sans intermédiaire.</p>
         <Link to="/catalog">Trouver mon monteur →</Link>
       </section>
     </div>

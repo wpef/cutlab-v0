@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupCatalog } from '../../mockups'
 
 export default function LandingPodcasteur() {
   return (
@@ -23,6 +24,10 @@ export default function LandingPodcasteur() {
         <Link to="/catalog" className="persona-hero-cta">
           Trouver mon monteur →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupCatalog />
       </section>
 
       <div className="persona-divider" />
@@ -131,12 +136,12 @@ export default function LandingPodcasteur() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Multi-format</span>
+            <span className="persona-stat-label">1 brief, X livrables</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">Direct</span>
+            <span className="persona-stat-label">Sans intermédiaire</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">10x</span>

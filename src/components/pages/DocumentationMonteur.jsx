@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import SEO from '../seo/SEO'
 import { SEO_CONFIG } from '../seo/seoConfig'
+import { MockupOnboarding, MockupLevels, MockupPricing, MockupPipeline, MockupChat } from '../mockups'
 
 export default function DocumentationMonteur() {
   return (
@@ -32,7 +33,7 @@ export default function DocumentationMonteur() {
           <h2>Introduction</h2>
           <p>
             CUTLAB vous connecte directement avec des créateurs de contenu à la recherche de monteurs vidéo professionnels.
-            Pas de commission, pas d'intermédiaire. Vous créez votre profil, les créateurs vous trouvent.
+            Pas d'intermédiaire, contact direct. Vous créez votre profil, les créateurs vous trouvent.
           </p>
           <p>
             La plateforme est conçue pour valoriser votre expertise : un système de niveaux automatique met en avant votre
@@ -137,6 +138,9 @@ export default function DocumentationMonteur() {
               </p>
             </div>
           </div>
+          <div className="doc-mockup-wrap">
+            <MockupOnboarding />
+          </div>
         </section>
 
         {/* Mon profil */}
@@ -196,6 +200,9 @@ export default function DocumentationMonteur() {
               </p>
             </div>
           </div>
+          <div className="doc-mockup-wrap">
+            <MockupLevels />
+          </div>
         </section>
 
         {/* Tarifs */}
@@ -226,6 +233,9 @@ export default function DocumentationMonteur() {
             page profil détaillée. Les tarifs ne sont jamais imposés : ils servent de point de départ à la négociation
             lors de chaque proposition de mission.
           </p>
+          <div className="doc-mockup-wrap">
+            <MockupPricing />
+          </div>
         </section>
 
         {/* Recevoir des demandes */}
@@ -270,6 +280,9 @@ export default function DocumentationMonteur() {
             L'onglet Messagerie liste l'ensemble de vos conversations actives avec un aperçu du dernier message et
             un indicateur de messages non lus.
           </p>
+          <div className="doc-mockup-wrap">
+            <MockupChat />
+          </div>
         </section>
 
         {/* Pipeline */}
@@ -289,6 +302,9 @@ export default function DocumentationMonteur() {
             Le pipeline vous aide à ne jamais perdre de vue l'état de vos engagements en cours et à gérer votre charge
             de travail sereinement. Il est accessible depuis l'onglet <strong>Pipeline</strong> dans la barre de navigation.
           </p>
+          <div className="doc-mockup-wrap">
+            <MockupPipeline />
+          </div>
         </section>
 
         {/* Mes projets */}
@@ -313,8 +329,8 @@ export default function DocumentationMonteur() {
         {/* CTA */}
         <div className="doc-cta">
           <h2>Prêt à rejoindre le catalogue ?</h2>
-          <p>Inscrivez-vous gratuitement et commencez à recevoir des demandes de créateurs.</p>
-          <Link to="/onboarding/1" className="doc-cta-btn">S'inscrire gratuitement →</Link>
+          <p>Créez votre profil en quelques minutes et commencez à recevoir des demandes de créateurs.</p>
+          <Link to="/onboarding/1" className="doc-cta-btn">Créer mon profil →</Link>
         </div>
       </div>
     </div>

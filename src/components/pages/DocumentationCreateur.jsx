@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import SEO from '../seo/SEO'
 import { SEO_CONFIG } from '../seo/seoConfig'
+import { MockupCatalog, MockupChat, MockupProject } from '../mockups'
 
 export default function DocumentationCreateur() {
   return (
@@ -34,7 +35,7 @@ export default function DocumentationCreateur() {
           </p>
           <p>
             Le principe est simple : parcourez les profils de monteurs, comparez leurs compétences et leurs tarifs,
-            puis contactez directement celui qui vous correspond. Aucun intermédiaire, aucune commission cachée —
+            puis contactez directement celui qui vous correspond. Aucun intermédiaire —
             la relation est directe entre vous et le monteur.
           </p>
           <div className="doc-feature-grid">
@@ -51,8 +52,8 @@ export default function DocumentationCreateur() {
               <p>Échangez en messagerie privée et recevez des propositions structurées.</p>
             </div>
             <div className="doc-feature-card">
-              <strong>Sans commission</strong>
-              <p>CUTLAB ne prélève aucune commission sur vos transactions avec les monteurs.</p>
+              <strong>Contact direct</strong>
+              <p>Vous échangez directement avec le monteur, sans intermédiaire qui filtre les conversations.</p>
             </div>
           </div>
         </div>
@@ -81,6 +82,9 @@ export default function DocumentationCreateur() {
             la grille tarifaire complète détaillant ses prix pour chaque type de prestation (montage court,
             montage long, motion design, miniature, etc.).
           </p>
+          <div className="doc-mockup-wrap">
+            <MockupCatalog />
+          </div>
         </div>
 
         {/* Contacter un monteur */}
@@ -149,6 +153,9 @@ export default function DocumentationCreateur() {
             Une fois publié, votre projet apparaît dans l'onglet "Mes projets" où vous pouvez suivre
             les candidatures reçues et gérer leur statut.
           </p>
+          <div className="doc-mockup-wrap">
+            <MockupProject />
+          </div>
         </div>
 
         {/* Messagerie */}
@@ -182,6 +189,9 @@ export default function DocumentationCreateur() {
             depuis la conversation. En cas de refus, vous pouvez continuer à discuter pour affiner les
             conditions avant qu'une nouvelle offre soit soumise.
           </p>
+          <div className="doc-mockup-wrap">
+            <MockupChat />
+          </div>
         </div>
 
         {/* Gérer mes projets */}
@@ -244,8 +254,8 @@ export default function DocumentationCreateur() {
           </p>
           <p>
             Le budget final d'un projet est toujours convenu directement entre vous et le monteur via
-            la messagerie. <strong>CUTLAB ne prélève aucune commission sur les transactions</strong> — le
-            montant que vous négociez est celui que le monteur perçoit intégralement.
+            la messagerie. <strong>CUTLAB facilite la mise en relation et la gestion de projet.</strong> Les
+            transactions se font directement entre vous et le monteur.
           </p>
         </div>
 

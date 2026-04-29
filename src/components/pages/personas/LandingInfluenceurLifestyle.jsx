@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupCatalog } from '../../mockups'
 
 export default function LandingInfluenceurLifestyle() {
   return (
@@ -16,6 +17,12 @@ export default function LandingInfluenceurLifestyle() {
         <p>YouTube, Reels, TikTok — ton contenu doit être impeccable partout. CUTLAB te connecte avec des monteurs qui maîtrisent ton aesthetic.</p>
         <Link to="/catalog" className="persona-hero-cta">Trouver mon monteur →</Link>
       </section>
+
+      <section className="persona-mockup-section">
+        <MockupCatalog />
+      </section>
+
+      <div className="persona-divider" />
 
       {/* Pain points */}
       <section className="persona-section">
@@ -95,12 +102,12 @@ export default function LandingInfluenceurLifestyle() {
       {/* Stats */}
       <div className="persona-stat-row">
         <div className="persona-stat">
-          <span className="persona-stat-value">100%</span>
-          <span className="persona-stat-label">Gratuit</span>
+          <span className="persona-stat-value">Multi-format</span>
+          <span className="persona-stat-label">1 brief, X livrables</span>
         </div>
         <div className="persona-stat">
-          <span className="persona-stat-value">0%</span>
-          <span className="persona-stat-label">Commission</span>
+          <span className="persona-stat-value">Direct</span>
+          <span className="persona-stat-label">Sans intermédiaire</span>
         </div>
         <div className="persona-stat">
           <span className="persona-stat-value">15 min</span>
@@ -113,7 +120,7 @@ export default function LandingInfluenceurLifestyle() {
       {/* Bottom CTA */}
       <section className="persona-cta-section">
         <h2>Prêt(e) à élever ton contenu ?</h2>
-        <p>Trouve un monteur qui comprend ton univers. Gratuit, direct, sans intermédiaire.</p>
+        <p>Trouve un monteur qui comprend ton univers. Direct, sans intermédiaire.</p>
         <Link to="/catalog" className="persona-hero-cta">Parcourir les monteurs →</Link>
       </section>
     </div>

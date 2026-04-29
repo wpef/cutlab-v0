@@ -70,7 +70,7 @@ export default function Landing() {
             <h1>Trouvez un projet bien payé.</h1>
             <p>Rejoins le catalogue. Les créateurs te contactent directement.</p>
             <button className="landing-btn landing-btn--dark" onClick={goToOnboarding}>
-              S'inscrire gratuitement →
+              Créer mon profil monteur →
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupOnboarding } from '../../mockups'
 
 export default function LandingFreelanceYoutube() {
   return (
@@ -17,6 +18,12 @@ export default function LandingFreelanceYoutube() {
         <Link to="/onboarding/1" className="persona-hero-cta">Rejoindre le catalogue →</Link>
       </section>
 
+      <section className="persona-mockup-section">
+        <MockupOnboarding />
+      </section>
+
+      <div className="persona-divider" />
+
       {/* Pain points */}
       <section className="persona-section">
         <h2>Ce que tu vis au quotidien</h2>
@@ -27,7 +34,7 @@ export default function LandingFreelanceYoutube() {
           </div>
           <div className="persona-pain-item">
             <span className="persona-pain-icon">💸</span>
-            <span className="persona-pain-text">Les plateformes prennent 10 à 20% de commission sur chaque mission.</span>
+            <span className="persona-pain-text">Tes tarifs sont tirés vers le bas par la course au moins-disant des marketplaces.</span>
           </div>
           <div className="persona-pain-item">
             <span className="persona-pain-icon">🤷</span>
@@ -55,9 +62,9 @@ export default function LandingFreelanceYoutube() {
             <p>Skills, portfolio, niveau, tarifs, formats, niches — tout est visible. Les créateurs savent ce qu'ils trouvent.</p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">🚫</span>
-            <h3>0% commission</h3>
-            <p>CUTLAB ne prend aucune commission. Ce que le créateur paye, c'est ce que tu reçois.</p>
+            <span className="persona-feature-icon">🌟</span>
+            <h3>Visibilité dédiée</h3>
+            <p>Un catalogue 100% montage vidéo. Ton profil s'adresse aux créateurs qui cherchent exactement ce que tu fais.</p>
           </div>
         </div>
       </section>
@@ -95,12 +102,12 @@ export default function LandingFreelanceYoutube() {
       {/* Stats */}
       <div className="persona-stat-row">
         <div className="persona-stat">
-          <span className="persona-stat-value">100%</span>
-          <span className="persona-stat-label">Gratuit</span>
+          <span className="persona-stat-value">Catalogue</span>
+          <span className="persona-stat-label">100% montage</span>
         </div>
         <div className="persona-stat">
-          <span className="persona-stat-value">0%</span>
-          <span className="persona-stat-label">Commission</span>
+          <span className="persona-stat-value">Profil complet</span>
+          <span className="persona-stat-label">Skills, niveau, tarifs</span>
         </div>
         <div className="persona-stat">
           <span className="persona-stat-value">7 étapes</span>
@@ -113,8 +120,8 @@ export default function LandingFreelanceYoutube() {
       {/* Bottom CTA */}
       <section className="persona-cta-section">
         <h2>Prêt à recevoir des demandes ?</h2>
-        <p>Rejoins le catalogue CUTLAB. Inscription gratuite, 0 commission, créateurs qui viennent à toi.</p>
-        <Link to="/onboarding/1" className="persona-hero-cta">S'inscrire gratuitement →</Link>
+        <p>Rejoins le catalogue CUTLAB. Inscription rapide, créateurs qui viennent à toi.</p>
+        <Link to="/onboarding/1" className="persona-hero-cta">Lancer mon profil →</Link>
       </section>
     </div>
   )

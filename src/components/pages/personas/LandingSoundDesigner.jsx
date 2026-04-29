@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
+import { MockupPricing } from '../../mockups'
 
 export default function LandingSoundDesigner() {
   return (
@@ -23,6 +24,10 @@ export default function LandingSoundDesigner() {
         <Link to="/onboarding/1" className="persona-hero-cta">
           Créer mon profil →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupPricing />
       </section>
 
       <div className="persona-divider" />
@@ -132,12 +137,12 @@ export default function LandingSoundDesigner() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Vitrine</span>
+            <span className="persona-stat-label">Pour se faire trouver</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">7</span>
+            <span className="persona-stat-label">Niveaux</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">Audio</span>

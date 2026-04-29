@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupChat } from '../../mockups'
 
 export default function LandingFormateurEnLigne() {
   return (
@@ -22,6 +23,10 @@ export default function LandingFormateurEnLigne() {
         <Link to="/catalog" className="persona-hero-cta">
           Trouver mon monteur →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupChat />
       </section>
 
       <div className="persona-divider" />
@@ -131,12 +136,12 @@ export default function LandingFormateurEnLigne() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Pédagogie</span>
+            <span className="persona-stat-label">Monteurs spécialisés</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">Sans agence</span>
+            <span className="persona-stat-label">Direct freelance</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">5K€</span>
@@ -151,7 +156,7 @@ export default function LandingFormateurEnLigne() {
         <h2>Prêt à industrialiser votre catalogue ?</h2>
         <p>
           Trouvez un monteur expert en contenu pédagogique. Sans agence, sans abonnement,
-          sans commission.
+          sans intermédiaire.
         </p>
         <Link to="/catalog">Parcourir les monteurs →</Link>
       </section>

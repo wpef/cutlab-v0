@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
+import { MockupOnboarding } from '../../mockups'
 
 export default function LandingMonteurReconverti() {
   return (
@@ -20,8 +21,12 @@ export default function LandingMonteurReconverti() {
           des opportunités sans avoir 5 ans d'expérience.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Commencer gratuitement →
+          Lancer mon profil →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupOnboarding />
       </section>
 
       <div className="persona-divider" />
@@ -94,7 +99,7 @@ export default function LandingMonteurReconverti() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Inscris-toi gratuitement</h3>
+              <h3>Inscris-toi</h3>
               <p>Compte créé en 2 minutes. L'onboarding te guide étape par étape.</p>
             </div>
           </li>
@@ -125,12 +130,12 @@ export default function LandingMonteurReconverti() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Niveau adapté</span>
+            <span className="persona-stat-label">À ton expérience</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">Vitrine</span>
+            <span className="persona-stat-label">Pour se faire trouver</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">10 min</span>
@@ -148,7 +153,7 @@ export default function LandingMonteurReconverti() {
           chance.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Commencer gratuitement →
+          Lancer mon profil →
         </Link>
       </section>
     </div>

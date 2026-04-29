@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupPipeline } from '../../mockups'
 
 export default function LandingYoutubeurGaming() {
   return (
@@ -16,6 +17,12 @@ export default function LandingYoutubeurGaming() {
         <p>Tu passes plus de temps à monter qu'à créer. CUTLAB te connecte avec des monteurs spécialisés gaming pour scaler ton contenu sans sacrifier la qualité.</p>
         <Link to="/catalog" className="persona-hero-cta">Trouver mon monteur →</Link>
       </section>
+
+      <section className="persona-mockup-section">
+        <MockupPipeline />
+      </section>
+
+      <div className="persona-divider" />
 
       {/* Pain points */}
       <section className="persona-section">
@@ -95,12 +102,12 @@ export default function LandingYoutubeurGaming() {
       {/* Stats */}
       <div className="persona-stat-row">
         <div className="persona-stat">
-          <span className="persona-stat-value">100%</span>
-          <span className="persona-stat-label">Gratuit</span>
+          <span className="persona-stat-value">Pipeline</span>
+          <span className="persona-stat-label">Suivi visuel</span>
         </div>
         <div className="persona-stat">
-          <span className="persona-stat-value">0%</span>
-          <span className="persona-stat-label">Commission</span>
+          <span className="persona-stat-value">Vérifiés</span>
+          <span className="persona-stat-label">Profils</span>
         </div>
         <div className="persona-stat">
           <span className="persona-stat-value">15 min</span>
@@ -113,7 +120,7 @@ export default function LandingYoutubeurGaming() {
       {/* Bottom CTA */}
       <section className="persona-cta-section">
         <h2>Prêt à scaler ton contenu ?</h2>
-        <p>Trouve un monteur gaming qui comprend tes codes. Gratuit, sans commission.</p>
+        <p>Trouve un monteur gaming qui comprend tes codes. Direct, sans intermédiaire.</p>
         <Link to="/catalog" className="persona-hero-cta">Parcourir les monteurs →</Link>
       </section>
     </div>

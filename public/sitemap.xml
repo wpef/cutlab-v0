@@ -101,6 +101,26 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://cutlab.io/vs/fiverr</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cutlab.io/vs/malt</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cutlab.io/vs/upwork</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cutlab.io/vs/agences-video</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cutlab.io/legal/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

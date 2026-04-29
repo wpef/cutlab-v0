@@ -52,6 +52,10 @@ const LandingSpecialisteShorts = lazy(() => import('./components/pages/personas/
 const LandingMonteurAgence = lazy(() => import('./components/pages/personas/LandingMonteurAgence'))
 const LandingSoundDesigner = lazy(() => import('./components/pages/personas/LandingSoundDesigner'))
 const LandingColorist = lazy(() => import('./components/pages/personas/LandingColorist'))
+const ComparisonFiverr = lazy(() => import('./components/pages/comparisons/ComparisonFiverr'))
+const ComparisonMalt = lazy(() => import('./components/pages/comparisons/ComparisonMalt'))
+const ComparisonUpwork = lazy(() => import('./components/pages/comparisons/ComparisonUpwork'))
+const ComparisonAgences = lazy(() => import('./components/pages/comparisons/ComparisonAgences'))
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -174,6 +178,12 @@ export default function App() {
       <Route path="/pour/monteur-agence" element={<LandingMonteurAgence />} />
       <Route path="/pour/sound-designer" element={<LandingSoundDesigner />} />
       <Route path="/pour/colorist" element={<LandingColorist />} />
+
+      {/* Comparison landing pages — public, dedicated */}
+      <Route path="/vs/fiverr" element={<ComparisonFiverr />} />
+      <Route path="/vs/malt" element={<ComparisonMalt />} />
+      <Route path="/vs/upwork" element={<ComparisonUpwork />} />
+      <Route path="/vs/agences-video" element={<ComparisonAgences />} />
 
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />

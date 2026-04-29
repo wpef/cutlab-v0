@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
+import { MockupLevels } from '../../mockups'
 
 export default function LandingMonteurAgence() {
   return (
@@ -22,6 +23,10 @@ export default function LandingMonteurAgence() {
         <Link to="/onboarding/1" className="persona-hero-cta">
           Rejoindre le catalogue →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupLevels />
       </section>
 
       <div className="persona-divider" />
@@ -132,12 +137,12 @@ export default function LandingMonteurAgence() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Sans agence</span>
+            <span className="persona-stat-label">Direct freelance</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">7</span>
+            <span className="persona-stat-label">Niveaux</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">Toi</span>

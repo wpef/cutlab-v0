@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupProject } from '../../mockups'
 
 export default function LandingAgencePme() {
   return (
@@ -23,6 +24,10 @@ export default function LandingAgencePme() {
         <Link to="/catalog" className="persona-hero-cta">
           Parcourir les monteurs →
         </Link>
+      </section>
+
+      <section className="persona-mockup-section">
+        <MockupProject />
       </section>
 
       <div className="persona-divider" />
@@ -133,12 +138,12 @@ export default function LandingAgencePme() {
       <section className="persona-section">
         <div className="persona-stat-row">
           <div className="persona-stat">
-            <span className="persona-stat-value">100%</span>
-            <span className="persona-stat-label">Gratuit</span>
+            <span className="persona-stat-value">Brief structuré</span>
+            <span className="persona-stat-label">Pas de devis flou</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">0%</span>
-            <span className="persona-stat-label">Commission</span>
+            <span className="persona-stat-value">Vérifiés</span>
+            <span className="persona-stat-label">Profils</span>
           </div>
           <div className="persona-stat">
             <span className="persona-stat-value">70%</span>
@@ -153,7 +158,7 @@ export default function LandingAgencePme() {
         <h2>Prêt à externaliser intelligemment ?</h2>
         <p>
           Trouvez votre prestataire vidéo à la demande. Sans engagement, sans agence,
-          sans commission.
+          sans intermédiaire.
         </p>
         <Link to="/catalog">Parcourir les monteurs →</Link>
       </section>

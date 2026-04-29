@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
+import { MockupPipeline } from '../../mockups'
 
 export default function LandingStreamerTwitch() {
   return (
@@ -16,6 +17,12 @@ export default function LandingStreamerTwitch() {
         <p>Tes meilleurs moments dorment dans tes VODs. Un monteur transforme tes lives en highlights, en shorts viraux, et en contenu YouTube qui drive du nouveau public.</p>
         <Link to="/catalog" className="persona-hero-cta">Trouver mon monteur →</Link>
       </section>
+
+      <section className="persona-mockup-section">
+        <MockupPipeline />
+      </section>
+
+      <div className="persona-divider" />
 
       {/* Pain points */}
       <section className="persona-section">
@@ -95,12 +102,12 @@ export default function LandingStreamerTwitch() {
       {/* Stats */}
       <div className="persona-stat-row">
         <div className="persona-stat">
-          <span className="persona-stat-value">100%</span>
-          <span className="persona-stat-label">Gratuit</span>
+          <span className="persona-stat-value">Highlights</span>
+          <span className="persona-stat-label">VOD → Shorts</span>
         </div>
         <div className="persona-stat">
-          <span className="persona-stat-value">0%</span>
-          <span className="persona-stat-label">Commission</span>
+          <span className="persona-stat-value">Pipeline</span>
+          <span className="persona-stat-label">Suivi visuel</span>
         </div>
         <div className="persona-stat">
           <span className="persona-stat-value">5x</span>
