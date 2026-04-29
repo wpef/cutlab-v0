@@ -34,6 +34,14 @@ const MyProjects       = lazy(() => import('./components/pages/MyProjects'))
 const ProfileEditor    = lazy(() => import('./components/editor/ProfileEditor'))
 const MesProjetsMonteur = lazy(() => import('./components/pages/MesProjetsMonteur'))
 const EditorPipeline   = lazy(() => import('./components/pages/EditorPipeline'))
+const DocumentationMonteur = lazy(() => import('./components/pages/DocumentationMonteur'))
+const DocumentationCreateur = lazy(() => import('./components/pages/DocumentationCreateur'))
+const LandingYoutubeurGaming = lazy(() => import('./components/pages/personas/LandingYoutubeurGaming'))
+const LandingInfluenceurLifestyle = lazy(() => import('./components/pages/personas/LandingInfluenceurLifestyle'))
+const LandingCoachEntrepreneur = lazy(() => import('./components/pages/personas/LandingCoachEntrepreneur'))
+const LandingFreelanceYoutube = lazy(() => import('./components/pages/personas/LandingFreelanceYoutube'))
+const LandingMotionDesigner = lazy(() => import('./components/pages/personas/LandingMotionDesigner'))
+const LandingEtudiantAudiovisuel = lazy(() => import('./components/pages/personas/LandingEtudiantAudiovisuel'))
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -134,6 +142,18 @@ export default function App() {
       {/* Legal pages — always public */}
       <Route path="/legal/privacy" element={<LegalPrivacy />} />
       <Route path="/legal/terms" element={<LegalTerms />} />
+
+      {/* Documentation — public */}
+      <Route path="/guide/monteur" element={<DocumentationMonteur />} />
+      <Route path="/guide/createur" element={<DocumentationCreateur />} />
+
+      {/* Persona landing pages — public, dedicated */}
+      <Route path="/pour/youtubeur-gaming" element={<LandingYoutubeurGaming />} />
+      <Route path="/pour/influenceur-lifestyle" element={<LandingInfluenceurLifestyle />} />
+      <Route path="/pour/coach-entrepreneur" element={<LandingCoachEntrepreneur />} />
+      <Route path="/pour/freelance-youtube" element={<LandingFreelanceYoutube />} />
+      <Route path="/pour/motion-designer" element={<LandingMotionDesigner />} />
+      <Route path="/pour/etudiant-audiovisuel" element={<LandingEtudiantAudiovisuel />} />
 
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />

@@ -8,6 +8,7 @@
  * Three demo buttons let visitors test the app without creating a real account.
  */
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_CREATOR_EMAIL, DEMO_CREATOR_PASSWORD } from '../../lib/demoData'
 
@@ -101,6 +102,14 @@ export default function Landing() {
           >
             {demoLoading === 'onboarding' ? '...' : 'Tester l\'onboarding'}
           </button>
+        </div>
+      </div>
+
+      <div className="landing-guides">
+        <div className="landing-guides-label">Guides d'utilisation</div>
+        <div className="landing-guides-links">
+          <Link to="/guide/monteur">Guide monteur →</Link>
+          <Link to="/guide/createur">Guide créateur →</Link>
         </div>
       </div>
     </div>
