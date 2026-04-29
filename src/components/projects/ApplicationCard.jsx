@@ -48,7 +48,7 @@ export default function ApplicationCard({ application, onAccept, onRefuse }) {
         <button
           className="btn btn-ghost"
           style={{ fontSize: 12, padding: '6px 12px' }}
-          onClick={() => goToEditorDetail(profile.id)}
+          onClick={() => goToEditorDetail(application.editor_id)}
         >
           Voir le profil →
         </button>

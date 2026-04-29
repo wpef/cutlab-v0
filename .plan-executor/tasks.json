@@ -1,0 +1,141 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "ProjectForm UX dates",
+      "description": "Dates start/deadline same row on desktop, default start_date=today, calculated duration display, visible calendar icon on dark theme",
+      "dependencies": [],
+      "complexity": "simple",
+      "files_touched": ["src/components/pages/ProjectForm.jsx", "src/styles/global.css"],
+      "lane": "A",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T002",
+      "title": "ApplicationCard 'Voir le profil' fix",
+      "description": "Replace goToEditorDetail(profile.id) [undefined] with goToEditorDetail(application.editor_id)",
+      "dependencies": [],
+      "complexity": "trivial",
+      "files_touched": ["src/components/projects/ApplicationCard.jsx"],
+      "lane": "B",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T003",
+      "title": "ProjectDetail loading vs not-found + hero consistency",
+      "description": "Add notFound state. Always render 3 hero items (Budget/Deadline/Start) with em-dash placeholder. CSS hero-item flex 1 1 0 min-width 120px",
+      "dependencies": ["T001"],
+      "complexity": "simple",
+      "files_touched": ["src/components/pages/ProjectDetail.jsx", "src/styles/global.css"],
+      "lane": "A",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T004",
+      "title": "ProjectFilters thumbnail toggle",
+      "description": "Modify setFilter to delete key when value===undefined. Fixes thumbnail_included toggle off",
+      "dependencies": [],
+      "complexity": "trivial",
+      "files_touched": ["src/components/projects/ProjectFilters.jsx"],
+      "lane": "B",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T005",
+      "title": "fetchMyProjects compute application_count",
+      "description": "Use PostgREST sub-select contact_requests!project_id(id, status), enrich each project with application_count = pending count",
+      "dependencies": [],
+      "complexity": "moderate",
+      "files_touched": ["src/context/ProjectContext.jsx"],
+      "lane": "B",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T006",
+      "title": "ChatView header shows project title for editor",
+      "description": "Fetch project title when request.project_id present, display in header for editor role with fallback to creator_name",
+      "dependencies": ["T009"],
+      "complexity": "simple",
+      "files_touched": ["src/components/pages/ChatView.jsx"],
+      "lane": "D",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T007",
+      "title": "OfferForm prefill budget_min + safe init",
+      "description": "Prefill budget with data.budget_min when budget_fixed null. useEffect to call loadRequests if request undefined and activeRequestId present",
+      "dependencies": [],
+      "complexity": "simple",
+      "files_touched": ["src/components/pages/OfferForm.jsx"],
+      "lane": "C",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T008",
+      "title": "CollabTracker offer pending state + cancel + end project button",
+      "description": "ChatView passes latest non-cancelled offer (any status) to tracker. Tracker offer_sent step shows Modify(disabled)/Cancel for sender. Feedback step shows 'End project' button for creator after review submitted",
+      "dependencies": ["T009"],
+      "complexity": "complex",
+      "files_touched": ["src/components/messaging/CollabTracker.jsx", "src/components/pages/ChatView.jsx"],
+      "lane": "D",
+      "model": "opus",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T009",
+      "title": "Add cancelOffer + closeProject to CollabContext, expose via hooks",
+      "description": "cancelOffer(offerId): UPDATE offers status=cancelled + notify receiver. closeProject(request, offer): UPDATE projects status=completed if project_id, notify both parties. Expose in useCollab",
+      "dependencies": [],
+      "complexity": "moderate",
+      "files_touched": ["src/context/CollabContext.jsx"],
+      "lane": "D",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    },
+    {
+      "id": "T010",
+      "title": "Re-seed DB with valid keys",
+      "description": "UPDATE projects + offers SET content_format/mission_type/experience_level/niches/deliverables to use option keys from src/constants/options.js",
+      "dependencies": [],
+      "complexity": "simple",
+      "files_touched": [],
+      "lane": "E",
+      "model": "sonnet",
+      "gate": false,
+      "excluded": false
+    }
+  ],
+  "excluded": [
+    {
+      "id": "X001",
+      "title": "Round events in chat timeline (CHAT1)",
+      "reason": "Documented in plans/PLAN_PHASE2.md — chat improvements"
+    },
+    {
+      "id": "X002",
+      "title": "Validated deliverable links in sidebar (CHAT2)",
+      "reason": "Documented in plans/PLAN_PHASE2.md — chat improvements"
+    },
+    {
+      "id": "X003",
+      "title": "Edit offer (modify) UI (CHAT3)",
+      "reason": "Documented in plans/PLAN_PHASE2.md — only Cancel implemented in T008"
+    }
+  ]
+}

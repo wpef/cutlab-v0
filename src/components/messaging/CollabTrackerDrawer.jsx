@@ -5,7 +5,7 @@ import CollabTracker from './CollabTracker'
  * CollabTrackerDrawer — mobile bottom drawer that wraps CollabTracker.
  * Triggered by the "Suivi" button in the ChatView header on mobile.
  */
-export default function CollabTrackerDrawer({ open, onClose, request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest }) {
+export default function CollabTrackerDrawer({ open, onClose, request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest, onCancelOffer, onCloseProject }) {
   return (
     <AnimatePresence>
       {open && (
@@ -42,6 +42,8 @@ export default function CollabTrackerDrawer({ open, onClose, request, offer, use
                 onRefuseOffer={onRefuseOffer}
                 onAcceptRequest={onAcceptRequest}
                 onRefuseRequest={onRefuseRequest}
+                onCancelOffer={onCancelOffer}
+                onCloseProject={onCloseProject}
               />
             </div>
           </motion.div>

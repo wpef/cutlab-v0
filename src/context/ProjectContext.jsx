@@ -58,12 +58,16 @@ export function ProjectProvider({ children }) {
     setProjectLoading(true)
     const { data, error } = await supabase
       .from('projects')
-      .select('*')
+      .select('*, contact_requests!project_id(id, status)')
       .eq('creator_id', user.id)
       .order('created_at', { ascending: false })
     setProjectLoading(false)
     if (error) { console.error('[Projects] fetchMine:', error.message); return }
-    setMyProjects(data ?? [])
+    const enriched = (data ?? []).map((p) => ({
+      ...p,
+      application_count: (p.contact_requests || []).filter((r) => r.status === 'pending').length,
+    }))
+    setMyProjects(enriched)
   }, [user])
 
   const fetchPublishedProjects = useCallback(async (filters = {}) => {
