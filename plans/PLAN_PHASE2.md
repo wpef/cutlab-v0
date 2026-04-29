@@ -474,3 +474,49 @@ Semaines 5–6 : I18N1 (préparation expansion) + WP1 (push — si PWA déployé
 | Taux d'ouverture emails | ≥ 40% |
 | Crash rate (Sentry) | < 0.5% sessions |
 | Opt-in push | ≥ 30% utilisateurs actifs |
+
+---
+
+## CHAT-IMPROVEMENTS — Améliorations conversation (notées 2026-04-29)
+
+Issues remontés en test manuel mais non bloquants pour le MVP. À traiter après stabilisation.
+
+### CHAT1 — Échanges de feedback dans le corps de la conversation
+
+Aujourd'hui les retours créateur (commentaires de révision sur un round) n'apparaissent que dans la sidebar `CollabTracker` — pas dans le timeline du chat.
+
+**Comportement attendu** : chaque demande de révision et validation produit une "system message" / "tracker event" dans le timeline du chat, à côté des messages texte et offres :
+- "Le créateur a demandé une révision (v2) — \"Les hooks sont trop longs sur les shorts 3, 5, 7\""
+- "Les livrables v2 ont été validés par le créateur"
+- "Le monteur a partagé les livrables v3 (lien WeTransfer)"
+
+Implémentation suggérée : étendre le timeline `useMemo` dans `ChatView.jsx` pour inclure les `rounds` triés par `created_at`, avec un nouveau `_type: 'round_event'` rendu via un composant `<RoundEventBubble>`.
+
+**Fichiers** : `src/components/pages/ChatView.jsx`, nouveau `src/components/messaging/RoundEventBubble.jsx`
+
+---
+
+### CHAT2 — Liens des livrables validés dans la sidebar
+
+Aujourd'hui la sidebar tracker affiche les rounds dans la liste `tracker-rounds-list` mais quand un round est `validated`, le lien WeTransfer/Drive n'est plus mis en avant — il est noyé dans le composant `DeliverableRoundItem`.
+
+**Comportement attendu** : un bloc dédié dans la sidebar "Livrables validés" liste les rounds validés avec leurs liens cliquables, comme pour les feedbacks :
+```
+✅ v1 — validé le 12 mai
+   → Lien WeTransfer (cliquable)
+✅ v2 — validé le 18 mai
+   → Lien Drive (cliquable)
+```
+
+**Fichier** : `src/components/messaging/CollabTracker.jsx` — ajouter une section après les reviews ou avant, avec filter `rounds.filter(r => r.status === 'validated')`.
+
+---
+
+### CHAT3 — Edit offer (modifier au lieu d'annuler seulement)
+
+Le batch 2 (T08) implémente uniquement l'annulation d'une offre. La modification nécessite :
+- Réouverture du formulaire `/offer/new` pré-rempli avec les valeurs de l'offre courante
+- Soit créer une nouvelle offre et marquer l'ancienne `superseded`, soit faire un UPDATE in-place
+- Notification au receveur "L'offre a été modifiée"
+
+**Fichiers** : `src/components/pages/OfferForm.jsx` (mode édition via `?edit=<offer_id>` query param), `src/components/messaging/CollabTracker.jsx` (réactiver le bouton "✏️ Modifier")
