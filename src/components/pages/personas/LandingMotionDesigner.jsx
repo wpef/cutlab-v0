@@ -113,8 +113,8 @@ export default function LandingMotionDesigner() {
             <div className="persona-step-content">
               <h3>Fixe tes tarifs</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Tu fixes le prix de ton choix sur chaque ligne motion, indépendamment du
+                montage classique. La baseline du niveau te sert de repère, pas de contrainte.
               </p>
             </div>
           </li>

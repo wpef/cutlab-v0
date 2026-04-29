@@ -3230,6 +3230,31 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 .mockup-pricing-toggle-btn--active { background: var(--accent); color: #000; }
 .mockup-pricing-price { font-size: 13px; font-weight: 700; color: var(--text); }
 .mockup-pricing-price--adjusted { color: var(--accent); }
+.mockup-pricing-input-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 90px;
+}
+.mockup-pricing-input {
+  width: 100%;
+  padding: 6px 22px 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.mockup-pricing-input:focus { border-color: var(--accent); }
+.mockup-pricing-input--custom { color: var(--accent); border-color: rgba(212, 240, 0, 0.4); }
+.mockup-pricing-input::placeholder { color: var(--text-muted); font-weight: 400; }
+.mockup-pricing-input-suffix { position: absolute; right: 8px; font-size: 11px; color: var(--text-muted); pointer-events: none; }
+.mockup-pricing-baseline { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.mockup-pricing-note { font-size: 11px; color: var(--text-muted); padding: 12px 16px; border-top: 1px solid var(--border); background: rgba(255,255,255,0.01); font-style: italic; }
 
 /* ─────────────────────────────────────────────────
    MockupOnboarding

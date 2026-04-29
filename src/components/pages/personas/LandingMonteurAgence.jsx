@@ -114,8 +114,9 @@ export default function LandingMonteurAgence() {
             <div className="persona-step-content">
               <h3>Positionne tes tarifs</h3>
               <p>
-                Grille officielle CUTLAB + ajustement ±10% par ligne. Tu te positionnes haut sans
-                surenchère.
+                La grille officielle CUTLAB te donne une baseline indicative selon ton niveau,
+                mais tu fixes le prix de ton choix ligne par ligne. Tu te positionnes haut sans
+                surenchère, à ta vraie valeur.
               </p>
             </div>
           </li>

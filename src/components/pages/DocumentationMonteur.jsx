@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import SEO from '../seo/SEO'
 import { SEO_CONFIG } from '../seo/seoConfig'
-import { MockupOnboarding, MockupLevels, MockupPricing, MockupPipeline, MockupChat } from '../mockups'
 
 export default function DocumentationMonteur() {
   return (
@@ -138,9 +137,6 @@ export default function DocumentationMonteur() {
               </p>
             </div>
           </div>
-          <div className="doc-mockup-wrap">
-            <MockupOnboarding />
-          </div>
         </section>
 
         {/* Mon profil */}
@@ -152,8 +148,9 @@ export default function DocumentationMonteur() {
           </p>
           <p>
             La section <strong>Tarifs</strong> vous permet de configurer votre grille tarifaire après la révélation de
-            votre niveau. Vous pouvez ajuster chaque ligne de tarif indépendamment (−10 %, baseline, +10 %) pour refléter
-            la complexité habituelle de vos missions.
+            votre niveau. Pour chaque ligne, le tarif de référence (baseline) calculé à partir de votre niveau s'affiche
+            comme repère, mais vous saisissez le prix de votre choix dans un champ libre — laisser vide signifie utiliser
+            la baseline. Vous gardez la main complète sur vos prix.
           </p>
           <p>
             La section <strong>Liens sociaux</strong> centralise vos présences en ligne : Instagram, TikTok, YouTube,
@@ -200,9 +197,6 @@ export default function DocumentationMonteur() {
               </p>
             </div>
           </div>
-          <div className="doc-mockup-wrap">
-            <MockupLevels />
-          </div>
         </section>
 
         {/* Tarifs */}
@@ -222,20 +216,21 @@ export default function DocumentationMonteur() {
             <li>Miniature</li>
           </ul>
           <p>
-            Chaque ligne dispose d'un tarif de base déterminé par votre niveau. Vous pouvez ensuite ajuster chaque
-            tarif indépendamment avec un toggle 3 positions : <strong>−10 %</strong>, <strong>Baseline</strong> ou
-            <strong>+10 %</strong>. Utilisez ces ajustements pour affiner vos prix en fonction de la complexité habituelle
-            de chaque type de mission.
+            Chaque ligne affiche un <strong>tarif de référence (baseline)</strong> calculé à partir de votre niveau —
+            il sert de repère, pas d'imposition. Pour chaque ligne, vous saisissez le prix de votre choix dans un
+            champ libre. Si vous laissez le champ vide, c'est la baseline qui s'applique. Vous avez ainsi la main
+            complète sur votre tarification, ligne par ligne, sans contrainte de pourcentage.
+          </p>
+          <p>
+            La baseline se met à jour automatiquement si votre niveau évolue. Vos prix personnalisés, eux, restent
+            tels que vous les avez saisis tant que vous ne les modifiez pas.
           </p>
           <p>
             La fourchette affichée aux créateurs dans le catalogue (exemple : "80 – 120 €") est calculée dynamiquement
-            à partir du minimum et du maximum de votre grille ajustée. Les prix exacts par ligne sont visibles sur votre
-            page profil détaillée. Les tarifs ne sont jamais imposés : ils servent de point de départ à la négociation
-            lors de chaque proposition de mission.
+            à partir du minimum et du maximum de votre grille (vos prix personnalisés ou la baseline pour les lignes
+            laissées vides). Les prix exacts par ligne sont visibles sur votre page profil détaillée. Les tarifs
+            servent de point de départ à la négociation lors de chaque proposition de mission.
           </p>
-          <div className="doc-mockup-wrap">
-            <MockupPricing />
-          </div>
         </section>
 
         {/* Recevoir des demandes */}
@@ -280,9 +275,6 @@ export default function DocumentationMonteur() {
             L'onglet Messagerie liste l'ensemble de vos conversations actives avec un aperçu du dernier message et
             un indicateur de messages non lus.
           </p>
-          <div className="doc-mockup-wrap">
-            <MockupChat />
-          </div>
         </section>
 
         {/* Pipeline */}
@@ -302,9 +294,6 @@ export default function DocumentationMonteur() {
             Le pipeline vous aide à ne jamais perdre de vue l'état de vos engagements en cours et à gérer votre charge
             de travail sereinement. Il est accessible depuis l'onglet <strong>Pipeline</strong> dans la barre de navigation.
           </p>
-          <div className="doc-mockup-wrap">
-            <MockupPipeline />
-          </div>
         </section>
 
         {/* Mes projets */}

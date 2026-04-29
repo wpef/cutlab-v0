@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
+// Mockup illustrant le vrai système : input libre par ligne, baseline indicative.
 const ROWS = [
-  { key: 'montage_court', label: 'Montage court', sub: '< 5 min', base: 120 },
+  { key: 'montage_court', label: 'Montage court', sub: '< 5 min',  base: 120 },
   { key: 'montage_moyen', label: 'Montage moyen', sub: '5–15 min', base: 200 },
   { key: 'montage_long',  label: 'Montage long',  sub: '15 min+',  base: 300 },
   { key: 'motion_court',  label: 'Motion court',  sub: '< 5 min',  base: 200 },
@@ -10,25 +11,15 @@ const ROWS = [
   { key: 'thumbnail',     label: 'Miniature',     sub: 'additif',  base: 30  },
 ]
 
-const ADJUSTMENTS = [-10, 0, 10]
-
-function computePrice(base, adj) {
-  return Math.round(base * (1 + adj / 100))
-}
-
 export default function MockupPricing() {
-  const [adjustments, setAdjustments] = useState({
-    montage_court: 0,
-    montage_moyen: 10,
-    montage_long:  0,
-    motion_court:  0,
-    motion_moyen:  0,
-    motion_long:   0,
-    thumbnail:     0,
+  // Quelques prix custom pré-remplis pour illustrer (le reste = baseline)
+  const [prices, setPrices] = useState({
+    montage_moyen: '220',
+    motion_long: '500',
   })
 
-  function setAdj(key, val) {
-    setAdjustments(prev => ({ ...prev, [key]: val }))
+  function setPrice(key, val) {
+    setPrices(prev => ({ ...prev, [key]: val.replace(/[^0-9]/g, '') }))
   }
 
   return (
@@ -36,12 +27,12 @@ export default function MockupPricing() {
       <div className="mockup-pricing">
         <div className="mockup-pricing-header">
           <div className="mockup-pricing-header-label mockup-pricing-col-service">Service</div>
-          <div className="mockup-pricing-header-label mockup-pricing-col-toggle">Ajustement</div>
-          <div className="mockup-pricing-header-label mockup-pricing-col-price">Prix</div>
+          <div className="mockup-pricing-header-label mockup-pricing-col-toggle">Votre prix</div>
+          <div className="mockup-pricing-header-label mockup-pricing-col-price">Réf.</div>
         </div>
         {ROWS.map(row => {
-          const adj = adjustments[row.key]
-          const price = computePrice(row.base, adj)
+          const custom = prices[row.key]
+          const isCustom = custom !== undefined && custom !== ''
           return (
             <div key={row.key} className="mockup-pricing-row">
               <div className="mockup-pricing-col-service">
@@ -49,26 +40,27 @@ export default function MockupPricing() {
                 <div className="mockup-pricing-service-sub">{row.sub}</div>
               </div>
               <div className="mockup-pricing-col-toggle">
-                <div className="mockup-pricing-toggle">
-                  {ADJUSTMENTS.map(a => (
-                    <button
-                      key={a}
-                      className={`mockup-pricing-toggle-btn${adj === a ? ' mockup-pricing-toggle-btn--active' : ''}`}
-                      onClick={() => setAdj(row.key, a)}
-                    >
-                      {a === 0 ? 'Base' : `${a > 0 ? '+' : ''}${a}%`}
-                    </button>
-                  ))}
+                <div className="mockup-pricing-input-wrap">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className={`mockup-pricing-input${isCustom ? ' mockup-pricing-input--custom' : ''}`}
+                    placeholder={`${row.base}`}
+                    value={custom ?? ''}
+                    onChange={(e) => setPrice(row.key, e.target.value)}
+                  />
+                  <span className="mockup-pricing-input-suffix">€</span>
                 </div>
               </div>
               <div className="mockup-pricing-col-price">
-                <span className={`mockup-pricing-price${adj !== 0 ? ' mockup-pricing-price--adjusted' : ''}`}>
-                  {price} €
-                </span>
+                <span className="mockup-pricing-baseline">{row.base} €</span>
               </div>
             </div>
           )
         })}
+        <div className="mockup-pricing-note">
+          Laisser vide = utiliser la référence. Vous saisissez le prix de votre choix, sans contrainte.
+        </div>
       </div>
     </div>
   )

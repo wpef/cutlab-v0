@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import SEO from '../seo/SEO'
 import { SEO_CONFIG } from '../seo/seoConfig'
-import { MockupCatalog, MockupChat, MockupProject } from '../mockups'
 
 export default function DocumentationCreateur() {
   return (
@@ -72,8 +71,8 @@ export default function DocumentationCreateur() {
             <li><strong>Nom et photo</strong> — l'identité du monteur.</li>
             <li><strong>Disponibilité</strong> — un badge coloré indique s'il est disponible, bientôt disponible ou actuellement occupé.</li>
             <li><strong>Compétences principales</strong> — les tags de ses formats maîtrisés (YouTube, Reels, TikTok, etc.) et des niches couvertes.</li>
-            <li><strong>Niveau</strong> — son niveau attribué par CUTLAB, de Débutant à Expert.</li>
-            <li><strong>Fourchette de tarifs</strong> — le min et le max de sa grille tarifaire, après ses ajustements personnels.</li>
+            <li><strong>Niveau</strong> — son niveau attribué par CUTLAB sur 7 paliers (Débutant, Prospect, Confirmé, Expert, Star, Elite, Légende).</li>
+            <li><strong>Fourchette de tarifs</strong> — le min et le max de la grille tarifaire personnelle du monteur.</li>
             <li><strong>Note</strong> — l'évaluation moyenne laissée par les créateurs ayant déjà collaboré avec lui.</li>
           </ul>
           <p>
@@ -82,9 +81,6 @@ export default function DocumentationCreateur() {
             la grille tarifaire complète détaillant ses prix pour chaque type de prestation (montage court,
             montage long, motion design, miniature, etc.).
           </p>
-          <div className="doc-mockup-wrap">
-            <MockupCatalog />
-          </div>
         </div>
 
         {/* Contacter un monteur */}
@@ -153,9 +149,6 @@ export default function DocumentationCreateur() {
             Une fois publié, votre projet apparaît dans l'onglet "Mes projets" où vous pouvez suivre
             les candidatures reçues et gérer leur statut.
           </p>
-          <div className="doc-mockup-wrap">
-            <MockupProject />
-          </div>
         </div>
 
         {/* Messagerie */}
@@ -189,9 +182,6 @@ export default function DocumentationCreateur() {
             depuis la conversation. En cas de refus, vous pouvez continuer à discuter pour affiner les
             conditions avant qu'une nouvelle offre soit soumise.
           </p>
-          <div className="doc-mockup-wrap">
-            <MockupChat />
-          </div>
         </div>
 
         {/* Gérer mes projets */}
@@ -231,9 +221,8 @@ export default function DocumentationCreateur() {
           <h2>Comprendre les tarifs</h2>
           <p>
             Les tarifs affichés sur les cartes du catalogue correspondent à la <strong>fourchette de prix</strong> du
-            monteur : le minimum et le maximum de sa grille tarifaire personnelle, après application de ses
-            ajustements. Cette fourchette vous donne un aperçu rapide du coût d'une collaboration, sans vous
-            engager sur un montant précis.
+            monteur : le minimum et le maximum de sa grille tarifaire personnelle. Cette fourchette vous donne un
+            aperçu rapide du coût d'une collaboration, sans vous engager sur un montant précis.
           </p>
           <p>
             La grille tarifaire complète d'un monteur comporte sept lignes :
@@ -248,9 +237,9 @@ export default function DocumentationCreateur() {
             <li>Miniature</li>
           </ul>
           <p>
-            Ces tarifs sont calculés à partir d'une grille officielle CUTLAB selon le niveau du monteur,
-            que ce dernier peut ajuster à la hausse ou à la baisse dans une marge de ±10 %. Vous pouvez
-            consulter la grille détaillée sur le profil complet de chaque monteur.
+            Une <strong>grille de référence (baseline)</strong> est calculée à partir du niveau du monteur — elle sert
+            de point de départ. Le monteur reste libre de fixer ses propres prix, ligne par ligne. La grille détaillée
+            est consultable sur le profil complet de chaque monteur.
           </p>
           <p>
             Le budget final d'un projet est toujours convenu directement entre vous et le monteur via
