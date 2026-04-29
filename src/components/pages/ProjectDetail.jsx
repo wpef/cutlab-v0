@@ -36,6 +36,7 @@ export default function ProjectDetail() {
   } = useProjects()
 
   const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
   const [existingApp, setExistingApp] = useState(null) // { id, status } or null
   const [appLoading, setAppLoading] = useState(false)
 
@@ -43,7 +44,11 @@ export default function ProjectDetail() {
 
   useEffect(() => {
     setLoading(true)
-    fetchProjectById(id).then(() => setLoading(false))
+    setNotFound(false)
+    fetchProjectById(id).then((p) => {
+      setLoading(false)
+      if (!p) setNotFound(true)
+    })
   }, [id])
 
   // Check if editor already applied
@@ -60,8 +65,18 @@ export default function ProjectDetail() {
     }
   }, [project, user])
 
-  if (loading || !project) {
-    return <div className="project-detail" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Chargement en cours...</div>
+  if (loading) {
+    return <div className="project-detail" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Chargement…</div>
+  }
+  if (notFound || !project) {
+    return (
+      <div className="project-detail" style={{ padding: 40, textAlign: 'center' }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
+        <h2 style={{ fontFamily: 'Syne, sans-serif' }}>Projet introuvable</h2>
+        <p style={{ color: 'var(--text-muted)', marginTop: 8, marginBottom: 24 }}>Ce projet n'existe pas ou n'est plus accessible.</p>
+        <button className="btn btn-ghost" onClick={() => navigate(-1)}>← Retour</button>
+      </div>
+    )
   }
 
   const isCreator = user && project.creator_id === user.id
@@ -190,18 +205,14 @@ export default function ProjectDetail() {
           <div className="project-detail-hero-label">Budget</div>
           <div className="project-detail-hero-value">{formatBudget(project)}</div>
         </div>
-        {project.deadline && (
-          <div className="project-detail-hero-item">
-            <div className="project-detail-hero-label">Date limite</div>
-            <div className="project-detail-hero-value">{formatDate(project.deadline)}</div>
-          </div>
-        )}
-        {project.start_date && (
-          <div className="project-detail-hero-item">
-            <div className="project-detail-hero-label">Début souhaité</div>
-            <div className="project-detail-hero-value">{formatDate(project.start_date)}</div>
-          </div>
-        )}
+        <div className="project-detail-hero-item">
+          <div className="project-detail-hero-label">Date limite</div>
+          <div className="project-detail-hero-value">{project.deadline ? formatDate(project.deadline) : '—'}</div>
+        </div>
+        <div className="project-detail-hero-item">
+          <div className="project-detail-hero-label">Début souhaité</div>
+          <div className="project-detail-hero-value">{project.start_date ? formatDate(project.start_date) : '—'}</div>
+        </div>
       </div>
 
       {/* Key info grid */}

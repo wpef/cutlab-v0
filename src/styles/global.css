@@ -1529,7 +1529,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
   padding: 16px; background: #161616; border-radius: var(--radius); border: 1px solid #222;
 }
-.project-detail-hero-item { flex: 1; min-width: 90px; }
+.project-detail-hero-item { flex: 1 1 0; min-width: 120px; }
 .project-detail-hero-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
 .project-detail-hero-value { font-size: 20px; font-weight: 700; color: #fff; }
 .project-detail-hero-item:first-child .project-detail-hero-value { color: var(--accent); }
