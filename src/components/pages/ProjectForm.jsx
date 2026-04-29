@@ -26,7 +26,7 @@ export default function ProjectForm() {
     budget_fixed: '',
     budget_min: '',
     budget_max: '',
-    start_date: '',
+    start_date: new Date().toISOString().split('T')[0],
     deadline: '',
     quality: '',
     revision_count: 2,
@@ -327,26 +327,37 @@ export default function ProjectForm() {
           {errors.budget && <div className="step-error">{errors.budget}</div>}
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Date de début souhaitée <span className="optional">(optionnel)</span></label>
-          <input
-            className="form-input"
-            type="date"
-            value={form.start_date}
-            onChange={(e) => update({ start_date: e.target.value })}
-          />
+        <div className="form-group form-group--row">
+          <div className="form-group-half">
+            <label className="form-label">Date de début souhaitée <span className="optional">(optionnel)</span></label>
+            <input
+              className="form-input"
+              type="date"
+              value={form.start_date}
+              onChange={(e) => update({ start_date: e.target.value })}
+            />
+          </div>
+          <div className="form-group-half">
+            <label className="form-label">Date limite de livraison *</label>
+            <input
+              className="form-input"
+              type="date"
+              value={form.deadline}
+              onChange={(e) => update({ deadline: e.target.value })}
+            />
+            {errors.deadline && <div className="step-error">{errors.deadline}</div>}
+          </div>
         </div>
-
-        <div className="form-group">
-          <label className="form-label">Date limite de livraison *</label>
-          <input
-            className="form-input"
-            type="date"
-            value={form.deadline}
-            onChange={(e) => update({ deadline: e.target.value })}
-          />
-          {errors.deadline && <div className="step-error">{errors.deadline}</div>}
-        </div>
+        {form.start_date && form.deadline && new Date(form.deadline) > new Date(form.start_date) && (
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: -8, marginBottom: 16 }}>
+            Durée : {(() => {
+              const days = Math.round((new Date(form.deadline) - new Date(form.start_date)) / (1000 * 60 * 60 * 24))
+              if (days < 14) return `${days} jour${days > 1 ? 's' : ''}`
+              if (days < 60) return `${Math.round(days / 7)} semaine${Math.round(days / 7) > 1 ? 's' : ''}`
+              return `${Math.round(days / 30)} mois`
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Section 4: Technical preferences */}
