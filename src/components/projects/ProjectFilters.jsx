@@ -6,7 +6,7 @@ export default function ProjectFilters({ filters, onFilterChange }) {
 
   function setFilter(key, value) {
     const next = { ...filters }
-    if (next[key] === value) delete next[key]
+    if (value === undefined || next[key] === value) delete next[key]
     else next[key] = value
     onFilterChange(next)
     setExpanded(null)
