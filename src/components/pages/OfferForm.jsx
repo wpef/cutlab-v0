@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { supabase } from '../../lib/supabase'
@@ -17,7 +17,7 @@ const EMPTY_DELIVERABLE = { type: '', quantity: 1, duration: '' }
 
 export default function OfferForm() {
   const { goToOfferPreview, goToMessaging, userRole } = useOnboarding()
-  const { activeRequestId, requests, setOfferFormData, loadRequests } = useMessaging()
+  const { activeRequestId, requests, offerFormData, setOfferFormData, loadRequests } = useMessaging()
 
   const request = requests.find((r) => r.id === activeRequestId)
 
@@ -42,10 +42,32 @@ export default function OfferForm() {
     rushes_info: '',
   })
   const [errors, setErrors] = useState({})
-  const [projectLoaded, setProjectLoaded] = useState(false)
+  const prefillDone = useRef(false)
 
   useEffect(() => {
-    if (!request?.project_id || projectLoaded) return
+    if (!offerFormData?._prefillFromOffer) return
+    setForm({
+      title: offerFormData.title || '',
+      description: offerFormData.description || '',
+      deliverables: offerFormData.deliverables?.length ? offerFormData.deliverables : [{ ...EMPTY_DELIVERABLE }],
+      content_format: offerFormData.content_format || '',
+      deadline: offerFormData.deadline || '',
+      budget: offerFormData.budget ? String(offerFormData.budget) : '',
+      revisions: offerFormData.revisions ?? 2,
+      mission_start: offerFormData.mission_start || '',
+      quality: offerFormData.quality ?? '',
+      niches: offerFormData.niches || [],
+      required_languages: offerFormData.required_languages || [],
+      experience_level: offerFormData.experience_level ?? '',
+      mission_type: offerFormData.mission_type ?? '',
+      rushes_info: offerFormData.rushes_info ?? '',
+    })
+    prefillDone.current = true
+    setOfferFormData(null)
+  }, [])
+
+  useEffect(() => {
+    if (!request?.project_id || prefillDone.current) return
     supabase
       .from('projects')
       .select('*')
@@ -53,7 +75,7 @@ export default function OfferForm() {
       .single()
       .then(({ data }) => {
         if (!data) return
-        setProjectLoaded(true)
+        prefillDone.current = true
         setForm((prev) => ({
           ...prev,
           title: data.title || prev.title,
@@ -72,7 +94,7 @@ export default function OfferForm() {
           rushes_info: data.rushes_info ?? prev.rushes_info,
         }))
       })
-  }, [request?.project_id, projectLoaded])
+  }, [request?.project_id])
 
   if (!activeRequestId || !request) {
     return (
@@ -132,12 +154,6 @@ export default function OfferForm() {
   return (
     <div className="offer-form-page">
       <PageTitle title="Offre de mission" />
-
-      {request.project_id && projectLoaded && (
-        <div style={{ padding: '8px 16px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', fontSize: 12, color: 'var(--accent)' }}>
-          ✓ Pré-rempli depuis le projet
-        </div>
-      )}
 
       <div className="offer-form-content">
 

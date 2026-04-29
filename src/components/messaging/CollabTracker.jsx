@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCollab } from '../../context/CollabContext'
 import { useOnboarding } from '../../context/OnboardingContext'
+import { useMessaging } from '../../context/MessagingContext'
 import DeliverableRoundItem from './DeliverableRoundItem'
 import ReviewForm from './ReviewForm'
 
@@ -12,6 +13,7 @@ import ReviewForm from './ReviewForm'
  */
 export default function CollabTracker({ request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest, onCancelOffer, onCloseProject }) {
   const { goToOfferForm } = useOnboarding()
+  const { setOfferFormData } = useMessaging()
   const {
     rounds, reviews, collabStep: _unused,
     submitDeliverables, requestRevision, validateDeliverables,
@@ -27,6 +29,7 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
   const [feedbackText, setFeedbackText] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [expandedStep, setExpandedStep] = useState(null) // manually override expanded step
+  const [projectClosedLocally, setProjectClosedLocally] = useState(false) // local confirmation after close action
 
   const isProjectBased = !!request?.project_id
 
@@ -294,9 +297,33 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
               <div className="tracker-btn-row">
                 <button
                   className="btn tracker-action-btn tracker-btn--secondary"
-                  disabled
-                  title="Modification d'offre — bientôt disponible"
-                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                  disabled={actionLoading}
+                  onClick={async () => {
+                    if (!confirm("Modifier cette offre ? L'offre actuelle sera annulée et vous pourrez en créer une nouvelle.")) return
+                    setActionLoading(true)
+                    await onCancelOffer?.(offer.id)
+                    setOfferFormData({
+                      _prefillFromOffer: true,
+                      title: offer.title || '',
+                      description: offer.description || '',
+                      deliverables: offer.deliverables,
+                      content_format: offer.content_format || '',
+                      deadline: offer.deadline || '',
+                      budget: offer.budget,
+                      revisions: offer.revisions,
+                      mission_start: offer.mission_start || '',
+                      quality: offer.quality || '',
+                      niches: offer.niches || [],
+                      required_languages: offer.required_languages || [],
+                      experience_level: offer.experience_level || '',
+                      mission_type: offer.mission_type || '',
+                      rushes_info: offer.rushes_info || '',
+                      sent_by: userRole,
+                      requestId: request?.id,
+                    })
+                    setActionLoading(false)
+                    goToOfferForm()
+                  }}
                 >
                   ✏️ Modifier
                 </button>
@@ -500,25 +527,34 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
       case 'feedback': {
         const myReviewType = userRole === 'creator' ? 'creator_to_editor' : 'editor_to_creator'
         const myReview = reviews.find((r) => r.type === myReviewType)
+
+        // Close project button — creator only, always visible in feedback step
+        const closeBtn = userRole === 'creator' && onCloseProject && (
+          projectClosedLocally
+            ? <p className="tracker-done-text" style={{ marginTop: 12 }}>✓ Projet clôturé</p>
+            : (
+              <button
+                className="btn btn-primary tracker-action-btn"
+                style={{ marginTop: 12 }}
+                onClick={async () => {
+                  if (!confirm('Mettre fin au projet ? La conversation sera archivée et le projet marqué comme terminé.')) return
+                  setActionLoading(true)
+                  await onCloseProject()
+                  setProjectClosedLocally(true)
+                  setActionLoading(false)
+                }}
+                disabled={actionLoading}
+              >
+                🏁 Mettre fin au projet
+              </button>
+            )
+        )
+
         if (myReview) {
           return (
             <div className="tracker-action-area tracker-action-area--done">
               <p className="tracker-done-text">✓ Avis soumis</p>
-              {userRole === 'creator' && onCloseProject && (
-                <button
-                  className="btn btn-primary tracker-action-btn"
-                  style={{ marginTop: 12 }}
-                  onClick={async () => {
-                    if (!confirm('Mettre fin au projet ? La conversation sera archivée et le projet marqué comme terminé.')) return
-                    setActionLoading(true)
-                    await onCloseProject()
-                    setActionLoading(false)
-                  }}
-                  disabled={actionLoading}
-                >
-                  🏁 Mettre fin au projet
-                </button>
-              )}
+              {closeBtn}
             </div>
           )
         }
@@ -536,6 +572,18 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
               onSubmit={handleReview}
               loading={actionLoading}
             />
+            {closeBtn}
+          </div>
+        )
+      }
+
+      case 'closed': {
+        if (userRole !== 'creator' || !onCloseProject) return null
+        // If the collab step is already 'closed', the project is marked completed in DB —
+        // show the confirmation text directly (no button needed).
+        return (
+          <div className="tracker-action-area tracker-action-area--done">
+            <p className="tracker-done-text">✓ Projet clôturé</p>
           </div>
         )
       }
@@ -620,6 +668,32 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
           )
         })}
       </div>
+
+      {/* Validated rounds summary */}
+      {rounds.filter((r) => r.status === 'validated').length > 0 && (
+        <div className="tracker-validated-section">
+          <div className="tracker-section-title">Livrables validés</div>
+          {rounds.filter((r) => r.status === 'validated').map((round) => (
+            <div key={round.id} className="tracker-validated-item">
+              <span className="tracker-validated-label">
+                ✅ v{round.round_number} — validé le {formatDate(round.updated_at || round.created_at)}
+              </span>
+              {round.delivery_link && (
+                <a
+                  className="tracker-validated-link"
+                  href={round.delivery_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  🔗 {round.delivery_link.length > 45
+                    ? round.delivery_link.slice(0, 45) + '…'
+                    : round.delivery_link}
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Reviews display (when closed or feedback step) */}
       {(collabStep === 'closed' || collabStep === 'feedback') && reviews.length > 0 && (
