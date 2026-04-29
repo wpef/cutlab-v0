@@ -10,7 +10,7 @@ import ReviewForm from './ReviewForm'
  * Renders the 11-step collaboration timeline and contextual action areas.
  * Props come from ChatView which owns the request, offer, and collab data.
  */
-export default function CollabTracker({ request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest }) {
+export default function CollabTracker({ request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest, onCancelOffer, onCloseProject }) {
   const { goToOfferForm } = useOnboarding()
   const {
     rounds, reviews, collabStep: _unused,
@@ -291,7 +291,29 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
                 </button>
               </div>
             ) : (
-              <p className="tracker-waiting-text">⏳ En attente de la réponse…</p>
+              <div className="tracker-btn-row">
+                <button
+                  className="btn tracker-action-btn tracker-btn--secondary"
+                  disabled
+                  title="Modification d'offre — bientôt disponible"
+                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                >
+                  ✏️ Modifier
+                </button>
+                <button
+                  className="btn tracker-action-btn tracker-btn--secondary"
+                  onClick={async () => {
+                    if (!confirm("Annuler cette offre ? Le suivi reviendra à l'étape précédente.")) return
+                    setActionLoading(true)
+                    await onCancelOffer?.(offer.id)
+                    setActionLoading(false)
+                  }}
+                  disabled={actionLoading || !onCancelOffer}
+                  style={{ color: '#f87171', borderColor: '#f87171' }}
+                >
+                  ✗ Annuler l'offre
+                </button>
+              </div>
             )}
           </div>
         )
@@ -482,6 +504,21 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
           return (
             <div className="tracker-action-area tracker-action-area--done">
               <p className="tracker-done-text">✓ Avis soumis</p>
+              {userRole === 'creator' && onCloseProject && (
+                <button
+                  className="btn btn-primary tracker-action-btn"
+                  style={{ marginTop: 12 }}
+                  onClick={async () => {
+                    if (!confirm('Mettre fin au projet ? La conversation sera archivée et le projet marqué comme terminé.')) return
+                    setActionLoading(true)
+                    await onCloseProject()
+                    setActionLoading(false)
+                  }}
+                  disabled={actionLoading}
+                >
+                  🏁 Mettre fin au projet
+                </button>
+              )}
             </div>
           )
         }
