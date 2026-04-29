@@ -49,12 +49,17 @@ export default function ProjectProposalCard({ offer, currentUserRole, isMine, on
     budgetDisplay = `${Number(offer.budget).toLocaleString('fr-FR')} €`
   }
 
+  // Deliverables: format array of {type, quantity, duration} to readable string
+  const deliverablesDisplay = Array.isArray(offer.deliverables) && offer.deliverables.length > 0
+    ? offer.deliverables.map((d) => `${d.quantity}× ${d.type}${d.duration ? ` (${d.duration})` : ''}`).join(', ')
+    : (typeof offer.deliverables === 'string' && offer.deliverables ? offer.deliverables : null)
+
   // Key-value grid fields — only rendered when the value is non-empty
   const fields = [
     { label: 'Format',           value: formatDisplay },
     { label: 'Deadline',         value: offer.deadline },
     { label: 'Budget',           value: budgetDisplay },
-    { label: 'Livrables',        value: offer.deliverables },
+    { label: 'Livrables',        value: deliverablesDisplay },
     { label: 'Retours inclus',   value: offer.revisions != null ? String(offer.revisions) : 'Non précisé' },
     { label: 'Type de mission',  value: offer.mission_type ? formatLabel(offer.mission_type, MISSION_TYPES) : null },
     { label: 'Qualité',          value: offer.quality ? formatLabel(offer.quality, QUALITY_OPTIONS) : null },

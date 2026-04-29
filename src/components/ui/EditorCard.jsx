@@ -111,9 +111,11 @@ export default function EditorCard({ profile, hideName = false, stats, onClick, 
             {level && <>{level.emoji} {level.name}</>}
           </div>
           <div className="profile-rating">
-            {stats
-              ? `${stats.received ?? 0} demande${(stats.received ?? 0) > 1 ? 's' : ''}`
-              : 'Nouveau'
+            {profile._reviewCount > 0
+              ? <span>{'★'.repeat(Math.round(profile._reviewAvg))} {profile._reviewAvg.toFixed(1)} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({profile._reviewCount})</span></span>
+              : stats
+                ? `${stats.received ?? 0} demande${(stats.received ?? 0) > 1 ? 's' : ''}`
+                : 'Nouveau'
             }
           </div>
         </div>

@@ -10,7 +10,7 @@ import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
 export default function Catalog() {
   const navigate = useNavigate()
   const {
-    goToOnboarding, goToCreatorSignup,
+    goToOnboarding, goToCreatorSignup, goToMessaging,
     user, userRole,
   } = useOnboarding()
   const { loadRequests, sendContactRequest } = useMessaging()
@@ -22,15 +22,38 @@ export default function Catalog() {
   const [contactSending, setContactSending] = useState(false)
   const [contactError, setContactError] = useState('')
 
+  useEffect(() => { document.title = 'CUTLAB — Catalogue' }, [])
+
   useEffect(() => {
-    supabase
-      .from('profiles')
-      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing')
-      .eq('status', 'published')
-      .then(({ data }) => {
-        setProfiles(data ?? [])
-        setLoading(false)
-      })
+    async function load() {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing')
+        .eq('status', 'published')
+
+      if (!profiles) { setLoading(false); return }
+
+      // Fetch review aggregates for all editors in one query
+      const editorIds = profiles.map((p) => p.id)
+      const { data: reviews } = editorIds.length
+        ? await supabase.from('project_reviews').select('editor_id, rating').in('editor_id', editorIds)
+        : { data: [] }
+
+      const reviewMap = {}
+      for (const r of reviews ?? []) {
+        if (!reviewMap[r.editor_id]) reviewMap[r.editor_id] = { sum: 0, count: 0 }
+        reviewMap[r.editor_id].sum += r.rating ?? 0
+        reviewMap[r.editor_id].count += 1
+      }
+
+      setProfiles(profiles.map((p) => ({
+        ...p,
+        _reviewCount: reviewMap[p.id]?.count ?? 0,
+        _reviewAvg: reviewMap[p.id] ? reviewMap[p.id].sum / reviewMap[p.id].count : null,
+      })))
+      setLoading(false)
+    }
+    load()
   }, [])
 
   useEffect(() => {

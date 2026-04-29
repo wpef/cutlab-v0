@@ -10,7 +10,7 @@ import ReviewForm from './ReviewForm'
  * Renders the 11-step collaboration timeline and contextual action areas.
  * Props come from ChatView which owns the request, offer, and collab data.
  */
-export default function CollabTracker({ request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest }) {
+export default function CollabTracker({ request, offer, userRole, onRequestUpdated, onAcceptOffer, onRefuseOffer, onAcceptRequest, onRefuseRequest, onCancelOffer, onCloseProject }) {
   const { goToOfferForm } = useOnboarding()
   const {
     rounds, reviews, collabStep: _unused,
@@ -33,9 +33,12 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
   // ── Step definitions ─────────────────────────────────────────
   const allSteps = [
     ...(isProjectBased ? [
-      { id: 'candidature_sent',     label: 'Candidature envoyée',   icon: '📤' },
-      { id: 'candidature_accepted', label: 'Candidature acceptée',  icon: '✅' },
-    ] : []),
+      { id: 'candidature_sent',     label: 'Candidature envoyée',  icon: '📤' },
+      { id: 'candidature_accepted', label: 'Candidature acceptée', icon: '✅' },
+    ] : [
+      { id: 'contact_pending',  label: 'Contact initié',   icon: '📨' },
+      { id: 'contact_accepted', label: 'Contact accepté',  icon: '✅' },
+    ]),
     { id: 'offer_sent',     label: 'Offre envoyée',           icon: '📋' },
     { id: 'production',     label: 'Production en cours',      icon: '🎬' },
     { id: 'deliverables',   label: 'Livrables',                icon: '📦' }, // special — handles under_review + revision cycles
@@ -73,6 +76,8 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
     switch (stepId) {
       case 'candidature_sent':     return formatDate(request?.created_at)
       case 'candidature_accepted': return formatDate(request?.updated_at)
+      case 'contact_pending':      return formatDate(request?.created_at)
+      case 'contact_accepted':     return formatDate(request?.updated_at)
       case 'offer_sent':           return offer ? formatDate(offer.created_at) : null
       case 'payment':              return rounds.find((r) => r.status === 'validated') ? formatDate(rounds.find((r) => r.status === 'validated').reviewed_at) : null
       case 'payment_confirmation': return request?.payment_received_at ? formatDate(request.payment_received_at) : null
@@ -193,6 +198,66 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
                 📋 Créer une offre
               </button>
             )}
+            {userRole === 'editor' && offer?.status !== 'accepted' && (
+              <button
+                className="btn btn-primary tracker-action-btn"
+                onClick={goToOfferForm}
+              >
+                📋 Proposer une offre
+              </button>
+            )}
+          </div>
+        )
+      }
+
+      case 'contact_pending': {
+        if (userRole === 'creator') {
+          return (
+            <div className="tracker-action-area tracker-action-area--waiting">
+              <p className="tracker-waiting-text">⏳ En attente de la réponse du monteur…</p>
+            </div>
+          )
+        }
+        // editor: show accept/refuse
+        return (
+          <div className="tracker-action-area">
+            <p className="tracker-info-text">
+              <strong style={{ color: 'var(--text)' }}>{request?.creator_name}</strong> souhaite entrer en contact.
+            </p>
+            <div className="tracker-btn-row">
+              <button
+                className="btn tracker-action-btn tracker-btn--secondary"
+                onClick={() => onRefuseRequest?.(request.id)}
+                disabled={actionLoading}
+              >
+                ✗ Refuser
+              </button>
+              <button
+                className="btn btn-primary tracker-action-btn"
+                onClick={() => onAcceptRequest?.(request.id)}
+                disabled={actionLoading}
+              >
+                ✓ Accepter
+              </button>
+            </div>
+          </div>
+        )
+      }
+
+      case 'contact_accepted': {
+        return (
+          <div className="tracker-action-area">
+            <p className="tracker-info-text">
+              {userRole === 'creator'
+                ? "Contact accepté. Créez une offre pour formaliser la collaboration."
+                : "Contact accepté. Proposez votre offre ou attendez celle du créateur."}
+            </p>
+            <button
+              className="btn btn-primary tracker-action-btn"
+              onClick={goToOfferForm}
+            >
+              📋 {userRole === 'creator' ? 'Créer une offre' : 'Proposer une offre'}
+            </button>
           </div>
         )
       }
@@ -226,7 +291,29 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
                 </button>
               </div>
             ) : (
-              <p className="tracker-waiting-text">⏳ En attente de la réponse…</p>
+              <div className="tracker-btn-row">
+                <button
+                  className="btn tracker-action-btn tracker-btn--secondary"
+                  disabled
+                  title="Modification d'offre — bientôt disponible"
+                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                >
+                  ✏️ Modifier
+                </button>
+                <button
+                  className="btn tracker-action-btn tracker-btn--secondary"
+                  onClick={async () => {
+                    if (!confirm("Annuler cette offre ? Le suivi reviendra à l'étape précédente.")) return
+                    setActionLoading(true)
+                    await onCancelOffer?.(offer.id)
+                    setActionLoading(false)
+                  }}
+                  disabled={actionLoading || !onCancelOffer}
+                  style={{ color: '#f87171', borderColor: '#f87171' }}
+                >
+                  ✗ Annuler l'offre
+                </button>
+              </div>
             )}
           </div>
         )
@@ -417,6 +504,21 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
           return (
             <div className="tracker-action-area tracker-action-area--done">
               <p className="tracker-done-text">✓ Avis soumis</p>
+              {userRole === 'creator' && onCloseProject && (
+                <button
+                  className="btn btn-primary tracker-action-btn"
+                  style={{ marginTop: 12 }}
+                  onClick={async () => {
+                    if (!confirm('Mettre fin au projet ? La conversation sera archivée et le projet marqué comme terminé.')) return
+                    setActionLoading(true)
+                    await onCloseProject()
+                    setActionLoading(false)
+                  }}
+                  disabled={actionLoading}
+                >
+                  🏁 Mettre fin au projet
+                </button>
+              )}
             </div>
           )
         }

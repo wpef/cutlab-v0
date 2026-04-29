@@ -1,9 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useOnboarding } from './context/OnboardingContext'
 import { STEPS } from './constants/steps'
 import Sidebar from './components/layout/Sidebar'
 import AppLayout from './components/layout/AppLayout'
+
+// Onboarding steps — kept eager (critical auth path, small footprint)
 import Step1Account from './components/steps/Step1Account'
 import Step2Identity from './components/steps/Step2Identity'
 import Step3Skills from './components/steps/Step3Skills'
@@ -12,20 +14,26 @@ import Step5Presentation from './components/steps/Step5Presentation'
 import Step6Level from './components/steps/Step6Level'
 import Step7Preview from './components/steps/Step7Preview'
 import Step8Success from './components/steps/Step8Success'
-import ProfileEditor from './components/editor/ProfileEditor'
-import Landing from './components/pages/Landing'
-import Catalog from './components/pages/Catalog'
-import CreatorSignup from './components/pages/CreatorSignup'
-import MessagingHub from './components/pages/MessagingHub'
-import ChatView from './components/pages/ChatView'
-import OfferForm from './components/pages/OfferForm'
-import OfferPreview from './components/pages/OfferPreview'
-import MesProjetsMonteur from './components/pages/MesProjetsMonteur'
-import EditorPipeline from './components/pages/EditorPipeline'
-import ProjectForm from './components/pages/ProjectForm'
-import ProjectDetail from './components/pages/ProjectDetail'
-import MyProjects from './components/pages/MyProjects'
-import EditorDetail from './components/pages/EditorDetail'
+
+// App pages — lazy loaded by role chunk
+const Landing          = lazy(() => import('./components/pages/Landing'))
+const LegalPrivacy     = lazy(() => import('./components/pages/LegalPrivacy'))
+const LegalTerms       = lazy(() => import('./components/pages/LegalTerms'))
+const AdminUsers       = lazy(() => import('./components/pages/admin/AdminUsers'))
+const AdminReports     = lazy(() => import('./components/pages/admin/AdminReports'))
+const CreatorSignup    = lazy(() => import('./components/pages/CreatorSignup'))
+const Catalog          = lazy(() => import('./components/pages/Catalog'))
+const EditorDetail     = lazy(() => import('./components/pages/EditorDetail'))
+const MessagingHub     = lazy(() => import('./components/pages/MessagingHub'))
+const ChatView         = lazy(() => import('./components/pages/ChatView'))
+const OfferForm        = lazy(() => import('./components/pages/OfferForm'))
+const OfferPreview     = lazy(() => import('./components/pages/OfferPreview'))
+const ProjectForm      = lazy(() => import('./components/pages/ProjectForm'))
+const ProjectDetail    = lazy(() => import('./components/pages/ProjectDetail'))
+const MyProjects       = lazy(() => import('./components/pages/MyProjects'))
+const ProfileEditor    = lazy(() => import('./components/editor/ProfileEditor'))
+const MesProjetsMonteur = lazy(() => import('./components/pages/MesProjetsMonteur'))
+const EditorPipeline   = lazy(() => import('./components/pages/EditorPipeline'))
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -117,10 +125,15 @@ function PublicOnly({ children }) {
 
 export default function App() {
   return (
+    <Suspense fallback={<div className="page-loading" />}>
     <Routes>
       {/* Public-only routes — logged-in users get redirected to home */}
       <Route path="/" element={<PublicOnly><Landing /></PublicOnly>} />
       <Route path="/creator-signup" element={<CreatorSignup />} />
+
+      {/* Legal pages — always public */}
+      <Route path="/legal/privacy" element={<LegalPrivacy />} />
+      <Route path="/legal/terms" element={<LegalTerms />} />
 
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />
@@ -151,7 +164,14 @@ export default function App() {
         <Route path="/project/:id" element={<ProjectDetail />} />
       </Route>
 
+      {/* Admin routes — role='admin' required */}
+      <Route element={<RequireAuth><RequireRole allowed={['admin']}><AppLayout /></RequireRole></RequireAuth>}>
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/reports" element={<AdminReports />} />
+      </Route>
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   )
 }

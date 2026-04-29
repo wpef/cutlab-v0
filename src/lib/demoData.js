@@ -1,11 +1,11 @@
 import { emptyPrices } from './pricing'
 
-// Demo accounts
-export const DEMO_EMAIL    = 'demo@cutlab.io'
-export const DEMO_PASSWORD = 'cutlab-demo-2024!'
+// Demo accounts — credentials loaded from env vars (never hardcode in source)
+export const DEMO_EMAIL    = import.meta.env.VITE_DEMO_EMAIL    ?? ''
+export const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD ?? ''
 
-export const DEMO_CREATOR_EMAIL    = 'demo-creator@cutlab.io'
-export const DEMO_CREATOR_PASSWORD = 'cutlab-creator-2024!'
+export const DEMO_CREATOR_EMAIL    = import.meta.env.VITE_DEMO_CREATOR_EMAIL    ?? ''
+export const DEMO_CREATOR_PASSWORD = import.meta.env.VITE_DEMO_CREATOR_PASSWORD ?? ''
 
 export const DEMO_FORM = {
   firstName:        'Lucas',

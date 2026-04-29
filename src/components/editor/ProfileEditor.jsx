@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { computeCompletion } from '../../lib/profileCompletion'
 import { computeScoreDetails } from '../../lib/computeLevel'
 import { LEVELS } from '../../constants/levels'
-import { PRICING_ROWS, PRICING_GRID } from '../../constants/pricing'
-import { baselinePrices } from '../../lib/pricing'
 import { uploadFile } from '../../lib/uploadFile'
 import EditorCard from '../ui/EditorCard'
 import ScoreBreakdown from '../ui/ScoreBreakdown'
@@ -19,6 +18,7 @@ import HintBox from '../ui/HintBox'
 import { toast } from '../ui/Toast'
 import { AnimatePresence, motion } from 'framer-motion'
 import SocialLinksInput from '../ui/SocialLinksInput'
+import PricingEditor from '../ui/PricingEditor'
 
 const LANGUAGES = [
   { key: 'fr', flag: '🇫🇷', code: 'FR', label: 'Français' },
@@ -102,97 +102,6 @@ const RESPONSE_TIMES = [
 
 const MAX_BIO = 280
 
-/**
- * Pricing editor sub-component — shown in section-pricing of ProfileEditor.
- * Free-input model: each row has a numeric input. Empty input = use baseline.
- * Custom prices are stored as absolute values; the baseline is shown alongside
- * for reference (with a delta in € and %).
- *
- * Props:
- *   assignedLevel — null | number (0-6)
- *   pricing       — { baselineLevel, prices }
- *   onUpdate      — (newPricing) => void
- */
-function PricingEditor({ assignedLevel, pricing, onUpdate }) {
-  const customPrices = pricing?.prices ?? {}
-
-  // Level not set — show info block
-  if (assignedLevel == null) {
-    return (
-      <div className="pricing-editor">
-        <div className="pricing-locked-hint">
-          Ton niveau n'est pas encore défini — complète ton profil pour débloquer la grille de tarifs.
-        </div>
-      </div>
-    )
-  }
-
-  const level = LEVELS[assignedLevel]
-  const baseline = baselinePrices(assignedLevel)
-
-  function handleChange(key, raw) {
-    const next = { ...customPrices }
-    if (raw === '' || raw == null) {
-      delete next[key]
-    } else {
-      const num = Number(raw)
-      if (!Number.isFinite(num) || num < 0) return
-      next[key] = Math.round(num)
-    }
-    onUpdate({ baselineLevel: assignedLevel, prices: next })
-  }
-
-  return (
-    <div className="pricing-editor">
-      <div className="pricing-subtitle">
-        Baseline — {level.emoji} {level.name}. Saisis le prix de ton choix ; la baseline reste affichée pour repère.
-      </div>
-      <div className="pricing-rows-list">
-        {PRICING_ROWS.map((row) => {
-          const base = baseline[row.key]
-          const custom = customPrices[row.key]
-          const hasCustom = typeof custom === 'number' && Number.isFinite(custom) && custom >= 0
-          const final = hasCustom ? custom : base
-          const delta = final - base
-          const deltaPct = base > 0 ? Math.round((delta / base) * 100) : 0
-          return (
-            <div key={row.key} className="pricing-row">
-              <div className="pricing-row__label">{row.label}</div>
-              <div className="pricing-row__controls">
-                <div className="pricing-input-group">
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    step={5}
-                    className="pricing-input"
-                    value={hasCustom ? custom : ''}
-                    placeholder={String(base)}
-                    onChange={(e) => handleChange(row.key, e.target.value)}
-                    aria-label={`${row.label} (€)`}
-                  />
-                  <span className="pricing-input-suffix">€</span>
-                </div>
-                <div className="pricing-baseline-block">
-                  {hasCustom ? (
-                    <span className={`pricing-delta pricing-delta--${delta > 0 ? 'up' : delta < 0 ? 'down' : 'equal'}`}>
-                      {delta > 0 ? '+' : ''}{deltaPct}%
-                    </span>
-                  ) : (
-                    <span className="pricing-delta pricing-delta--equal">baseline</span>
-                  )}
-                  <span className="pricing-baseline-label">Réf. {base} €</span>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      <div className="pricing-grid-note">La baseline se met à jour si ton niveau évolue. Laisser vide = utiliser la baseline.</div>
-    </div>
-  )
-}
-
 const NAV_SECTIONS = [
   { id: 'section-identity',     label: 'Identité' },
   { id: 'section-skills',       label: 'Compétences' },
@@ -211,6 +120,33 @@ export default function ProfileEditor() {
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [avatarUploadError, setAvatarUploadError] = useState(null)
   const [avatarUploadSuccess, setAvatarUploadSuccess] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
+
+  async function handleExportData() {
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    const { data: requests } = await supabase.from('contact_requests').select('*').eq('user_id', user.id)
+    const blob = new Blob([JSON.stringify({ profile, contact_requests: requests }, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = 'cutlab-my-data.json'; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleDeleteAccount() {
+    if (!window.confirm('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')) return
+    setDeletingAccount(true)
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    })
+    if (res.ok) {
+      await signOut()
+    } else {
+      setDeletingAccount(false)
+      alert('Erreur lors de la suppression. Contactez privacy@cutlab.io.')
+    }
+  }
   const [previewOpen, setPreviewOpen] = useState(false)
   const [clipUploading, setClipUploading] = useState(false)
   const [clipUploadError, setClipUploadError] = useState(null)
@@ -261,6 +197,8 @@ export default function ProfileEditor() {
       setClipUploadError("Erreur lors de l'upload.")
     }
   }
+
+  useEffect(() => { document.title = 'CUTLAB — Mon profil' }, [])
 
   useEffect(() => {
     if (user) {
@@ -335,10 +273,11 @@ export default function ProfileEditor() {
     const ok = await saveProfile('published')
     setSaveStatus(ok ? 'saved' : 'error')
     if (ok) {
-      toast.success('Profil mis a jour !')
+      toast.success('Profil mis à jour !')
       setTimeout(() => setSaveStatus(null), 3000)
     } else {
       toast.error('Erreur lors de la sauvegarde')
+      setTimeout(() => setSaveStatus(null), 3000)
     }
   }
 
@@ -373,7 +312,7 @@ export default function ProfileEditor() {
           className="editor-preview-toggle"
           onClick={() => setPreviewOpen((v) => !v)}
         >
-          <span>{previewOpen ? '▾' : '▸'} Apercu de ma carte</span>
+          <span>{previewOpen ? '▾' : '▸'} Aperçu de ma carte</span>
           <span className="editor-preview-completion" style={{ color: completionColor }}>{completionPct}%</span>
         </button>
         <AnimatePresence>
@@ -795,8 +734,16 @@ export default function ProfileEditor() {
               {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
             </Button>
             <button className="editor-logout-mobile" onClick={signOut}>
-              Se deconnecter
+              Se déconnecter
             </button>
+            <div className="editor-account-actions">
+              <button className="editor-account-btn" onClick={handleExportData}>
+                Exporter mes données (JSON)
+              </button>
+              <button className="editor-account-btn editor-account-btn--danger" onClick={handleDeleteAccount} disabled={deletingAccount}>
+                {deletingAccount ? 'Suppression...' : 'Supprimer mon compte'}
+              </button>
+            </div>
           </div>
 
         </div>

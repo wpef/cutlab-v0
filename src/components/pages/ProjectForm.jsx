@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useProjects } from '../../context/ProjectContext'
-import { FORMATS, NICHES, SOFTWARE, LANGUAGES, EXPERIENCE_OPTIONS, MISSION_TYPES, DELIVERABLE_TYPES, QUALITY_OPTIONS } from '../../constants/options'
+import { FORMATS, NICHES, LANGUAGES, EXPERIENCE_OPTIONS, MISSION_TYPES, DELIVERABLE_TYPES, QUALITY_OPTIONS } from '../../constants/options'
 import PageTitle from '../layout/PageTitle'
 import { toast } from '../ui/Toast'
 
@@ -26,14 +26,10 @@ export default function ProjectForm() {
     budget_fixed: '',
     budget_min: '',
     budget_max: '',
-    start_date: '',
+    start_date: new Date().toISOString().split('T')[0],
     deadline: '',
     quality: '',
-    thumbnail_included: false,
-    video_count: '',
-    video_duration: '',
     revision_count: 2,
-    preferred_software: [],
     required_languages: [],
     experience_level: '',
     mission_type: '',
@@ -42,7 +38,6 @@ export default function ProjectForm() {
   const [isEdit, setIsEdit] = useState(false)
   const [isPublished, setIsPublished] = useState(false)
 
-  // Load existing project for edit mode
   useEffect(() => {
     if (!editId) return
     fetchProjectById(editId).then((p) => {
@@ -62,11 +57,7 @@ export default function ProjectForm() {
         start_date: p.start_date || '',
         deadline: p.deadline || '',
         quality: p.quality || '',
-        thumbnail_included: p.thumbnail_included || false,
-        video_count: p.video_count != null ? String(p.video_count) : '',
-        video_duration: p.video_duration || '',
         revision_count: p.revision_count ?? 2,
-        preferred_software: p.preferred_software || [],
         required_languages: p.required_languages || [],
         experience_level: p.experience_level || '',
         mission_type: p.mission_type || '',
@@ -81,7 +72,6 @@ export default function ProjectForm() {
     return arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]
   }
 
-  // Deliverable management
   function updateDeliverable(idx, patch) {
     const updated = [...form.deliverables]
     updated[idx] = { ...updated[idx], ...patch }
@@ -95,7 +85,6 @@ export default function ProjectForm() {
     update({ deliverables: form.deliverables.filter((_, i) => i !== idx) })
   }
 
-  // Validation
   function validate(forPublish = false) {
     const errs = {}
     if (!form.title.trim() || form.title.length < 3) errs.title = 'Le titre doit contenir au moins 3 caractères'
@@ -120,7 +109,6 @@ export default function ProjectForm() {
     return Object.keys(errs).length === 0
   }
 
-  // Build data object for Supabase
   function buildData(status) {
     return {
       title: form.title.trim(),
@@ -135,11 +123,7 @@ export default function ProjectForm() {
       start_date: form.start_date || null,
       deadline: form.deadline,
       quality: form.quality || null,
-      thumbnail_included: form.thumbnail_included,
-      video_count: form.video_count ? Number(form.video_count) : null,
-      video_duration: form.video_duration || null,
       revision_count: form.revision_count,
-      preferred_software: form.preferred_software,
       required_languages: form.required_languages,
       experience_level: form.experience_level || null,
       mission_type: form.mission_type || null,
@@ -180,7 +164,7 @@ export default function ProjectForm() {
     }
   }
 
-  const locked = isPublished // structural fields locked when editing published project
+  const locked = isPublished
 
   return (
     <div className="project-form">
@@ -343,26 +327,37 @@ export default function ProjectForm() {
           {errors.budget && <div className="step-error">{errors.budget}</div>}
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Date de début souhaitée</label>
-          <input
-            className="form-input"
-            type="date"
-            value={form.start_date}
-            onChange={(e) => update({ start_date: e.target.value })}
-          />
+        <div className="form-group form-group--row">
+          <div className="form-group-half">
+            <label className="form-label">Date de début souhaitée <span className="optional">(optionnel)</span></label>
+            <input
+              className="form-input"
+              type="date"
+              value={form.start_date}
+              onChange={(e) => update({ start_date: e.target.value })}
+            />
+          </div>
+          <div className="form-group-half">
+            <label className="form-label">Date limite de livraison *</label>
+            <input
+              className="form-input"
+              type="date"
+              value={form.deadline}
+              onChange={(e) => update({ deadline: e.target.value })}
+            />
+            {errors.deadline && <div className="step-error">{errors.deadline}</div>}
+          </div>
         </div>
-
-        <div className="form-group">
-          <label className="form-label">Date limite de livraison *</label>
-          <input
-            className="form-input"
-            type="date"
-            value={form.deadline}
-            onChange={(e) => update({ deadline: e.target.value })}
-          />
-          {errors.deadline && <div className="step-error">{errors.deadline}</div>}
-        </div>
+        {form.start_date && form.deadline && new Date(form.deadline) > new Date(form.start_date) && (
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: -8, marginBottom: 16 }}>
+            Durée : {(() => {
+              const days = Math.round((new Date(form.deadline) - new Date(form.start_date)) / (1000 * 60 * 60 * 24))
+              if (days < 14) return `${days} jour${days > 1 ? 's' : ''}`
+              if (days < 60) return `${Math.round(days / 7)} semaine${Math.round(days / 7) > 1 ? 's' : ''}`
+              return `${Math.round(days / 30)} mois`
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Section 4: Technical preferences */}
@@ -380,22 +375,6 @@ export default function ProjectForm() {
                 type="button"
               >
                 {q.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Logiciels préférés</label>
-          <div className="chip-group">
-            {SOFTWARE.map((s) => (
-              <button
-                key={s}
-                className={`chip ${form.preferred_software.includes(s) ? 'active' : ''}`}
-                onClick={() => update({ preferred_software: toggleInArray(form.preferred_software, s) })}
-                type="button"
-              >
-                {s}
               </button>
             ))}
           </div>
@@ -463,46 +442,12 @@ export default function ProjectForm() {
         </div>
       </div>
 
-      {/* Section 5: Additional details */}
+      {/* Section 5: Rushes */}
       <div className="project-form-section">
-        <div className="project-form-section-title">Détails supplémentaires</div>
+        <div className="project-form-section-title">Informations complémentaires</div>
 
         <div className="form-group">
-          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input
-              type="checkbox"
-              checked={form.thumbnail_included}
-              onChange={(e) => update({ thumbnail_included: e.target.checked })}
-            />
-            Miniature incluse dans la prestation
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Nombre de vidéos attendues</label>
-          <input
-            className="form-input"
-            type="number"
-            min={1}
-            value={form.video_count}
-            onChange={(e) => update({ video_count: e.target.value })}
-            placeholder="Ex: 4"
-            style={{ maxWidth: 100 }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Durée estimée par vidéo</label>
-          <input
-            className="form-input"
-            value={form.video_duration}
-            onChange={(e) => update({ video_duration: e.target.value })}
-            placeholder="Ex: 10-15 minutes"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Informations sur les rushes</label>
+          <label className="form-label">Informations sur les rushes <span className="optional">(optionnel)</span></label>
           <textarea
             className="form-input"
             value={form.rushes_info}

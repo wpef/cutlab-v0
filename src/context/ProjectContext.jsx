@@ -58,12 +58,16 @@ export function ProjectProvider({ children }) {
     setProjectLoading(true)
     const { data, error } = await supabase
       .from('projects')
-      .select('*')
+      .select('*, contact_requests!project_id(id, status)')
       .eq('creator_id', user.id)
       .order('created_at', { ascending: false })
     setProjectLoading(false)
     if (error) { console.error('[Projects] fetchMine:', error.message); return }
-    setMyProjects(data ?? [])
+    const enriched = (data ?? []).map((p) => ({
+      ...p,
+      application_count: (p.contact_requests || []).filter((r) => r.status === 'pending').length,
+    }))
+    setMyProjects(enriched)
   }, [user])
 
   const fetchPublishedProjects = useCallback(async (filters = {}) => {
@@ -415,12 +419,20 @@ export function ProjectProvider({ children }) {
     setUnreadCount(0)
   }, [user])
 
-  // Polling: fetch unread count every 30s
+  // Realtime: react to new notifications instead of polling
   useEffect(() => {
     if (!user) return
     fetchUnreadCount()
-    pollRef.current = setInterval(fetchUnreadCount, 30000)
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => fetchUnreadCount())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [user, fetchUnreadCount])
 
   // Auto-reset on logout (user becomes null)
@@ -438,7 +450,7 @@ export function ProjectProvider({ children }) {
     setMyApplications([])
     setNotifications([])
     setUnreadCount(0)
-    if (pollRef.current) clearInterval(pollRef.current)
+    if (pollRef.current) clearInterval(pollRef.current) // legacy cleanup
   }, [])
 
   return (

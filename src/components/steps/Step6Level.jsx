@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { LEVELS } from '../../constants/levels'
 import { computeScoreDetails } from '../../lib/computeLevel'
+import PricingEditor from '../ui/PricingEditor'
 import ScoreBreakdown from '../ui/ScoreBreakdown'
 import LevelUnlockAnimation from '../ui/LevelUnlockAnimation'
 import StepHeader from '../ui/StepHeader'
@@ -28,6 +29,7 @@ export default function Step6Level() {
   const [loadingText, setLoadingText] = useState('Lecture du profil...')
   const [certifSent,  setCertifSent]  = useState(formData.certificationStatus === 'pending')
   const [showBreakdown, setShowBreakdown] = useState(false)
+  const [pricing, setPricing] = useState(formData.pricing ?? {})
 
   // Compute score from formData (read-only, no picker)
   const scoreDetails = computeScoreDetails(formData)
@@ -187,8 +189,31 @@ export default function Step6Level() {
         )}
       </AnimatePresence>
 
+      {/* Pricing configuration — shown after animation completes */}
       {phase === 'result' && (
-        <StepNav onBack={() => goToStep(5)} onNext={() => goToStep(7)} nextLabel="Voir mon profil →" />
+        <div className="step6-pricing-section">
+          <div className="step6-pricing-title">Configurez vos tarifs</div>
+          <p className="step6-pricing-desc">
+            Basé sur votre niveau <strong>{level.name}</strong>.
+            Laissez vide pour utiliser la baseline — ajustable depuis votre profil à tout moment.
+          </p>
+          <PricingEditor
+            assignedLevel={levelIndex}
+            pricing={pricing}
+            onUpdate={(p) => setPricing(p)}
+          />
+        </div>
+      )}
+
+      {phase === 'result' && (
+        <StepNav
+          onBack={() => goToStep(5)}
+          onNext={() => {
+            updateFormData({ pricing })
+            goToStep(7)
+          }}
+          nextLabel="Voir mon profil →"
+        />
       )}
     </div>
   )

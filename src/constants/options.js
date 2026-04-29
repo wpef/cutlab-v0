@@ -58,14 +58,6 @@ export const SOFTWARE = [
   'CapCut', 'Canva', 'Photoshop', 'Illustrator', 'Audition', 'Figma',
 ]
 
-export const REVISION_OPTIONS = ['1', '2', '3', '4', '5']
-
-export const CAPACITY_OPTIONS = [
-  { key: '1',   label: '1 projet à la fois' },
-  { key: '2-3', label: '2–3 projets' },
-  { key: '4+',  label: '4 projets et plus' },
-]
-
 export const MISSION_TYPES = [
   { key: 'ponctuelle',   label: 'Mission ponctuelle' },
   { key: 'long-terme',   label: 'Partenariat long terme' },

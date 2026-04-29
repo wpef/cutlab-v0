@@ -43,7 +43,10 @@ export function CollabProvider({ children }) {
       return 'candidature_sent'
     }
 
-    return 'offer_sent' // direct contact pending offer
+    // direct contact — derive from request status
+    if (request.status === 'pending') return 'contact_pending'
+    if (request.status === 'accepted') return 'contact_accepted'
+    return 'offer_sent' // fallback
   }
 
   // ─── Data loading ─────────────────────────────────────────────
@@ -299,6 +302,63 @@ export function CollabProvider({ children }) {
     return data
   }, [user])
 
+  /** Sender (creator OR editor): cancels a pending offer. */
+  const cancelOffer = useCallback(async (offerId, request = null, offer = null) => {
+    if (!user) return false
+    const { error } = await supabase
+      .from('offers')
+      .update({ status: 'cancelled' })
+      .eq('id', offerId)
+    if (error) { console.error('[Collab] cancelOffer:', error.message); return false }
+
+    if (request && offer) {
+      const receiverId = offer.sent_by === 'editor' ? request.creator_id : request.editor_id
+      const senderName = offer.sent_by === 'editor' ? request.editor_name : request.creator_name
+      if (receiverId) {
+        await notify({
+          user_id: receiverId,
+          type: 'offer_cancelled',
+          request_id: request.id,
+          project_id: request.project_id ?? null,
+          actor_id: user.id,
+          actor_name: senderName ?? '',
+          project_title: offer.title ?? '',
+          read: false,
+        })
+      }
+    }
+    return true
+  }, [user])
+
+  /** Closes the collaboration: marks linked project as completed, notifies the other party. */
+  const closeProject = useCallback(async (request, offer = null) => {
+    if (!user || !request) return false
+    const ops = []
+    if (request.project_id) {
+      ops.push(supabase.from('projects').update({ status: 'completed' }).eq('id', request.project_id))
+    }
+    const results = await Promise.all(ops)
+    if (results.some((r) => r.error)) {
+      console.error('[Collab] closeProject error')
+      return false
+    }
+    const otherUserId = request.creator_id === user.id ? request.editor_id : request.creator_id
+    const myName = request.creator_id === user.id ? request.creator_name : request.editor_name
+    if (otherUserId) {
+      await notify({
+        user_id: otherUserId,
+        type: 'project_closed',
+        request_id: request.id,
+        project_id: request.project_id ?? null,
+        actor_id: user.id,
+        actor_name: myName ?? '',
+        project_title: offer?.title ?? '',
+        read: false,
+      })
+    }
+    return true
+  }, [user])
+
   return (
     <CollabContext.Provider value={{
       rounds,
@@ -312,6 +372,8 @@ export function CollabProvider({ children }) {
       confirmPaymentSent,
       confirmPaymentReceived,
       submitReview,
+      cancelOffer,
+      closeProject,
     }}>
       {children}
     </CollabContext.Provider>

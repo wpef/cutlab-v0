@@ -8,6 +8,7 @@ import { PRICING_ROWS } from '../../constants/pricing'
 import { computePricing } from '../../lib/pricing'
 import PageTitle from '../layout/PageTitle'
 import SocialLinksDisplay from '../ui/SocialLinksDisplay'
+import { toast } from '../ui/Toast'
 
 const SKILL_LABELS = {
   video: 'Montage', thumb: 'Miniatures', sound: 'Sound',
@@ -49,6 +50,8 @@ export default function EditorDetail() {
   const [contactMsg, setContactMsg] = useState('')
   const [contactSending, setContactSending] = useState(false)
   const [contactError, setContactError] = useState('')
+  const [reviews, setReviews] = useState([])
+  const [isFavorite, setIsFavorite] = useState(false)
 
   useEffect(() => {
     supabase
@@ -64,12 +67,54 @@ export default function EditorDetail() {
         setProfile(data)
         setLoading(false)
       })
+    // Fetch reviews
+    supabase
+      .from('project_reviews')
+      .select('rating, comment, created_at')
+      .eq('editor_id', id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => setReviews(data ?? []))
   }, [id])
+
+  // Derive name early so it's available in toggleFavorite and handleShare
+  // (profile may be null before data loads; optional chaining keeps it safe)
+  const name = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ')
+
+  // Check favorite status for logged-in creators
+  useEffect(() => {
+    if (!user || userRole !== 'creator' || !id) return
+    supabase
+      .from('favorites')
+      .select('id')
+      .eq('creator_id', user.id)
+      .eq('editor_id', id)
+      .maybeSingle()
+      .then(({ data }) => setIsFavorite(!!data))
+  }, [user, userRole, id])
+
+  async function toggleFavorite() {
+    if (!user) { goToCreatorSignup(id, name || 'Monteur'); return }
+    if (isFavorite) {
+      await supabase.from('favorites').delete().eq('creator_id', user.id).eq('editor_id', id)
+      setIsFavorite(false)
+    } else {
+      await supabase.from('favorites').insert({ creator_id: user.id, editor_id: id })
+      setIsFavorite(true)
+    }
+  }
+
+  function handleShare() {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({ title: `Profil ${name}`, url })
+    } else {
+      navigator.clipboard.writeText(url).then(() => toast.success('Lien copié !'))
+    }
+  }
 
   if (loading) return <div className="catalog-loading">Chargement...</div>
   if (!profile) return null
 
-  const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ')
   const rawIdx = profile.assigned_level
   const levelIdx = (typeof rawIdx === 'number' && rawIdx >= 0 && rawIdx < LEVELS.length) ? rawIdx : 0
   const level = LEVELS[levelIdx]
@@ -102,6 +147,18 @@ export default function EditorDetail() {
         <button className="catalog-header-btn" onClick={() => navigate('/catalog')}>
           ← Catalogue
         </button>
+        <button className="catalog-header-btn" onClick={handleShare} title="Partager">
+          ↗ Partager
+        </button>
+        {userRole === 'creator' && (
+          <button
+            className={`catalog-header-btn${isFavorite ? ' catalog-header-btn--active' : ''}`}
+            onClick={toggleFavorite}
+            title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          >
+            {isFavorite ? '♥' : '♡'}
+          </button>
+        )}
       </PageTitle>
 
       <div className="editor-detail-content">
@@ -197,6 +254,30 @@ export default function EditorDetail() {
               </div>
             )
           })()}
+
+          {/* Reviews */}
+          {reviews.length > 0 && (
+            <div className="editor-detail-section">
+              <div className="editor-detail-section-title">
+                Avis ({reviews.length})
+                {' '}
+                <span className="editor-detail-rating-avg">
+                  {'★'.repeat(Math.round(reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length))}
+                  {' '}
+                  {(reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length).toFixed(1)}
+                </span>
+              </div>
+              <div className="editor-detail-reviews">
+                {reviews.slice(0, 5).map((r, i) => (
+                  <div key={i} className="editor-detail-review">
+                    {r.rating && <div className="review-stars-display">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>}
+                    {r.comment && <div className="review-comment">{r.comment}</div>}
+                    <div className="review-date">{new Date(r.created_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Contact */}
           {!contactOpen ? (

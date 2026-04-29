@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { useCollab } from '../../context/CollabContext'
@@ -14,6 +15,7 @@ function formatTime(iso) {
 
 export default function ChatView() {
   const { id: urlId } = useParams()
+  const navigate = useNavigate()
   const { goToMessaging, goToEditorDetail, goToProjectDetail, userRole, user } = useOnboarding()
   const {
     activeRequestId, setActiveRequestId, requests,
@@ -24,7 +26,7 @@ export default function ChatView() {
     acceptRequest, refuseRequest,
     acceptOffer, refuseOffer,
   } = useMessaging()
-  const { loadCollabData } = useCollab()
+  const { loadCollabData, cancelOffer, closeProject } = useCollab()
   const { acceptApplication, refuseApplication } = useProjects()
 
   // Sync URL param → activeRequestId
@@ -40,13 +42,21 @@ export default function ChatView() {
   const [sending, setSending] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [projectTitle, setProjectTitle] = useState('')
   const messagesEndRef = useRef(null)
 
   const request = requests.find((r) => r.id === requestId)
-  const offer = offers.find((o) => o.status === 'accepted') ?? offers[0] ?? null
+  // Latest non-cancelled/non-refused offer drives the tracker step (T008)
+  const offer = offers
+    .filter((o) => o.status !== 'cancelled' && o.status !== 'refused')
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0] ?? null
   const otherName = request
     ? (userRole === 'creator' ? request.editor_name : request.creator_name)
     : 'Conversation'
+  // For editors with a project context, show the project title in the header (T006)
+  const headerLabel = (userRole === 'editor' && request?.project_id)
+    ? (projectTitle || otherName)
+    : otherName
 
   // Unified chronological timeline: messages + offers sorted by created_at
   const timeline = useMemo(() => [
@@ -58,22 +68,35 @@ export default function ChatView() {
   // Show whenever request exists (even pending), but tracker renders contextually
   const showTracker = !!request
 
-  // Initial load + polling every 5s
+  // Initial load
   useEffect(() => {
     if (!requestId) return
     loadRequests()
     fetchMessages(requestId)
     loadOffers(requestId)
     loadCollabData(requestId)
+  }, [requestId])
 
-    const interval = setInterval(() => {
-      fetchMessages(requestId)
-      loadOffers(requestId)
-      loadCollabData(requestId)
-      loadRequests()
-    }, 5000)
+  // Fetch project title when chat is bound to a project (T006)
+  useEffect(() => {
+    if (!request?.project_id) { setProjectTitle(''); return }
+    supabase.from('projects').select('title').eq('id', request.project_id).single()
+      .then(({ data }) => setProjectTitle(data?.title || ''))
+  }, [request?.project_id])
 
-    return () => clearInterval(interval)
+  // Realtime: new messages trigger a fetch instead of polling 5s
+  useEffect(() => {
+    if (!requestId) return
+    const channel = supabase
+      .channel(`messages:${requestId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `contact_request_id=eq.${requestId}`,
+      }, () => fetchMessages(requestId))
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [requestId])
 
   // Scroll to bottom when messages change
@@ -155,7 +178,7 @@ export default function ChatView() {
               onClick={() => goToEditorDetail(request.editor_id)}
               title="Voir le profil du monteur"
             >
-              {otherName} <span className="chat-header-link-icon">↗</span>
+              {headerLabel} <span className="chat-header-link-icon">↗</span>
             </button>
           ) : userRole === 'editor' && request?.project_id ? (
             <button
@@ -163,10 +186,10 @@ export default function ChatView() {
               onClick={() => goToProjectDetail(request.project_id)}
               title="Voir la fiche projet"
             >
-              {otherName} <span className="chat-header-link-icon">↗</span>
+              {headerLabel} <span className="chat-header-link-icon">↗</span>
             </button>
           ) : (
-            <div className="chat-header-name">{otherName}</div>
+            <div className="chat-header-name">{headerLabel}</div>
           )}
           <span className={`messaging-status messaging-status--${request.status}`}>
             {request.status === 'pending' ? 'En attente' : request.status === 'accepted' ? 'Acceptée' : 'Refusée'}
@@ -282,6 +305,8 @@ export default function ChatView() {
             onRefuseOffer={refuseOffer}
             onAcceptRequest={acceptRequest}
             onRefuseRequest={refuseRequest}
+            onCancelOffer={async (offerId) => { await cancelOffer(offerId, request, offer); handleTrackerUpdated() }}
+            onCloseProject={async () => { await closeProject(request, offer); handleTrackerUpdated() }}
           />
         </div>
       )}
@@ -298,6 +323,8 @@ export default function ChatView() {
         onRefuseOffer={refuseOffer}
         onAcceptRequest={acceptRequest}
         onRefuseRequest={refuseRequest}
+        onCancelOffer={async (offerId) => { await cancelOffer(offerId, request, offer); handleTrackerUpdated() }}
+        onCloseProject={async () => { await closeProject(request, offer); handleTrackerUpdated() }}
       />
     </div>
   )

@@ -7,11 +7,12 @@ import StepHeader from '../ui/StepHeader'
 import StepNav from '../ui/StepNav'
 
 const LEGEND_ITEMS = [
-  { label: 'Niveau',            desc: 'affiché en bas à gauche de la carte, calculé depuis ton profil' },
-  { label: 'Drapeaux',          desc: 'langues parlées, visibles par les clients directement' },
-  { label: 'Disponibilité',     desc: 'mise à jour depuis ton dashboard en temps réel' },
-  { label: 'Tags compétences',  desc: 'tes 3 premières apparaissent sur la carte' },
-  { label: 'Indicateur prix',   desc: 'de $ à $$$$ calculé automatiquement depuis ta grille' },
+  { label: 'Niveau',               desc: 'emoji + nom du niveau, visible en bas de la carte' },
+  { label: 'Drapeaux',             desc: 'langues maîtrisées, visibles directement par les créateurs' },
+  { label: 'Disponibilité',        desc: 'indicateur coloré, modifiable depuis votre profil' },
+  { label: 'Compétences',          desc: 'vos 3 premières compétences sélectionnées' },
+  { label: 'Formats',              desc: 'YouTube, Shorts, Clips… vos 3 premiers formats' },
+  { label: 'Fourchette tarifaire', desc: 'calculée depuis votre grille, ex. 250 – 450 €' },
 ]
 
 
@@ -53,7 +54,7 @@ export default function Step7Preview() {
             experience: formData.experience,
             languages: formData.languages,
             formats: formData.formats,
-            hourly_rate: formData.hourlyRate,
+            pricing: formData.pricing,
           }}
         />
 
