@@ -1,26 +1,27 @@
 import { Link } from 'react-router-dom';
-import SEO from '../../seo/SEO';
-import { SEO_CONFIG } from '../../seo/seoConfig';
+import SEO from '../../seo/SEO'
+import { SEO_CONFIG } from '../../seo/seoConfig'
 
-export default function LandingMotionDesigner() {
+export default function LandingMusicienIndependant() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.motionDesigner} />
+      <SEO {...SEO_CONFIG.musicienIndependant} />
       <header className="persona-header">
-        <div className="logo">CUT<span>LAB</span></div>
+        <Link to="/" className="logo">CUT<span>LAB</span></Link>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Tu fais du motion, pas du montage basique.{' '}
-          <em>Montre-le.</em>
+          Ta musique mérite{' '}
+          <em>plus qu'un fond noir</em>.
         </h1>
         <p>
-          Sur les plateformes généralistes, motion design = montage vidéo. Sur CUTLAB,
-          tes compétences motion sont identifiées, valorisées, et tarifées séparément.
+          Lyric videos, clips musicaux, live sessions, visualizers — donne à tes morceaux
+          le visuel qu'ils méritent. CUTLAB te connecte avec des monteurs qui aiment la
+          musique et savent la mettre en image.
         </p>
-        <Link to="/onboarding/1" className="persona-hero-cta">
-          Créer mon profil motion →
+        <Link to="/catalog" className="persona-hero-cta">
+          Trouver mon monteur →
         </Link>
       </section>
 
@@ -29,30 +30,29 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎭</span>
+            <span className="persona-pain-icon">🎵</span>
             <span className="persona-pain-text">
-              Les clients confondent montage et motion design. Tes skills After Effects
-              sont sous-valorisées.
+              Sans label, tu galères à trouver un monteur qui comprend ton univers musical.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🔍</span>
+            <span className="persona-pain-icon">💸</span>
             <span className="persona-pain-text">
-              Pas de filtre "Motion Design" sur les marketplaces. Tu es rangé avec les
-              monteurs basiques.
+              Sur Fiverr, c'est 100€ pour du sous-traité au Vietnam. Sur Malt, c'est 5K€
+              pour une "agence".
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">💰</span>
+            <span className="persona-pain-icon">🎨</span>
             <span className="persona-pain-text">
-              Tu factures au même tarif qu'un monteur junior alors que ton travail
-              demande 3x plus de technique.
+              Les monteurs vidéo classiques ne savent pas mixer image et son rythmiquement.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">😐</span>
+            <span className="persona-pain-icon">🎬</span>
             <span className="persona-pain-text">
-              Les projets qu'on te propose sont des cuts basiques, pas du motion.
+              Tu veux du qualitatif (clips, live sessions) mais ton budget est celui d'un
+              artiste indé.
             </span>
           </li>
         </ul>
@@ -63,27 +63,26 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">✨</span>
-            <h3>Motion comme skill</h3>
+            <span className="persona-feature-icon">🎶</span>
+            <h3>Monteurs Music</h3>
             <p>
-              Motion Design est une compétence à part entière sur CUTLAB. Les créateurs
-              te trouvent spécifiquement pour ça.
+              Filtre par niche Music. Des monteurs qui kiffent la musique et savent monter
+              au beat.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">💎</span>
-            <h3>Tarifs motion dédiés</h3>
+            <span className="persona-feature-icon">🎥</span>
+            <h3>Tous formats</h3>
             <p>
-              3 lignes tarifaires dédiées au motion (court, moyen, long). Tes tarifs
-              reflètent la complexité de ton travail.
+              Lyric video, clip musical, live session, visualizer, behind-the-scenes —
+              choisis ton format selon ton budget.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">📈</span>
-            <h3>Niveaux qui te valorisent</h3>
+            <span className="persona-feature-icon">💶</span>
+            <h3>Tarifs par projet</h3>
             <p>
-              7 niveaux basés sur ton profil et ton expérience. Plus tu es expert, plus
-              ton positionnement tarifaire est élevé.
+              Pas d'abonnement, pas de retainer. Un projet, un tarif, un livrable.
             </p>
           </div>
         </div>
@@ -96,30 +95,29 @@ export default function LandingMotionDesigner() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Crée ton profil</h3>
+              <h3>Filtre par niche Music</h3>
               <p>
-                Mets en avant tes compétences motion, ton portfolio After Effects, tes
-                réalisations.
+                Catalogue de monteurs qui ont déjà bossé sur du clip et de la lyric video.
+                Vérifie leur portfolio.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Fixe tes tarifs</h3>
+              <h3>Brief ton projet</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Track audio + références visuelles + délai. Le monteur te propose une offre
+                détaillée.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Reçois des projets motion</h3>
+              <h3>Reçois ton clip</h3>
               <p>
-                Les créateurs qui cherchent du motion te trouvent et te contactent
-                directement.
+                Livraison aux délais convenus. Tu publies sur YouTube, Spotify Canvas, Reels.
               </p>
             </div>
           </li>
@@ -139,8 +137,8 @@ export default function LandingMotionDesigner() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">3 lignes</span>
-            <span className="persona-stat-label">Tarifs motion</span>
+            <span className="persona-stat-value">1 projet</span>
+            <span className="persona-stat-label">1 tarif</span>
           </div>
         </div>
       </section>
@@ -148,11 +146,11 @@ export default function LandingMotionDesigner() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à être reconnu pour ton motion ?</h2>
+        <h2>Prêt à mettre ta musique en image ?</h2>
         <p>
-          Rejoins CUTLAB. Un catalogue où le motion design a sa place — et son tarif.
+          Trouve un monteur qui comprend ton son. Sans label, sans intermédiaire.
         </p>
-        <Link to="/onboarding/1">Créer mon profil motion →</Link>
+        <Link to="/catalog">Parcourir les monteurs →</Link>
       </section>
     </div>
   );

@@ -42,6 +42,16 @@ const LandingCoachEntrepreneur = lazy(() => import('./components/pages/personas/
 const LandingFreelanceYoutube = lazy(() => import('./components/pages/personas/LandingFreelanceYoutube'))
 const LandingMotionDesigner = lazy(() => import('./components/pages/personas/LandingMotionDesigner'))
 const LandingEtudiantAudiovisuel = lazy(() => import('./components/pages/personas/LandingEtudiantAudiovisuel'))
+const LandingPodcasteur = lazy(() => import('./components/pages/personas/LandingPodcasteur'))
+const LandingFormateurEnLigne = lazy(() => import('./components/pages/personas/LandingFormateurEnLigne'))
+const LandingAgencePme = lazy(() => import('./components/pages/personas/LandingAgencePme'))
+const LandingStreamerTwitch = lazy(() => import('./components/pages/personas/LandingStreamerTwitch'))
+const LandingMusicienIndependant = lazy(() => import('./components/pages/personas/LandingMusicienIndependant'))
+const LandingMonteurReconverti = lazy(() => import('./components/pages/personas/LandingMonteurReconverti'))
+const LandingSpecialisteShorts = lazy(() => import('./components/pages/personas/LandingSpecialisteShorts'))
+const LandingMonteurAgence = lazy(() => import('./components/pages/personas/LandingMonteurAgence'))
+const LandingSoundDesigner = lazy(() => import('./components/pages/personas/LandingSoundDesigner'))
+const LandingColorist = lazy(() => import('./components/pages/personas/LandingColorist'))
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -154,6 +164,16 @@ export default function App() {
       <Route path="/pour/freelance-youtube" element={<LandingFreelanceYoutube />} />
       <Route path="/pour/motion-designer" element={<LandingMotionDesigner />} />
       <Route path="/pour/etudiant-audiovisuel" element={<LandingEtudiantAudiovisuel />} />
+      <Route path="/pour/podcasteur" element={<LandingPodcasteur />} />
+      <Route path="/pour/formateur-en-ligne" element={<LandingFormateurEnLigne />} />
+      <Route path="/pour/agence-pme" element={<LandingAgencePme />} />
+      <Route path="/pour/streamer-twitch" element={<LandingStreamerTwitch />} />
+      <Route path="/pour/musicien-independant" element={<LandingMusicienIndependant />} />
+      <Route path="/pour/monteur-reconverti" element={<LandingMonteurReconverti />} />
+      <Route path="/pour/specialiste-shorts" element={<LandingSpecialisteShorts />} />
+      <Route path="/pour/monteur-agence" element={<LandingMonteurAgence />} />
+      <Route path="/pour/sound-designer" element={<LandingSoundDesigner />} />
+      <Route path="/pour/colorist" element={<LandingColorist />} />
 
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />

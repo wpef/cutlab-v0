@@ -2,26 +2,26 @@ import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
 
-export default function LandingCoachEntrepreneur() {
+export default function LandingAgencePme() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.coachEntrepreneur} />
+      <SEO {...SEO_CONFIG.agencePme} />
       <header className="persona-header">
-        <div className="logo">CUT<span>LAB</span></div>
+        <Link to="/" className="logo">CUT<span>LAB</span></Link>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Votre contenu pro, monté par un expert.{' '}
-          <em>Sans passer par une agence.</em>
+          Vos contenus social media méritent{' '}
+          <em>un studio à la demande</em>.
         </h1>
         <p>
-          Formations, webinaires, vidéos LinkedIn — votre contenu mérite un montage
-          professionnel. CUTLAB vous connecte avec des monteurs expérimentés, sans
-          intermédiaire.
+          PME, ETI, agences — externalisez votre montage vidéo sans signer de contrat
+          agence. Trouvez des monteurs vérifiés à la demande, pour vos LinkedIn, Reels,
+          vidéos corporate, formations internes.
         </p>
         <Link to="/catalog" className="persona-hero-cta">
-          Trouver mon monteur →
+          Parcourir les monteurs →
         </Link>
       </section>
 
@@ -30,29 +30,31 @@ export default function LandingCoachEntrepreneur() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">📅</span>
+            <span className="persona-pain-icon">💼</span>
             <span className="persona-pain-text">
-              Vous devez produire du contenu régulièrement, mais le montage prend un
-              temps fou.
+              Recruter un monteur en interne représente 50K€/an minimum. Pour un volume
+              irrégulier, c'est sur-dimensionné.
             </span>
           </li>
           <li className="persona-pain-item">
             <span className="persona-pain-icon">🏢</span>
             <span className="persona-pain-text">
-              Les agences vidéo facturent des milliers d'euros pour quelques vidéos.
+              Les agences créatives facturent à des tarifs prohibitifs. Vous payez le
+              brand, pas le monteur.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎯</span>
+            <span className="persona-pain-icon">📈</span>
             <span className="persona-pain-text">
-              Vous avez besoin de fiabilité : des deadlines respectées, une qualité
-              constante.
+              Votre besoin en vidéo grimpe avec les réseaux sociaux, mais reste
+              imprévisible mois par mois.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🔄</span>
+            <span className="persona-pain-icon">🤝</span>
             <span className="persona-pain-text">
-              Les freelances génériques ne comprennent pas le contenu business.
+              Vous avez besoin de fiabilité B2B : factures, NDA, deadlines tenues,
+              qualité constante.
             </span>
           </li>
         </ul>
@@ -63,27 +65,27 @@ export default function LandingCoachEntrepreneur() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">👨‍💼</span>
-            <h3>Monteurs expérimentés</h3>
+            <span className="persona-feature-icon">✅</span>
+            <h3>Monteurs vérifiés</h3>
             <p>
-              Filtrez par années d'expérience. Trouvez des monteurs qui ont l'habitude
-              du contenu corporate et éducatif.
-            </p>
-          </div>
-          <div className="persona-feature">
-            <span className="persona-feature-icon">📋</span>
-            <h3>Gestion de projet</h3>
-            <p>
-              Créez des projets structurés avec brief, livrables, deadline et budget.
-              Tout est centralisé.
+              Filtres expérience, formats Corporate/B2B, et niches. Profils complets
+              avec portfolio et niveau.
             </p>
           </div>
           <div className="persona-feature">
             <span className="persona-feature-icon">💶</span>
-            <h3>Tarifs sans surprise</h3>
+            <h3>Tarifs transparents</h3>
             <p>
-              Chaque monteur affiche sa grille tarifaire. Vous savez exactement à quoi
-              vous attendre.
+              Grille tarifaire visible avant contact. Vous budgétisez sans devis
+              interminable.
+            </p>
+          </div>
+          <div className="persona-feature">
+            <span className="persona-feature-icon">📋</span>
+            <h3>Gestion structurée</h3>
+            <p>
+              Offres détaillées, livrables, deadlines, messagerie traçable. Vos équipes
+              pilotent comme avec un prestataire.
             </p>
           </div>
         </div>
@@ -96,30 +98,30 @@ export default function LandingCoachEntrepreneur() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Parcourez le catalogue</h3>
+              <h3>Briefez votre besoin</h3>
               <p>
-                Filtrez par expérience, compétences et disponibilité. Consultez les
-                portfolios.
+                Créez un projet structuré : format, livrables, délai, budget.
+                Centralisé pour vos équipes.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Contactez un monteur</h3>
+              <h3>Sélectionnez le monteur</h3>
               <p>
-                Présentez votre projet. Le monteur vous répond avec une proposition
-                détaillée.
+                Comparez profils, tarifs, et expérience. Contactez directement, sans
+                intermédiaire.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Lancez la collaboration</h3>
+              <h3>Pilotez la livraison</h3>
               <p>
-                Acceptez la proposition, échangez via la messagerie intégrée, suivez
-                l'avancement.
+                Échanges traçables, livrables structurés, validation simple.
+                Refacturable à votre client final.
               </p>
             </div>
           </li>
@@ -139,8 +141,8 @@ export default function LandingCoachEntrepreneur() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">15 min</span>
-            <span className="persona-stat-label">Pour trouver</span>
+            <span className="persona-stat-value">70%</span>
+            <span className="persona-stat-label">Économies vs agence</span>
           </div>
         </div>
       </section>
@@ -148,9 +150,12 @@ export default function LandingCoachEntrepreneur() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à professionnaliser votre contenu ?</h2>
-        <p>Trouvez un monteur fiable et expérimenté. Sans agence, sans commission.</p>
-        <Link to="/catalog">Trouver mon monteur →</Link>
+        <h2>Prêt à externaliser intelligemment ?</h2>
+        <p>
+          Trouvez votre prestataire vidéo à la demande. Sans engagement, sans agence,
+          sans commission.
+        </p>
+        <Link to="/catalog">Parcourir les monteurs →</Link>
       </section>
     </div>
   );

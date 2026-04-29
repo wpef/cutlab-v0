@@ -2,25 +2,25 @@ import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
 
-export default function LandingMotionDesigner() {
+export default function LandingMonteurReconverti() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.motionDesigner} />
+      <SEO {...SEO_CONFIG.monteurReconverti} />
       <header className="persona-header">
-        <div className="logo">CUT<span>LAB</span></div>
+        <Link to="/" className="logo">CUT<span>LAB</span></Link>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Tu fais du motion, pas du montage basique.{' '}
-          <em>Montre-le.</em>
+          Tu te reconvertis. <em>Tes premiers vrais clients t'attendent.</em>
         </h1>
         <p>
-          Sur les plateformes généralistes, motion design = montage vidéo. Sur CUTLAB,
-          tes compétences motion sont identifiées, valorisées, et tarifées séparément.
+          Tu sors de formation continue, de bootcamp, ou tu changes de carrière vers le montage
+          vidéo. Tu sais monter, mais tu n'as pas de réseau pro. CUTLAB te donne une vitrine et
+          des opportunités sans avoir 5 ans d'expérience.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Créer mon profil motion →
+          Commencer gratuitement →
         </Link>
       </section>
 
@@ -29,30 +29,28 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎭</span>
+            <span className="persona-pain-icon">🎓</span>
             <span className="persona-pain-text">
-              Les clients confondent montage et motion design. Tes skills After Effects
-              sont sous-valorisées.
+              Tu sors d'une formation continue, pas d'une école d'audiovisuel. Personne ne te
+              connaît dans le milieu.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🔍</span>
+            <span className="persona-pain-icon">🤝</span>
             <span className="persona-pain-text">
-              Pas de filtre "Motion Design" sur les marketplaces. Tu es rangé avec les
-              monteurs basiques.
+              Pas de réseau pro = pas de clients. Tu envoies des CV dans le vide.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">💰</span>
+            <span className="persona-pain-icon">💸</span>
             <span className="persona-pain-text">
-              Tu factures au même tarif qu'un monteur junior alors que ton travail
-              demande 3x plus de technique.
+              Tu doutes de tes tarifs : trop bas tu te brûles, trop hauts tu n'as personne.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">😐</span>
+            <span className="persona-pain-icon">🚪</span>
             <span className="persona-pain-text">
-              Les projets qu'on te propose sont des cuts basiques, pas du motion.
+              Malt, LinkedIn, Upwork te demandent 5 ans d'XP avant de te visibiliser.
             </span>
           </li>
         </ul>
@@ -63,27 +61,27 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">✨</span>
-            <h3>Motion comme skill</h3>
+            <span className="persona-feature-icon">🚀</span>
+            <h3>Onboarding guidé</h3>
             <p>
-              Motion Design est une compétence à part entière sur CUTLAB. Les créateurs
-              te trouvent spécifiquement pour ça.
+              7 étapes pour créer un profil pro complet. Pas besoin de portfolio béton — tes
+              formations comptent.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">💎</span>
-            <h3>Tarifs motion dédiés</h3>
+            <span className="persona-feature-icon">📊</span>
+            <h3>Niveaux progressifs</h3>
             <p>
-              3 lignes tarifaires dédiées au motion (court, moyen, long). Tes tarifs
-              reflètent la complexité de ton travail.
+              Tu commences au niveau de ton expérience réelle. Plus tu enrichis ton profil, plus
+              tu montes.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">📈</span>
-            <h3>Niveaux qui te valorisent</h3>
+            <span className="persona-feature-icon">💶</span>
+            <h3>Tarifs de référence</h3>
             <p>
-              7 niveaux basés sur ton profil et ton expérience. Plus tu es expert, plus
-              ton positionnement tarifaire est élevé.
+              La grille CUTLAB te donne une base. Plus besoin de deviner combien facturer ta
+              première mission.
             </p>
           </div>
         </div>
@@ -96,30 +94,26 @@ export default function LandingMotionDesigner() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Crée ton profil</h3>
-              <p>
-                Mets en avant tes compétences motion, ton portfolio After Effects, tes
-                réalisations.
-              </p>
+              <h3>Inscris-toi gratuitement</h3>
+              <p>Compte créé en 2 minutes. L'onboarding te guide étape par étape.</p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Fixe tes tarifs</h3>
+              <h3>Construis ta vitrine</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Skills, portfolio (même formations), bio, disponibilité. Ton profil est calibré
+                pour les créateurs.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Reçois des projets motion</h3>
+              <h3>Reçois tes premières demandes</h3>
               <p>
-                Les créateurs qui cherchent du motion te trouvent et te contactent
-                directement.
+                Les créateurs te trouvent dans le catalogue. Premières missions sans prospection.
               </p>
             </div>
           </li>
@@ -139,8 +133,8 @@ export default function LandingMotionDesigner() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">3 lignes</span>
-            <span className="persona-stat-label">Tarifs motion</span>
+            <span className="persona-stat-value">10 min</span>
+            <span className="persona-stat-label">Pour s'inscrire</span>
           </div>
         </div>
       </section>
@@ -148,11 +142,14 @@ export default function LandingMotionDesigner() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à être reconnu pour ton motion ?</h2>
+        <h2>Prêt à lancer ta nouvelle carrière ?</h2>
         <p>
-          Rejoins CUTLAB. Un catalogue où le motion design a sa place — et son tarif.
+          Sans réseau, sans expérience pro, sans portfolio béton. CUTLAB te donne ta première
+          chance.
         </p>
-        <Link to="/onboarding/1">Créer mon profil motion →</Link>
+        <Link to="/onboarding/1" className="persona-hero-cta">
+          Commencer gratuitement →
+        </Link>
       </section>
     </div>
   );

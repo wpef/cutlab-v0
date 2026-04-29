@@ -2,18 +2,18 @@ import { Link } from 'react-router-dom'
 import SEO from '../../seo/SEO'
 import { SEO_CONFIG } from '../../seo/seoConfig'
 
-export default function LandingYoutubeurGaming() {
+export default function LandingStreamerTwitch() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.youtubeurGaming} />
+      <SEO {...SEO_CONFIG.streamerTwitch} />
       <header className="persona-header">
         <Link to="/" className="logo">CUT<span>LAB</span></Link>
       </header>
 
       {/* Hero */}
       <section className="persona-hero">
-        <h1>Tu postes 3 vidéos par semaine. <em>Qui les monte ?</em></h1>
-        <p>Tu passes plus de temps à monter qu'à créer. CUTLAB te connecte avec des monteurs spécialisés gaming pour scaler ton contenu sans sacrifier la qualité.</p>
+        <h1>Tu streames 30h par semaine. <em>Combien ça reste sur YouTube ?</em></h1>
+        <p>Tes meilleurs moments dorment dans tes VODs. Un monteur transforme tes lives en highlights, en shorts viraux, et en contenu YouTube qui drive du nouveau public.</p>
         <Link to="/catalog" className="persona-hero-cta">Trouver mon monteur →</Link>
       </section>
 
@@ -22,20 +22,20 @@ export default function LandingYoutubeurGaming() {
         <h2>Ce que tu vis au quotidien</h2>
         <div className="persona-pain-list">
           <div className="persona-pain-item">
-            <span className="persona-pain-icon">⏰</span>
-            <span className="persona-pain-text">Tu montes tes vidéos toi-même le soir, au lieu de préparer ton prochain contenu</span>
+            <span className="persona-pain-icon">📅</span>
+            <span className="persona-pain-text">Tes VODs Twitch s'auto-suppriment au bout de 14 jours. Tout ton contenu meurt sans archive.</span>
           </div>
           <div className="persona-pain-item">
             <span className="persona-pain-icon">📉</span>
-            <span className="persona-pain-text">La qualité de tes vidéos baisse parce que tu rush le montage</span>
+            <span className="persona-pain-text">Tes clips Twitch font 50 vues, ton stream live 5K viewers. Le format clip est mort, YouTube/Shorts c'est l'avenir.</span>
           </div>
           <div className="persona-pain-item">
-            <span className="persona-pain-icon">🔄</span>
-            <span className="persona-pain-text">Tu n'arrives pas à scaler : plus de vidéos = plus de montage = plus de stress</span>
+            <span className="persona-pain-icon">⏰</span>
+            <span className="persona-pain-text">Monter des highlights, c'est 10h/semaine que tu n'as pas — surtout si tu streames en parallèle.</span>
           </div>
           <div className="persona-pain-item">
-            <span className="persona-pain-icon">💸</span>
-            <span className="persona-pain-text">Les agences sont trop chères, Fiverr trop aléatoire</span>
+            <span className="persona-pain-icon">🚀</span>
+            <span className="persona-pain-text">YouTube et TikTok sont des goldmines pour streamers, mais sans monteur tu rates le potentiel.</span>
           </div>
         </div>
       </section>
@@ -46,18 +46,18 @@ export default function LandingYoutubeurGaming() {
         <div className="persona-features">
           <div className="persona-feature">
             <span className="persona-feature-icon">🎮</span>
-            <h3>Monteurs Gaming</h3>
-            <p>Filtre par niche Gaming. Des monteurs qui connaissent les codes : cuts dynamiques, overlays, sound design.</p>
+            <h3>Monteurs Gaming/Streaming</h3>
+            <p>Filtres niche Gaming et formats courts. Des monteurs qui kiffent ton contenu et savent ce qui buzz.</p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">💰</span>
-            <h3>Tarifs transparents</h3>
-            <p>Chaque monteur affiche sa fourchette de prix. Pas de négociation aveugle, pas de mauvaise surprise.</p>
+            <span className="persona-feature-icon">⚡</span>
+            <h3>Spécialisation highlights</h3>
+            <p>Cherche des monteurs habitués au workflow VOD → highlights → shorts → cross-platform.</p>
           </div>
           <div className="persona-feature">
             <span className="persona-feature-icon">📊</span>
-            <h3>Pipeline intégré</h3>
-            <p>Suis tous tes projets sur un tableau visuel. Tu sais où en est chaque vidéo.</p>
+            <h3>Pipeline pour le volume</h3>
+            <p>Plusieurs streams par semaine = plusieurs livrables. Pipeline visuel pour ne rien rater.</p>
           </div>
         </div>
       </section>
@@ -71,22 +71,22 @@ export default function LandingYoutubeurGaming() {
           <div className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Parcours le catalogue</h3>
-              <p>Filtre par compétences, niche Gaming, disponibilité. Compare les profils et les tarifs.</p>
+              <h3>Trouve ton monteur Gaming</h3>
+              <p>Filtre par niche Gaming + formats Reels/Shorts. Compare les portfolios highlights.</p>
             </div>
           </div>
           <div className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Contacte ton monteur</h3>
-              <p>Envoie un message directement. Décris ton projet, tes attentes, ton rythme.</p>
+              <h3>Mets en place ton flow</h3>
+              <p>Brief une fois, applique à chaque stream : VOD → highlight YouTube → 3 shorts.</p>
             </div>
           </div>
           <div className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Lance la collaboration</h3>
-              <p>Reçois une proposition structurée. Accepte, et c'est parti.</p>
+              <h3>Récolte sur toutes les plateformes</h3>
+              <p>YouTube grow, TikTok perce, ton stream prend de l'audience entrante.</p>
             </div>
           </div>
         </div>
@@ -103,8 +103,8 @@ export default function LandingYoutubeurGaming() {
           <span className="persona-stat-label">Commission</span>
         </div>
         <div className="persona-stat">
-          <span className="persona-stat-value">15 min</span>
-          <span className="persona-stat-label">Pour trouver</span>
+          <span className="persona-stat-value">5x</span>
+          <span className="persona-stat-label">Audience cross-platform</span>
         </div>
       </div>
 
@@ -112,8 +112,8 @@ export default function LandingYoutubeurGaming() {
 
       {/* Bottom CTA */}
       <section className="persona-cta-section">
-        <h2>Prêt à scaler ton contenu ?</h2>
-        <p>Trouve un monteur gaming qui comprend tes codes. Gratuit, sans commission.</p>
+        <h2>Prêt à exploiter tes VODs ?</h2>
+        <p>Transforme tes streams en machine à contenu. Trouve ton monteur Gaming aujourd'hui.</p>
         <Link to="/catalog" className="persona-hero-cta">Parcourir les monteurs →</Link>
       </section>
     </div>

@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
+import SEO from '../seo/SEO'
+import { SEO_CONFIG } from '../seo/seoConfig'
 
 export default function DocumentationMonteur() {
   return (
     <div className="doc-page">
+      <SEO {...SEO_CONFIG.guideMonteur} type="article" />
       <div className="doc-content">
         <Link to="/" className="doc-back">← Retour</Link>
         <div className="logo" style={{ marginBottom: '24px' }}>CUT<span>LAB</span></div>

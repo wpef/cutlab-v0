@@ -2,25 +2,26 @@ import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
 
-export default function LandingMotionDesigner() {
+export default function LandingColorist() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.motionDesigner} />
+      <SEO {...SEO_CONFIG.colorist} />
       <header className="persona-header">
         <div className="logo">CUT<span>LAB</span></div>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Tu fais du motion, pas du montage basique.{' '}
-          <em>Montre-le.</em>
+          L'image te parle.{' '}
+          <em>Aux créateurs aussi.</em>
         </h1>
         <p>
-          Sur les plateformes généralistes, motion design = montage vidéo. Sur CUTLAB,
-          tes compétences motion sont identifiées, valorisées, et tarifées séparément.
+          Étalonnage, look development, color grading cinéma — ton œil mérite une
+          plateforme spécialisée. CUTLAB te connecte avec des créateurs qui cherchent
+          un vrai colorist, pas un monteur qui sait pousser un curseur.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Créer mon profil motion →
+          Créer mon profil →
         </Link>
       </section>
 
@@ -29,30 +30,30 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎭</span>
+            <span className="persona-pain-icon">🎨</span>
             <span className="persona-pain-text">
-              Les clients confondent montage et motion design. Tes skills After Effects
-              sont sous-valorisées.
+              On te confond avec un monteur qui sait appliquer une LUT. Ton œil de
+              colorist est invisible.
+            </span>
+          </li>
+          <li className="persona-pain-item">
+            <span className="persona-pain-icon">📦</span>
+            <span className="persona-pain-text">
+              Les LUTs gratuites tuent la valeur perçue de ton métier.
             </span>
           </li>
           <li className="persona-pain-item">
             <span className="persona-pain-icon">🔍</span>
             <span className="persona-pain-text">
-              Pas de filtre "Motion Design" sur les marketplaces. Tu es rangé avec les
-              monteurs basiques.
+              Pas de filtre "colorist" sur les marketplaces. Tu es noyé dans les
+              monteurs.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">💰</span>
+            <span className="persona-pain-icon">🎬</span>
             <span className="persona-pain-text">
-              Tu factures au même tarif qu'un monteur junior alors que ton travail
-              demande 3x plus de technique.
-            </span>
-          </li>
-          <li className="persona-pain-item">
-            <span className="persona-pain-icon">😐</span>
-            <span className="persona-pain-text">
-              Les projets qu'on te propose sont des cuts basiques, pas du motion.
+              Tu cherches des projets cinéma, clips, doc — pas des Reels avec un
+              filtre instagram.
             </span>
           </li>
         </ul>
@@ -63,27 +64,27 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">✨</span>
-            <h3>Motion comme skill</h3>
+            <span className="persona-feature-icon">🌈</span>
+            <h3>Color grading comme skill</h3>
             <p>
-              Motion Design est une compétence à part entière sur CUTLAB. Les créateurs
-              te trouvent spécifiquement pour ça.
+              Étalonnage est une compétence à part entière. Les créateurs te trouvent
+              spécifiquement pour ton œil.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">💎</span>
-            <h3>Tarifs motion dédiés</h3>
+            <span className="persona-feature-icon">🎞️</span>
+            <h3>Filtres formats</h3>
             <p>
-              3 lignes tarifaires dédiées au motion (court, moyen, long). Tes tarifs
-              reflètent la complexité de ton travail.
+              Clips, doc, cinéma, formats long — où l'étalonnage compte vraiment.
+              Choisis tes terrains de jeu.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">📈</span>
-            <h3>Niveaux qui te valorisent</h3>
+            <span className="persona-feature-icon">🏆</span>
+            <h3>Niveaux qui valorisent</h3>
             <p>
-              7 niveaux basés sur ton profil et ton expérience. Plus tu es expert, plus
-              ton positionnement tarifaire est élevé.
+              Ton expertise visuelle te positionne haut sur la grille. Tu factures à
+              la hauteur de ton œil.
             </p>
           </div>
         </div>
@@ -96,30 +97,30 @@ export default function LandingMotionDesigner() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Crée ton profil</h3>
+              <h3>Crée ton profil colorist</h3>
               <p>
-                Mets en avant tes compétences motion, ton portfolio After Effects, tes
-                réalisations.
+                Compétences color grading, portfolio (avant/après, looks signatures),
+                logiciels (DaVinci, Baselight).
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Fixe tes tarifs</h3>
+              <h3>Définis tes tarifs</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Grille tarifaire color dédiée. Étalonnage par minute, par projet, ou
+                par module.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Reçois des projets motion</h3>
+              <h3>Reçois des projets cinéma</h3>
               <p>
-                Les créateurs qui cherchent du motion te trouvent et te contactent
-                directement.
+                Les créateurs qui cherchent un look pro te contactent. Plus de
+                confusion avec un colorimétriste de base.
               </p>
             </div>
           </li>
@@ -139,8 +140,8 @@ export default function LandingMotionDesigner() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">3 lignes</span>
-            <span className="persona-stat-label">Tarifs motion</span>
+            <span className="persona-stat-value">Color</span>
+            <span className="persona-stat-label">Reconnu</span>
           </div>
         </div>
       </section>
@@ -148,11 +149,11 @@ export default function LandingMotionDesigner() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à être reconnu pour ton motion ?</h2>
+        <h2>Prêt à être reconnu pour ton œil ?</h2>
         <p>
-          Rejoins CUTLAB. Un catalogue où le motion design a sa place — et son tarif.
+          Rejoins CUTLAB. Une plateforme où le colorist a sa place — et son tarif.
         </p>
-        <Link to="/onboarding/1">Créer mon profil motion →</Link>
+        <Link to="/onboarding/1">Créer mon profil →</Link>
       </section>
     </div>
   );

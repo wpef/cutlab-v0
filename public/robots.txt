@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /messaging/
+Disallow: /onboarding/
+Disallow: /editor
+Disallow: /pipeline
+Disallow: /my-projects
+Disallow: /project/new
+Disallow: /offer/
+
+Sitemap: https://cutlab.io/sitemap.xml

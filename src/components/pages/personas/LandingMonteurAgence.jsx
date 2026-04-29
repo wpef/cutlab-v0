@@ -2,25 +2,25 @@ import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
 
-export default function LandingMotionDesigner() {
+export default function LandingMonteurAgence() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.motionDesigner} />
+      <SEO {...SEO_CONFIG.monteurAgence} />
       <header className="persona-header">
         <div className="logo">CUT<span>LAB</span></div>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Tu fais du motion, pas du montage basique.{' '}
-          <em>Montre-le.</em>
+          10 ans d'agence. <em>Et si tu choisissais tes projets ?</em>
         </h1>
         <p>
-          Sur les plateformes généralistes, motion design = montage vidéo. Sur CUTLAB,
-          tes compétences motion sont identifiées, valorisées, et tarifées séparément.
+          Tu en as marre des briefs absurdes, des deadlines impossibles, et des comptes Excel pour
+          tes heures sup. CUTLAB te permet de passer en freelance sans repartir de zéro — ton
+          expérience est ton meilleur atout.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Créer mon profil motion →
+          Rejoindre le catalogue →
         </Link>
       </section>
 
@@ -29,30 +29,31 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎭</span>
+            <span className="persona-pain-icon">⏱️</span>
             <span className="persona-pain-text">
-              Les clients confondent montage et motion design. Tes skills After Effects
-              sont sous-valorisées.
-            </span>
-          </li>
-          <li className="persona-pain-item">
-            <span className="persona-pain-icon">🔍</span>
-            <span className="persona-pain-text">
-              Pas de filtre "Motion Design" sur les marketplaces. Tu es rangé avec les
-              monteurs basiques.
+              50h+ par semaine pour un fixe qui ne suit plus l'inflation. Et toujours pas de
+              remerciement.
             </span>
           </li>
           <li className="persona-pain-item">
             <span className="persona-pain-icon">💰</span>
             <span className="persona-pain-text">
-              Tu factures au même tarif qu'un monteur junior alors que ton travail
-              demande 3x plus de technique.
+              Tu sais ce que tu vaux, mais tu ne sais pas comment le facturer en solo, sans la
+              marque de l'agence.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">😐</span>
+            <span className="persona-pain-icon">🥊</span>
             <span className="persona-pain-text">
-              Les projets qu'on te propose sont des cuts basiques, pas du motion.
+              Les marketplaces freelances généralistes = course au moins-disant face à des juniors
+              low-cost.
+            </span>
+          </li>
+          <li className="persona-pain-item">
+            <span className="persona-pain-icon">🎯</span>
+            <span className="persona-pain-text">
+              Tu veux choisir tes projets et tes clients. Plus de briefs absurdes, plus de retouches
+              infinies.
             </span>
           </li>
         </ul>
@@ -63,27 +64,27 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">✨</span>
-            <h3>Motion comme skill</h3>
+            <span className="persona-feature-icon">⭐</span>
+            <h3>Niveau élevé d'entrée</h3>
             <p>
-              Motion Design est une compétence à part entière sur CUTLAB. Les créateurs
-              te trouvent spécifiquement pour ça.
+              Ton expérience te positionne directement haut sur la grille. Pas de
+              "prouve-toi à partir de zéro".
             </p>
           </div>
           <div className="persona-feature">
             <span className="persona-feature-icon">💎</span>
-            <h3>Tarifs motion dédiés</h3>
+            <h3>Tarifs alignés</h3>
             <p>
-              3 lignes tarifaires dédiées au motion (court, moyen, long). Tes tarifs
-              reflètent la complexité de ton travail.
+              Ta grille tarifaire reflète ta vraie valeur. Pas de dumping, pas de
+              Fiverr-isation.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">📈</span>
-            <h3>Niveaux qui te valorisent</h3>
+            <span className="persona-feature-icon">🎬</span>
+            <h3>Choisis tes projets</h3>
             <p>
-              7 niveaux basés sur ton profil et ton expérience. Plus tu es expert, plus
-              ton positionnement tarifaire est élevé.
+              Filtres formats, niches, expérience client. Tu acceptes ce qui te plaît, tu refuses
+              le reste.
             </p>
           </div>
         </div>
@@ -96,30 +97,30 @@ export default function LandingMotionDesigner() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Crée ton profil</h3>
+              <h3>Crée ton profil senior</h3>
               <p>
-                Mets en avant tes compétences motion, ton portfolio After Effects, tes
-                réalisations.
+                Onboarding qui valorise ton expérience : portfolio agence, types de mission,
+                expertise spécifique.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Fixe tes tarifs</h3>
+              <h3>Positionne tes tarifs</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Grille officielle CUTLAB + ajustement ±10% par ligne. Tu te positionnes haut sans
+                surenchère.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Reçois des projets motion</h3>
+              <h3>Choisis tes missions</h3>
               <p>
-                Les créateurs qui cherchent du motion te trouvent et te contactent
-                directement.
+                Les créateurs te contactent. Tu acceptes les projets qui te plaisent, sans pression
+                hiérarchique.
               </p>
             </div>
           </li>
@@ -139,8 +140,8 @@ export default function LandingMotionDesigner() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">3 lignes</span>
-            <span className="persona-stat-label">Tarifs motion</span>
+            <span className="persona-stat-value">Toi</span>
+            <span className="persona-stat-label">Décides</span>
           </div>
         </div>
       </section>
@@ -148,11 +149,13 @@ export default function LandingMotionDesigner() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à être reconnu pour ton motion ?</h2>
+        <h2>Prêt à monétiser tes 10 ans d'XP ?</h2>
         <p>
-          Rejoins CUTLAB. Un catalogue où le motion design a sa place — et son tarif.
+          Quitte l'agence sans repartir de zéro. CUTLAB valorise ton expérience — pas le contraire.
         </p>
-        <Link to="/onboarding/1">Créer mon profil motion →</Link>
+        <Link to="/onboarding/1" className="persona-hero-cta">
+          Rejoindre le catalogue →
+        </Link>
       </section>
     </div>
   );

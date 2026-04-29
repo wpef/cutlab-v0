@@ -1,26 +1,27 @@
 import { Link } from 'react-router-dom';
-import SEO from '../../seo/SEO';
-import { SEO_CONFIG } from '../../seo/seoConfig';
+import SEO from '../../seo/SEO'
+import { SEO_CONFIG } from '../../seo/seoConfig'
 
-export default function LandingMotionDesigner() {
+export default function LandingPodcasteur() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.motionDesigner} />
+      <SEO {...SEO_CONFIG.podcasteur} />
       <header className="persona-header">
-        <div className="logo">CUT<span>LAB</span></div>
+        <Link to="/" className="logo">CUT<span>LAB</span></Link>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Tu fais du motion, pas du montage basique.{' '}
-          <em>Montre-le.</em>
+          Ton podcast existe en audio.{' '}
+          <em>Et en vidéo ?</em>
         </h1>
         <p>
-          Sur les plateformes généralistes, motion design = montage vidéo. Sur CUTLAB,
-          tes compétences motion sont identifiées, valorisées, et tarifées séparément.
+          Podcast vidéo, clips YouTube, snippets Reels, TikToks — un seul enregistrement,
+          mille déclinaisons. Trouve un monteur qui sait découper et repackager ton contenu
+          audio en formats vidéo qui performent.
         </p>
-        <Link to="/onboarding/1" className="persona-hero-cta">
-          Créer mon profil motion →
+        <Link to="/catalog" className="persona-hero-cta">
+          Trouver mon monteur →
         </Link>
       </section>
 
@@ -29,30 +30,29 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎭</span>
+            <span className="persona-pain-icon">🎙️</span>
             <span className="persona-pain-text">
-              Les clients confondent montage et motion design. Tes skills After Effects
-              sont sous-valorisées.
+              Tu es sur Spotify, mais 90% des podcasts à succès ont aussi du contenu vidéo.
+              Tu rates l'audience YouTube et TikTok.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🔍</span>
+            <span className="persona-pain-icon">✂️</span>
             <span className="persona-pain-text">
-              Pas de filtre "Motion Design" sur les marketplaces. Tu es rangé avec les
-              monteurs basiques.
+              Découper un épisode d'1h en 10 clips, c'est 5h de boulot. Tu n'as pas le temps.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">💰</span>
+            <span className="persona-pain-icon">📐</span>
             <span className="persona-pain-text">
-              Tu factures au même tarif qu'un monteur junior alors que ton travail
-              demande 3x plus de technique.
+              Les monteurs vidéo classiques ne savent pas cadrer un visage parlant ni gérer
+              le multi-cam podcast.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">😐</span>
+            <span className="persona-pain-icon">📊</span>
             <span className="persona-pain-text">
-              Les projets qu'on te propose sont des cuts basiques, pas du motion.
+              Tes meilleurs moments dorment dans ton flux audio. Personne ne les voit passer.
             </span>
           </li>
         </ul>
@@ -63,27 +63,27 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">✨</span>
-            <h3>Motion comme skill</h3>
+            <span className="persona-feature-icon">🎧</span>
+            <h3>Monteurs spécialisés podcast</h3>
             <p>
-              Motion Design est une compétence à part entière sur CUTLAB. Les créateurs
-              te trouvent spécifiquement pour ça.
+              Filtre par niche Podcast. Des monteurs qui maîtrisent les codes : multi-cam,
+              sous-titres dynamiques, B-roll.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">💎</span>
-            <h3>Tarifs motion dédiés</h3>
+            <span className="persona-feature-icon">🔄</span>
+            <h3>Multi-format</h3>
             <p>
-              3 lignes tarifaires dédiées au motion (court, moyen, long). Tes tarifs
-              reflètent la complexité de ton travail.
+              Un seul enregistrement, déclinaisons multiples : épisode YouTube long + clips
+              Reels + Shorts TikTok.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">📈</span>
-            <h3>Niveaux qui te valorisent</h3>
+            <span className="persona-feature-icon">💬</span>
+            <h3>Brief simple</h3>
             <p>
-              7 niveaux basés sur ton profil et ton expérience. Plus tu es expert, plus
-              ton positionnement tarifaire est élevé.
+              Tu envoies l'épisode, tu indiques le format. Le monteur te livre les
+              déclinaisons clé en main.
             </p>
           </div>
         </div>
@@ -96,30 +96,30 @@ export default function LandingMotionDesigner() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Crée ton profil</h3>
+              <h3>Filtre les monteurs podcast</h3>
               <p>
-                Mets en avant tes compétences motion, ton portfolio After Effects, tes
-                réalisations.
+                Catalogue filtré par compétence Podcast et formats courts. Compare
+                portfolios et tarifs.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Fixe tes tarifs</h3>
+              <h3>Envoie ton épisode</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Une fois la mission acceptée, tu transfères ton enregistrement. Brief
+                en 2 minutes.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Reçois des projets motion</h3>
+              <h3>Reçois tes déclinaisons</h3>
               <p>
-                Les créateurs qui cherchent du motion te trouvent et te contactent
-                directement.
+                Épisode monté + clips courts livrés selon le délai convenu. Tu publies,
+                tu cartonnes.
               </p>
             </div>
           </li>
@@ -139,8 +139,8 @@ export default function LandingMotionDesigner() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">3 lignes</span>
-            <span className="persona-stat-label">Tarifs motion</span>
+            <span className="persona-stat-value">10x</span>
+            <span className="persona-stat-label">Plus de portée</span>
           </div>
         </div>
       </section>
@@ -148,11 +148,12 @@ export default function LandingMotionDesigner() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à être reconnu pour ton motion ?</h2>
+        <h2>Prêt à exister en vidéo ?</h2>
         <p>
-          Rejoins CUTLAB. Un catalogue où le motion design a sa place — et son tarif.
+          Multiplie ta portée sans multiplier ton temps de travail. Trouve un monteur
+          podcast aujourd'hui.
         </p>
-        <Link to="/onboarding/1">Créer mon profil motion →</Link>
+        <Link to="/catalog">Parcourir les monteurs →</Link>
       </section>
     </div>
   );

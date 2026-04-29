@@ -2,25 +2,26 @@ import { Link } from 'react-router-dom';
 import SEO from '../../seo/SEO';
 import { SEO_CONFIG } from '../../seo/seoConfig';
 
-export default function LandingMotionDesigner() {
+export default function LandingSoundDesigner() {
   return (
     <div className="persona-page">
-      <SEO {...SEO_CONFIG.motionDesigner} />
+      <SEO {...SEO_CONFIG.soundDesigner} />
       <header className="persona-header">
         <div className="logo">CUT<span>LAB</span></div>
       </header>
 
       <section className="persona-hero">
         <h1>
-          Tu fais du motion, pas du montage basique.{' '}
-          <em>Montre-le.</em>
+          Tu fais du son, pas du montage image.{' '}
+          <em>Trouve les projets qui le valorisent.</em>
         </h1>
         <p>
-          Sur les plateformes généralistes, motion design = montage vidéo. Sur CUTLAB,
-          tes compétences motion sont identifiées, valorisées, et tarifées séparément.
+          Sound design, mixage, doublage, sound branding — tes skills audio méritent une
+          plateforme dédiée. Sur CUTLAB, tu apparais avec ton vrai métier, pas comme un
+          sous-monteur générique.
         </p>
         <Link to="/onboarding/1" className="persona-hero-cta">
-          Créer mon profil motion →
+          Créer mon profil →
         </Link>
       </section>
 
@@ -29,30 +30,30 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <ul className="persona-pain-list">
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🎭</span>
+            <span className="persona-pain-icon">🎙️</span>
             <span className="persona-pain-text">
-              Les clients confondent montage et motion design. Tes skills After Effects
-              sont sous-valorisées.
+              Tu es confondu avec un monteur vidéo lambda. Le sound design est invisible
+              sur les marketplaces.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">🔍</span>
+            <span className="persona-pain-icon">🤷</span>
             <span className="persona-pain-text">
-              Pas de filtre "Motion Design" sur les marketplaces. Tu es rangé avec les
-              monteurs basiques.
+              Personne ne valorise vraiment le sound design. "C'est juste du bruit en
+              plus, non ?"
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">💰</span>
+            <span className="persona-pain-icon">💸</span>
             <span className="persona-pain-text">
-              Tu factures au même tarif qu'un monteur junior alors que ton travail
-              demande 3x plus de technique.
+              Tu factures un mix pro au prix d'un cut basique. Ton expertise est dévaluée.
             </span>
           </li>
           <li className="persona-pain-item">
-            <span className="persona-pain-icon">😐</span>
+            <span className="persona-pain-icon">🎯</span>
             <span className="persona-pain-text">
-              Les projets qu'on te propose sont des cuts basiques, pas du motion.
+              Tu cherches des projets qui demandent vraiment du son : doc, podcast vidéo,
+              gaming, clip.
             </span>
           </li>
         </ul>
@@ -63,27 +64,27 @@ export default function LandingMotionDesigner() {
       <section className="persona-section">
         <div className="persona-features">
           <div className="persona-feature">
-            <span className="persona-feature-icon">✨</span>
-            <h3>Motion comme skill</h3>
+            <span className="persona-feature-icon">🔊</span>
+            <h3>Sound design comme skill</h3>
             <p>
-              Motion Design est une compétence à part entière sur CUTLAB. Les créateurs
-              te trouvent spécifiquement pour ça.
+              Sound design est une compétence à part entière sur CUTLAB. Les créateurs te
+              trouvent spécifiquement pour ça.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">💎</span>
-            <h3>Tarifs motion dédiés</h3>
+            <span className="persona-feature-icon">🎚️</span>
+            <h3>Tarifs sound dédiés</h3>
             <p>
-              3 lignes tarifaires dédiées au motion (court, moyen, long). Tes tarifs
-              reflètent la complexité de ton travail.
+              La grille tarifaire intègre tes spécificités. Tu factures à ta vraie valeur,
+              pas à celle d'un monteur junior.
             </p>
           </div>
           <div className="persona-feature">
-            <span className="persona-feature-icon">📈</span>
-            <h3>Niveaux qui te valorisent</h3>
+            <span className="persona-feature-icon">🎬</span>
+            <h3>Filtres niche</h3>
             <p>
-              7 niveaux basés sur ton profil et ton expérience. Plus tu es expert, plus
-              ton positionnement tarifaire est élevé.
+              Musique, podcast, doc, gaming — choisis les niches où ton expertise sonore
+              brille.
             </p>
           </div>
         </div>
@@ -96,30 +97,30 @@ export default function LandingMotionDesigner() {
           <li className="persona-step">
             <span className="persona-step-num">1</span>
             <div className="persona-step-content">
-              <h3>Crée ton profil</h3>
+              <h3>Crée ton profil son</h3>
               <p>
-                Mets en avant tes compétences motion, ton portfolio After Effects, tes
-                réalisations.
+                Compétences sound design, portfolio audio (clips de mix, sound libraries),
+                formats maîtrisés.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">2</span>
             <div className="persona-step-content">
-              <h3>Fixe tes tarifs</h3>
+              <h3>Définis tes tarifs</h3>
               <p>
-                Ajuste ta grille motion indépendamment du montage classique. ±10% par
-                ligne.
+                Grille spécifique son. Mix, doublage, sound design — chaque service a sa
+                ligne tarifaire.
               </p>
             </div>
           </li>
           <li className="persona-step">
             <span className="persona-step-num">3</span>
             <div className="persona-step-content">
-              <h3>Reçois des projets motion</h3>
+              <h3>Reçois des projets son</h3>
               <p>
-                Les créateurs qui cherchent du motion te trouvent et te contactent
-                directement.
+                Les créateurs qui cherchent du sound design te contactent. Plus de
+                confusion avec le montage classique.
               </p>
             </div>
           </li>
@@ -139,8 +140,8 @@ export default function LandingMotionDesigner() {
             <span className="persona-stat-label">Commission</span>
           </div>
           <div className="persona-stat">
-            <span className="persona-stat-value">3 lignes</span>
-            <span className="persona-stat-label">Tarifs motion</span>
+            <span className="persona-stat-value">Audio</span>
+            <span className="persona-stat-label">Reconnu</span>
           </div>
         </div>
       </section>
@@ -148,11 +149,11 @@ export default function LandingMotionDesigner() {
       <div className="persona-divider" />
 
       <section className="persona-cta-section">
-        <h2>Prêt à être reconnu pour ton motion ?</h2>
+        <h2>Prêt à être reconnu pour ton oreille ?</h2>
         <p>
-          Rejoins CUTLAB. Un catalogue où le motion design a sa place — et son tarif.
+          Rejoins CUTLAB. Une plateforme où le sound design a sa place — et son tarif.
         </p>
-        <Link to="/onboarding/1">Créer mon profil motion →</Link>
+        <Link to="/onboarding/1">Créer mon profil →</Link>
       </section>
     </div>
   );

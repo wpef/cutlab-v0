@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
+import SEO from '../../seo/SEO';
+import { SEO_CONFIG } from '../../seo/seoConfig';
 
 export default function LandingEtudiantAudiovisuel() {
   return (
     <div className="persona-page">
+      <SEO {...SEO_CONFIG.etudiantAudiovisuel} />
       <header className="persona-header">
         <div className="logo">CUT<span>LAB</span></div>
       </header>
