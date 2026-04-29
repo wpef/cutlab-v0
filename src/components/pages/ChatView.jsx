@@ -6,6 +6,7 @@ import { useMessaging } from '../../context/MessagingContext'
 import { useCollab } from '../../context/CollabContext'
 import { useProjects } from '../../context/ProjectContext'
 import ProjectProposalCard from '../messaging/ProjectProposalCard'
+import RoundEventBubble from '../messaging/RoundEventBubble'
 import CollabTracker from '../messaging/CollabTracker'
 import CollabTrackerDrawer from '../messaging/CollabTrackerDrawer'
 
@@ -26,7 +27,7 @@ export default function ChatView() {
     acceptRequest, refuseRequest,
     acceptOffer, refuseOffer,
   } = useMessaging()
-  const { loadCollabData, cancelOffer, closeProject } = useCollab()
+  const { rounds, loadCollabData, cancelOffer, closeProject } = useCollab()
   const { acceptApplication, refuseApplication } = useProjects()
 
   // Sync URL param → activeRequestId
@@ -58,11 +59,49 @@ export default function ChatView() {
     ? (projectTitle || otherName)
     : otherName
 
-  // Unified chronological timeline: messages + offers sorted by created_at
-  const timeline = useMemo(() => [
-    ...messages.map((m) => ({ ...m, _type: 'message' })),
-    ...offers.map((o) => ({ ...o, _type: 'offer' })),
-  ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)), [messages, offers])
+  // Unified chronological timeline: messages + offers + round events sorted by created_at
+  const timeline = useMemo(() => {
+    const roundEvents = []
+    for (const round of rounds) {
+      // Submission event: always emitted when the round is created
+      roundEvents.push({
+        _type: 'round_event',
+        _key: `round-${round.id}-submission`,
+        subtype: 'submission',
+        round_number: round.round_number,
+        timestamp: round.created_at,
+        created_at: round.created_at,
+      })
+      // Revision event: emitted when creator requests changes
+      if (round.status === 'revision_requested') {
+        roundEvents.push({
+          _type: 'round_event',
+          _key: `round-${round.id}-revision`,
+          subtype: 'revision',
+          round_number: round.round_number,
+          creator_feedback: round.creator_feedback,
+          timestamp: round.reviewed_at,
+          created_at: round.reviewed_at,
+        })
+      }
+      // Validation event: emitted when creator approves
+      if (round.status === 'validated') {
+        roundEvents.push({
+          _type: 'round_event',
+          _key: `round-${round.id}-validation`,
+          subtype: 'validation',
+          round_number: round.round_number,
+          timestamp: round.reviewed_at,
+          created_at: round.reviewed_at,
+        })
+      }
+    }
+    return [
+      ...messages.map((m) => ({ ...m, _type: 'message' })),
+      ...offers.map((o) => ({ ...o, _type: 'offer' })),
+      ...roundEvents,
+    ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+  }, [messages, offers, rounds])
 
   // Decide whether to show the collab tracker panel
   // Show whenever request exists (even pending), but tracker renders contextually
@@ -246,9 +285,11 @@ export default function ChatView() {
             </div>
           )}
 
-          {/* Chronological timeline: messages + offer cards interleaved by created_at */}
+          {/* Chronological timeline: messages + offer cards + round events interleaved by created_at */}
           {timeline.map((item) =>
-            item._type === 'offer' ? (
+            item._type === 'round_event' ? (
+              <RoundEventBubble key={item._key} event={item} />
+            ) : item._type === 'offer' ? (
               <ProjectProposalCard
                 key={item.id}
                 offer={item}
