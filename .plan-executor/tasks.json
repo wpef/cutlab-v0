@@ -1,141 +1,111 @@
 {
+  "plan_source": "plans/PLAN_RECETTE.md",
+  "created_at": "2026-04-29",
+  "branch": "plan-exec/recette-20260429",
   "tasks": [
     {
       "id": "T001",
-      "title": "ProjectForm UX dates",
-      "description": "Dates start/deadline same row on desktop, default start_date=today, calculated duration display, visible calendar icon on dark theme",
+      "plan_ref": "B3.4",
+      "title": "Fix RLS: monteur can access filled project detail",
+      "description": "Create migration 013_rls_projects_accepted_editor.sql. Current policy (008) allows SELECT only when status='published' OR creator_id=auth.uid(). Replace with policy that also allows: EXISTS (SELECT 1 FROM contact_requests WHERE project_id=projects.id AND editor_id=auth.uid() AND status='accepted'). This unblocks editors from viewing project details after a project is filled.",
       "dependencies": [],
       "complexity": "simple",
-      "files_touched": ["src/components/pages/ProjectForm.jsx", "src/styles/global.css"],
-      "lane": "A",
       "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "lane": "A",
+      "files_touched": ["supabase/migrations/013_rls_projects_accepted_editor.sql"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T002",
-      "title": "ApplicationCard 'Voir le profil' fix",
-      "description": "Replace goToEditorDetail(profile.id) [undefined] with goToEditorDetail(application.editor_id)",
+      "plan_ref": "B3.1",
+      "title": "Editor sees project title instead of creator name in conversation list",
+      "description": "In MessagingHub.jsx line 115, otherName for editor role currently shows creator_name. When request has a project_id, show the project title instead. Need to enrich requests with project titles — either join via project_id or batch-fetch. Add fallback to creator_name when no project. ChatView header (lines 57-59) has the code but it currently fails because the Supabase query to fetch project title is blocked by RLS on filled projects — verify the header works once T001 (RLS fix) is applied, and if the fetch still fails for other reasons, fix it. Also check chat bubbles for any sender attribution that should show project context.",
       "dependencies": [],
-      "complexity": "trivial",
-      "files_touched": ["src/components/projects/ApplicationCard.jsx"],
-      "lane": "B",
+      "complexity": "moderate",
       "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "lane": "B",
+      "files_touched": ["src/components/pages/MessagingHub.jsx"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T003",
-      "title": "ProjectDetail loading vs not-found + hero consistency",
-      "description": "Add notFound state. Always render 3 hero items (Budget/Deadline/Start) with em-dash placeholder. CSS hero-item flex 1 1 0 min-width 120px",
-      "dependencies": ["T001"],
-      "complexity": "simple",
-      "files_touched": ["src/components/pages/ProjectDetail.jsx", "src/styles/global.css"],
-      "lane": "A",
-      "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "plan_ref": "B3.3",
+      "title": "Remove 'pré-rempli depuis le projet' banner from OfferForm",
+      "description": "Delete the banner block at OfferForm.jsx lines 136-140 and remove the projectLoaded useState (line 45). Replace the projectLoaded guard in the prefill useEffect (line 48) with a ref (e.g. prefillDone) to prevent re-fetching without polluting JSX. Update the useEffect dependency array accordingly. The prefill logic itself (lines 57-73) stays intact.",
+      "dependencies": [],
+      "complexity": "trivial",
+      "model": "haiku",
+      "lane": "C",
+      "files_touched": ["src/components/pages/OfferForm.jsx"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T004",
-      "title": "ProjectFilters thumbnail toggle",
-      "description": "Modify setFilter to delete key when value===undefined. Fixes thumbnail_included toggle off",
+      "plan_ref": "CHAT1",
+      "title": "Show round events (revisions, validations) in chat timeline",
+      "description": "Extend ChatView.jsx timeline useMemo (lines 62-65) to include deliverable_rounds from CollabContext. Add _type:'round_event' entries sorted by created_at alongside messages and offers. Create new component src/components/messaging/RoundEventBubble.jsx rendering system-style messages: revision requests show creator feedback, validations show 'Livrables vX validés', deliverable submissions show 'Livrables vX envoyés'. Style as centered, muted system messages distinct from chat bubbles and offer cards.",
       "dependencies": [],
-      "complexity": "trivial",
-      "files_touched": ["src/components/projects/ProjectFilters.jsx"],
-      "lane": "B",
+      "complexity": "moderate",
       "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "lane": "D",
+      "files_touched": ["src/components/pages/ChatView.jsx", "src/components/messaging/RoundEventBubble.jsx", "src/styles/global.css"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T005",
-      "title": "fetchMyProjects compute application_count",
-      "description": "Use PostgREST sub-select contact_requests!project_id(id, status), enrich each project with application_count = pending count",
+      "plan_ref": "B3.5",
+      "title": "Prominent 'Clore le projet' button for creator",
+      "description": "In CollabTracker.jsx, the 'Mettre fin au projet' button (lines 507-521) only shows in feedback step after review. Extend: (1) Show in both feedback and closed steps, regardless of review status (creator only). (2) Use existing CollabContext.closeProject() (lines 334-360) — sets project status='completed' + notifies. (3) After close action, display 'Projet clôturé' state in tracker instead of button. No new DB status needed — 'completed' is sufficient.",
       "dependencies": [],
       "complexity": "moderate",
-      "files_touched": ["src/context/ProjectContext.jsx"],
-      "lane": "B",
       "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "lane": "E",
+      "files_touched": ["src/components/messaging/CollabTracker.jsx"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T006",
-      "title": "ChatView header shows project title for editor",
-      "description": "Fetch project title when request.project_id present, display in header for editor role with fallback to creator_name",
-      "dependencies": ["T009"],
+      "plan_ref": "B3.2",
+      "title": "Verify and fix offer prefill for editor role",
+      "description": "The prefill useEffect in OfferForm.jsx (lines 47-75) triggers on request?.project_id — not role-specific. Verify it works when an editor clicks 'Proposer une offre' from CollabTracker. Check: (1) Does editor's request carry project_id? (2) Does the project fetch succeed? (3) Are all mapped fields relevant for editor proposals? Fix if needed, otherwise verify and close.",
+      "dependencies": ["T003"],
       "complexity": "simple",
-      "files_touched": ["src/components/pages/ChatView.jsx"],
-      "lane": "D",
       "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "lane": "C",
+      "files_touched": ["src/components/pages/OfferForm.jsx"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T007",
-      "title": "OfferForm prefill budget_min + safe init",
-      "description": "Prefill budget with data.budget_min when budget_fixed null. useEffect to call loadRequests if request undefined and activeRequestId present",
-      "dependencies": [],
+      "plan_ref": "CHAT2",
+      "title": "Validated deliverables section in CollabTracker sidebar",
+      "description": "In CollabTracker.jsx, add a 'Livrables validés' section listing rounds with status='validated' and their download links. Place after existing rounds display. Each item: checkmark + 'vX' label + validation date + clickable link (round.deliverable_link). Only show when >= 1 validated round.",
+      "dependencies": ["T005"],
       "complexity": "simple",
-      "files_touched": ["src/components/pages/OfferForm.jsx"],
-      "lane": "C",
       "model": "sonnet",
-      "gate": false,
-      "excluded": false
+      "lane": "E",
+      "files_touched": ["src/components/messaging/CollabTracker.jsx"],
+      "excluded": false,
+      "gate": false
     },
     {
       "id": "T008",
-      "title": "CollabTracker offer pending state + cancel + end project button",
-      "description": "ChatView passes latest non-cancelled offer (any status) to tracker. Tracker offer_sent step shows Modify(disabled)/Cancel for sender. Feedback step shows 'End project' button for creator after review submitted",
-      "dependencies": ["T009"],
+      "plan_ref": "CHAT3",
+      "title": "Edit offer (modify instead of cancel-only)",
+      "description": "Add edit mode to OfferForm.jsx via ?edit=<offer_id> query param. When present: (1) fetch existing offer and prefill form, (2) on submit UPDATE in-place (not create new), (3) notify receiver 'L'offre a été modifiée'. In CollabTracker.jsx, add 'Modifier' button next to cancel in offer_sent step — navigates to /offer/new?edit=<offer_id>&request=<request_id>. Add editOffer() in CollabContext.jsx that does the UPDATE + notification.",
+      "dependencies": ["T006", "T007"],
       "complexity": "complex",
-      "files_touched": ["src/components/messaging/CollabTracker.jsx", "src/components/pages/ChatView.jsx"],
-      "lane": "D",
       "model": "opus",
-      "gate": false,
-      "excluded": false
-    },
-    {
-      "id": "T009",
-      "title": "Add cancelOffer + closeProject to CollabContext, expose via hooks",
-      "description": "cancelOffer(offerId): UPDATE offers status=cancelled + notify receiver. closeProject(request, offer): UPDATE projects status=completed if project_id, notify both parties. Expose in useCollab",
-      "dependencies": [],
-      "complexity": "moderate",
-      "files_touched": ["src/context/CollabContext.jsx"],
-      "lane": "D",
-      "model": "sonnet",
-      "gate": false,
-      "excluded": false
-    },
-    {
-      "id": "T010",
-      "title": "Re-seed DB with valid keys",
-      "description": "UPDATE projects + offers SET content_format/mission_type/experience_level/niches/deliverables to use option keys from src/constants/options.js",
-      "dependencies": [],
-      "complexity": "simple",
-      "files_touched": [],
-      "lane": "E",
-      "model": "sonnet",
-      "gate": false,
-      "excluded": false
-    }
-  ],
-  "excluded": [
-    {
-      "id": "X001",
-      "title": "Round events in chat timeline (CHAT1)",
-      "reason": "Documented in plans/PLAN_PHASE2.md — chat improvements"
-    },
-    {
-      "id": "X002",
-      "title": "Validated deliverable links in sidebar (CHAT2)",
-      "reason": "Documented in plans/PLAN_PHASE2.md — chat improvements"
-    },
-    {
-      "id": "X003",
-      "title": "Edit offer (modify) UI (CHAT3)",
-      "reason": "Documented in plans/PLAN_PHASE2.md — only Cancel implemented in T008"
+      "lane": "F",
+      "files_touched": ["src/components/pages/OfferForm.jsx", "src/components/messaging/CollabTracker.jsx", "src/context/CollabContext.jsx"],
+      "excluded": false,
+      "gate": true
     }
   ]
 }
