@@ -17,9 +17,13 @@ const EMPTY_DELIVERABLE = { type: '', quantity: 1, duration: '' }
 
 export default function OfferForm() {
   const { goToOfferPreview, goToMessaging, userRole } = useOnboarding()
-  const { activeRequestId, requests, setOfferFormData } = useMessaging()
+  const { activeRequestId, requests, setOfferFormData, loadRequests } = useMessaging()
 
   const request = requests.find((r) => r.id === activeRequestId)
+
+  useEffect(() => {
+    if (activeRequestId && !request && loadRequests) loadRequests()
+  }, [activeRequestId, request, loadRequests])
 
   const [form, setForm] = useState({
     title: '',
@@ -56,7 +60,7 @@ export default function OfferForm() {
           description: data.description || prev.description,
           content_format: data.content_format || prev.content_format,
           deadline: data.deadline || prev.deadline,
-          budget: data.budget_fixed ? String(data.budget_fixed) : prev.budget,
+          budget: data.budget_fixed ? String(data.budget_fixed) : (data.budget_min ? String(data.budget_min) : prev.budget),
           revisions: data.revision_count ?? prev.revisions,
           mission_start: data.start_date || prev.mission_start,
           quality: data.quality ?? prev.quality,
