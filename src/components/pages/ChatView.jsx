@@ -80,8 +80,8 @@ export default function ChatView() {
           subtype: 'revision',
           round_number: round.round_number,
           creator_feedback: round.creator_feedback,
-          timestamp: round.updated_at,
-          created_at: round.updated_at,
+          timestamp: round.reviewed_at,
+          created_at: round.reviewed_at,
         })
       }
       // Validation event: emitted when creator approves
@@ -91,8 +91,8 @@ export default function ChatView() {
           _key: `round-${round.id}-validation`,
           subtype: 'validation',
           round_number: round.round_number,
-          timestamp: round.updated_at,
-          created_at: round.updated_at,
+          timestamp: round.reviewed_at,
+          created_at: round.reviewed_at,
         })
       }
     }

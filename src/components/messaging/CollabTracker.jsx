@@ -676,7 +676,7 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
           {rounds.filter((r) => r.status === 'validated').map((round) => (
             <div key={round.id} className="tracker-validated-item">
               <span className="tracker-validated-label">
-                ✅ v{round.round_number} — validé le {formatDate(round.updated_at || round.created_at)}
+                ✅ v{round.round_number} — validé le {formatDate(round.reviewed_at || round.created_at)}
               </span>
               {round.delivery_link && (
                 <a
