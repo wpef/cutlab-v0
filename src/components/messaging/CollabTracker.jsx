@@ -528,8 +528,8 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
         const myReviewType = userRole === 'creator' ? 'creator_to_editor' : 'editor_to_creator'
         const myReview = reviews.find((r) => r.type === myReviewType)
 
-        // Close project button — creator only, always visible in feedback step
-        const closeBtn = userRole === 'creator' && onCloseProject && (
+        // Close project button — creator only, gated on having submitted their review first.
+        const closeBtn = userRole === 'creator' && onCloseProject && myReview && (
           projectClosedLocally
             ? <p className="tracker-done-text" style={{ marginTop: 12 }}>✓ Projet clôturé</p>
             : (
@@ -562,7 +562,7 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
         return (
           <div className="tracker-action-area">
             {userRole === 'creator' && (
-              <p className="tracker-info-text">Votre avis est requis pour clôturer le projet.</p>
+              <p className="tracker-info-text">Envoyez votre avis pour pouvoir clôturer le projet.</p>
             )}
             {isOptional && (
               <p className="tracker-info-text tracker-info-text--muted">Facultatif — partagez votre expérience.</p>
@@ -572,7 +572,6 @@ export default function CollabTracker({ request, offer, userRole, onRequestUpdat
               onSubmit={handleReview}
               loading={actionLoading}
             />
-            {closeBtn}
           </div>
         )
       }
