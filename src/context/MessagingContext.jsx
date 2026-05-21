@@ -89,14 +89,16 @@ export function MessagingProvider({ children }) {
 
   async function sendContactRequest(editorId, initialMessage, creatorName, editorName) {
     if (!user) return false
-    const { error } = await supabase.from('contact_requests').insert({
+    const { data, error } = await supabase.from('contact_requests').insert({
       creator_id: user.id,
       editor_id: editorId,
       initial_message: initialMessage,
       creator_name: creatorName,
       editor_name: editorName,
-    })
-    return !error
+    }).select().single()
+    if (error || !data) return false
+    await notify({ userId: editorId, type: 'contact_received', requestId: data.id, actorName: creatorName })
+    return true
   }
 
   async function acceptRequest(requestId) {
@@ -190,9 +192,6 @@ export function MessagingProvider({ children }) {
         thumbnail_included: offerData.thumbnail_included ?? false,
         niches: offerData.niches ?? [],
         preferred_software: offerData.preferred_software ?? [],
-        required_languages: offerData.required_languages ?? [],
-        experience_level: offerData.experience_level || null,
-        mission_type: offerData.mission_type || null,
         rushes_info: offerData.rushes_info || null,
         status: 'pending',
         creator_name: request.creator_name,
