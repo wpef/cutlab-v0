@@ -56,11 +56,11 @@ export default function EditorDetail() {
   useEffect(() => {
     supabase
       .from('profiles')
-      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing, social_links')
+      .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing, social_links, role')
       .eq('id', id)
       .single()
       .then(({ data, error }) => {
-        if (error || !data) {
+        if (error || !data || data.role !== 'editor') {
           navigate('/catalog', { replace: true })
           return
         }
