@@ -34,6 +34,28 @@ const MyProjects       = lazy(() => import('./components/pages/MyProjects'))
 const ProfileEditor    = lazy(() => import('./components/editor/ProfileEditor'))
 const MesProjetsMonteur = lazy(() => import('./components/pages/MesProjetsMonteur'))
 const EditorPipeline   = lazy(() => import('./components/pages/EditorPipeline'))
+const DocumentationMonteur = lazy(() => import('./components/pages/DocumentationMonteur'))
+const DocumentationCreateur = lazy(() => import('./components/pages/DocumentationCreateur'))
+const LandingYoutubeurGaming = lazy(() => import('./components/pages/personas/LandingYoutubeurGaming'))
+const LandingInfluenceurLifestyle = lazy(() => import('./components/pages/personas/LandingInfluenceurLifestyle'))
+const LandingCoachEntrepreneur = lazy(() => import('./components/pages/personas/LandingCoachEntrepreneur'))
+const LandingFreelanceYoutube = lazy(() => import('./components/pages/personas/LandingFreelanceYoutube'))
+const LandingMotionDesigner = lazy(() => import('./components/pages/personas/LandingMotionDesigner'))
+const LandingEtudiantAudiovisuel = lazy(() => import('./components/pages/personas/LandingEtudiantAudiovisuel'))
+const LandingPodcasteur = lazy(() => import('./components/pages/personas/LandingPodcasteur'))
+const LandingFormateurEnLigne = lazy(() => import('./components/pages/personas/LandingFormateurEnLigne'))
+const LandingAgencePme = lazy(() => import('./components/pages/personas/LandingAgencePme'))
+const LandingStreamerTwitch = lazy(() => import('./components/pages/personas/LandingStreamerTwitch'))
+const LandingMusicienIndependant = lazy(() => import('./components/pages/personas/LandingMusicienIndependant'))
+const LandingMonteurReconverti = lazy(() => import('./components/pages/personas/LandingMonteurReconverti'))
+const LandingSpecialisteShorts = lazy(() => import('./components/pages/personas/LandingSpecialisteShorts'))
+const LandingMonteurAgence = lazy(() => import('./components/pages/personas/LandingMonteurAgence'))
+const LandingSoundDesigner = lazy(() => import('./components/pages/personas/LandingSoundDesigner'))
+const LandingColorist = lazy(() => import('./components/pages/personas/LandingColorist'))
+const ComparisonFiverr = lazy(() => import('./components/pages/comparisons/ComparisonFiverr'))
+const ComparisonMalt = lazy(() => import('./components/pages/comparisons/ComparisonMalt'))
+const ComparisonUpwork = lazy(() => import('./components/pages/comparisons/ComparisonUpwork'))
+const ComparisonAgences = lazy(() => import('./components/pages/comparisons/ComparisonAgences'))
 
 const STEP_COMPONENTS = {
   1: Step1Account,
@@ -134,6 +156,34 @@ export default function App() {
       {/* Legal pages — always public */}
       <Route path="/legal/privacy" element={<LegalPrivacy />} />
       <Route path="/legal/terms" element={<LegalTerms />} />
+
+      {/* Documentation — public */}
+      <Route path="/guide/monteur" element={<DocumentationMonteur />} />
+      <Route path="/guide/createur" element={<DocumentationCreateur />} />
+
+      {/* Persona landing pages — public, dedicated */}
+      <Route path="/pour/youtubeur-gaming" element={<LandingYoutubeurGaming />} />
+      <Route path="/pour/influenceur-lifestyle" element={<LandingInfluenceurLifestyle />} />
+      <Route path="/pour/coach-entrepreneur" element={<LandingCoachEntrepreneur />} />
+      <Route path="/pour/freelance-youtube" element={<LandingFreelanceYoutube />} />
+      <Route path="/pour/motion-designer" element={<LandingMotionDesigner />} />
+      <Route path="/pour/etudiant-audiovisuel" element={<LandingEtudiantAudiovisuel />} />
+      <Route path="/pour/podcasteur" element={<LandingPodcasteur />} />
+      <Route path="/pour/formateur-en-ligne" element={<LandingFormateurEnLigne />} />
+      <Route path="/pour/agence-pme" element={<LandingAgencePme />} />
+      <Route path="/pour/streamer-twitch" element={<LandingStreamerTwitch />} />
+      <Route path="/pour/musicien-independant" element={<LandingMusicienIndependant />} />
+      <Route path="/pour/monteur-reconverti" element={<LandingMonteurReconverti />} />
+      <Route path="/pour/specialiste-shorts" element={<LandingSpecialisteShorts />} />
+      <Route path="/pour/monteur-agence" element={<LandingMonteurAgence />} />
+      <Route path="/pour/sound-designer" element={<LandingSoundDesigner />} />
+      <Route path="/pour/colorist" element={<LandingColorist />} />
+
+      {/* Comparison landing pages — public, dedicated */}
+      <Route path="/vs/fiverr" element={<ComparisonFiverr />} />
+      <Route path="/vs/malt" element={<ComparisonMalt />} />
+      <Route path="/vs/upwork" element={<ComparisonUpwork />} />
+      <Route path="/vs/agences-video" element={<ComparisonAgences />} />
 
       {/* Onboarding — accessible for auth (signup/login happens on step 1) */}
       <Route path="/onboarding/:step" element={<OnboardingLayout />} />

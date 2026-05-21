@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 import { useOnboarding } from '../../context/OnboardingContext'
 import { useMessaging } from '../../context/MessagingContext'
 import { AnimatedList, AnimatedItem } from '../ui/AnimatedList'
@@ -19,12 +20,28 @@ const STATUS_CLASS = { pending: 'pending', accepted: 'accepted', refused: 'refus
 export default function MessagingHub() {
   const { goToChat, goToCatalog, userRole, user } = useOnboarding()
   const { requests, messagingLoading, loadRequests, setActiveRequestId } = useMessaging()
+  // projectId → title map for editor conversation list
+  const [projectTitles, setProjectTitles] = useState({})
 
   useEffect(() => { document.title = 'CUTLAB — Messages' }, [])
 
   useEffect(() => {
     loadRequests()
   }, [user])
+
+  // Batch-fetch project titles for requests linked to a project (editor view)
+  useEffect(() => {
+    if (userRole !== 'editor' || requests.length === 0) return
+    const ids = [...new Set(requests.map((r) => r.project_id).filter(Boolean))]
+    if (ids.length === 0) return
+    supabase.from('projects').select('id, title').in('id', ids)
+      .then(({ data }) => {
+        if (!data) return
+        const map = {}
+        data.forEach((p) => { map[p.id] = p.title })
+        setProjectTitles(map)
+      })
+  }, [requests, userRole])
 
   function openRequest(requestId) {
     setActiveRequestId(requestId)
@@ -62,7 +79,7 @@ export default function MessagingHub() {
                 </div>
                 <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
-                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
+                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} projectTitles={projectTitles} onOpen={openRequest} />
                   ))}
                 </AnimatedList>
               </div>
@@ -76,7 +93,7 @@ export default function MessagingHub() {
                 </div>
                 <AnimatedList className="messaging-list">
                   {activeRequests.map((r) => (
-                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
+                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} projectTitles={projectTitles} onOpen={openRequest} />
                   ))}
                 </AnimatedList>
               </div>
@@ -88,7 +105,7 @@ export default function MessagingHub() {
                 <div className="messaging-section-title">Mes demandes</div>
                 <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
-                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
+                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} projectTitles={projectTitles} onOpen={openRequest} />
                   ))}
                 </AnimatedList>
               </div>
@@ -99,7 +116,7 @@ export default function MessagingHub() {
                 <div className="messaging-section-title">Demandes en attente</div>
                 <AnimatedList className="messaging-list">
                   {pendingRequests.map((r) => (
-                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} onOpen={openRequest} />
+                    <RequestRow key={r.id} request={r} userRole={userRole} userId={user?.id} projectTitles={projectTitles} onOpen={openRequest} />
                   ))}
                 </AnimatedList>
               </div>
@@ -111,8 +128,11 @@ export default function MessagingHub() {
   )
 }
 
-function RequestRow({ request, userRole, userId, onOpen }) {
-  const otherName = userRole === 'creator' ? request.editor_name : request.creator_name
+function RequestRow({ request, userRole, userId, projectTitles, onOpen }) {
+  // For editors: show project title when available, fallback to creator_name
+  const otherName = userRole === 'creator'
+    ? request.editor_name
+    : (request.project_id && projectTitles?.[request.project_id]) || request.creator_name
   const preview = request.initial_message || 'Aucun message'
 
   return (
