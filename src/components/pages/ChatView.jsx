@@ -132,7 +132,7 @@ export default function ChatView() {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `contact_request_id=eq.${requestId}`,
+        filter: `request_id=eq.${requestId}`,
       }, () => fetchMessages(requestId))
       .subscribe()
     return () => { supabase.removeChannel(channel) }
