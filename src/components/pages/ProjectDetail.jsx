@@ -147,7 +147,7 @@ export default function ProjectDetail() {
 
   // Can editor apply?
   const deadlinePassed = project.deadline && new Date(project.deadline) < new Date()
-  const canApply = isEditor && !existingApp && project.status === 'published' && !deadlinePassed
+  const canApply = isEditor && !existingApp && project.status === 'published' && !deadlinePassed && !project.is_demo
 
   return (
     <div className="project-detail">
@@ -159,6 +159,7 @@ export default function ProjectDetail() {
       <div className="project-detail-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
           <ProjectStatusBadge status={project.status} />
+          {project.is_demo && <span className="project-demo-badge">DEMO</span>}
         </div>
         <h1 className="project-detail-title">{project.title}</h1>
         {!isCreator && (
@@ -282,7 +283,12 @@ export default function ProjectDetail() {
       {/* ── Editor: Candidature section ──────────────────────── */}
       {isEditor && (
         <div className="candidature-section">
-          {!existingApp && canApply && (
+          {project.is_demo && (
+            <div className="candidature-status">
+              <span className="candidature-status-label">🎓 Projet de démonstration — non éligible à candidature</span>
+            </div>
+          )}
+          {!project.is_demo && !existingApp && canApply && (
             <>
               <button className="candidature-button" onClick={handleApply} disabled={appLoading}>
                 {appLoading ? '...' : 'Candidater'}
@@ -292,13 +298,13 @@ export default function ProjectDetail() {
               )}
             </>
           )}
-          {!existingApp && !canApply && project.status === 'published' && deadlinePassed && (
+          {!project.is_demo && !existingApp && !canApply && project.status === 'published' && deadlinePassed && (
             <>
               <button className="candidature-button" disabled>Candidater</button>
               <div className="candidature-disabled-hint">La date limite de candidature est passée</div>
             </>
           )}
-          {!existingApp && project.status !== 'published' && (
+          {!project.is_demo && !existingApp && project.status !== 'published' && (
             <div className="candidature-status">
               <span className="candidature-status-label">Ce projet n'accepte plus de candidatures</span>
             </div>
