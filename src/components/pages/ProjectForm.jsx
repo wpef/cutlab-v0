@@ -54,7 +54,7 @@ export default function ProjectForm() {
         budget_fixed: p.budget_fixed != null ? String(p.budget_fixed) : '',
         budget_min: p.budget_min != null ? String(p.budget_min) : '',
         budget_max: p.budget_max != null ? String(p.budget_max) : '',
-        start_date: p.start_date || '',
+        start_date: p.start_date || new Date().toISOString().split('T')[0],
         deadline: p.deadline || '',
         quality: p.quality || '',
         revision_count: p.revision_count ?? 2,

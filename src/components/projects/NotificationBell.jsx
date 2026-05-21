@@ -15,6 +15,7 @@ const NOTIF_ICONS = {
   offer_received:   '📨',
   offer_accepted:   '✅',
   offer_refused:    '❌',
+  contact_received: '✉️',
   request_accepted: '🤝',
   request_refused:  '🚫',
   // Collab tracker notifications
@@ -50,6 +51,7 @@ function notifText(n) {
     case 'offer_received':   return <><strong>{n.actor_name}</strong> vous a envoyé une offre de mission</>
     case 'offer_accepted':   return <><strong>{n.actor_name}</strong> a accepté votre offre</>
     case 'offer_refused':    return <><strong>{n.actor_name}</strong> a refusé votre offre</>
+    case 'contact_received': return <><strong>{n.actor_name}</strong> souhaite vous contacter</>
     case 'request_accepted': return <><strong>{n.actor_name}</strong> a accepté votre demande de contact</>
     case 'request_refused':  return <><strong>{n.actor_name}</strong> a refusé votre demande de contact</>
     // Collab tracker
@@ -87,7 +89,7 @@ export default function NotificationBell() {
   const CHAT_NOTIF_TYPES = new Set([
     'application_accepted',
     'offer_received', 'offer_accepted', 'offer_refused',
-    'request_accepted', 'request_refused',
+    'contact_received', 'request_accepted', 'request_refused',
     'deliverable_shared', 'revision_requested', 'deliverables_validated',
     'payment_sent', 'payment_received', 'review_received',
   ])

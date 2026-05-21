@@ -209,7 +209,7 @@ export function OnboardingProvider({ children }) {
     if (pendingEditor) sessionStorage.setItem('oauthPendingEditor', JSON.stringify(pendingEditor))
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: import.meta.env.VITE_PUBLIC_SITE_URL || window.location.origin },
     })
     if (error) setAuthError(error.message)
   }
@@ -220,7 +220,7 @@ export function OnboardingProvider({ children }) {
     if (pendingEditor) sessionStorage.setItem('oauthPendingEditor', JSON.stringify(pendingEditor))
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: import.meta.env.VITE_PUBLIC_SITE_URL || window.location.origin },
     })
     if (error) setAuthError(error.message)
   }

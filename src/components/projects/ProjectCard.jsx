@@ -26,7 +26,10 @@ export default function ProjectCard({ project, onClick, showAppCount = false }) 
     >
       <div className="project-card-header">
         <div className="project-card-title">{project.title}</div>
-        <ProjectStatusBadge status={project.status} />
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {project.is_demo && <span className="project-demo-badge">DEMO</span>}
+          <ProjectStatusBadge status={project.status} />
+        </div>
       </div>
 
       {formatLabel && <div className="project-card-format">{formatLabel}</div>}

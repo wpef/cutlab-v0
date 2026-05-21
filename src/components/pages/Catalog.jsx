@@ -30,6 +30,7 @@ export default function Catalog() {
         .from('profiles')
         .select('id, first_name, last_name, availability, skills, assigned_level, bio, languages, avatar_url, experience, formats, pricing')
         .eq('status', 'published')
+        .eq('role', 'editor')
 
       if (!profiles) { setLoading(false); return }
 

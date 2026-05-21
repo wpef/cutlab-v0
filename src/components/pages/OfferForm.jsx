@@ -6,9 +6,6 @@ import PageTitle from '../layout/PageTitle'
 import {
   FORMATS,
   NICHES,
-  LANGUAGES,
-  EXPERIENCE_OPTIONS,
-  MISSION_TYPES,
   QUALITY_OPTIONS,
   DELIVERABLE_TYPES,
 } from '../../constants/options'
@@ -33,12 +30,9 @@ export default function OfferForm() {
     deadline: '',
     budget: '',
     revisions: 2,
-    mission_start: '',
+    mission_start: new Date().toISOString().split('T')[0],
     quality: '',
     niches: [],
-    required_languages: [],
-    experience_level: '',
-    mission_type: '',
     rushes_info: '',
   })
   const [errors, setErrors] = useState({})
@@ -54,12 +48,9 @@ export default function OfferForm() {
       deadline: offerFormData.deadline || '',
       budget: offerFormData.budget ? String(offerFormData.budget) : '',
       revisions: offerFormData.revisions ?? 2,
-      mission_start: offerFormData.mission_start || '',
+      mission_start: offerFormData.mission_start || new Date().toISOString().split('T')[0],
       quality: offerFormData.quality ?? '',
       niches: offerFormData.niches || [],
-      required_languages: offerFormData.required_languages || [],
-      experience_level: offerFormData.experience_level ?? '',
-      mission_type: offerFormData.mission_type ?? '',
       rushes_info: offerFormData.rushes_info ?? '',
     })
     prefillDone.current = true
@@ -87,10 +78,7 @@ export default function OfferForm() {
           mission_start: data.start_date || prev.mission_start,
           quality: data.quality ?? prev.quality,
           niches: data.niches || prev.niches,
-          required_languages: data.required_languages || prev.required_languages,
-          experience_level: data.experience_level ?? prev.experience_level,
           deliverables: data.deliverables?.length ? data.deliverables : prev.deliverables,
-          mission_type: data.mission_type ?? prev.mission_type,
           rushes_info: data.rushes_info ?? prev.rushes_info,
         }))
       })
@@ -259,6 +247,22 @@ export default function OfferForm() {
               ))}
             </div>
           </div>
+
+          <div className="form-group">
+            <label className="form-label">Qualité attendue</label>
+            <div className="chip-group">
+              {QUALITY_OPTIONS.map((q) => (
+                <button
+                  key={q.key}
+                  type="button"
+                  className={`chip ${form.quality === q.key ? 'active' : ''}`}
+                  onClick={() => update({ quality: form.quality === q.key ? '' : q.key })}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Section 2 — Budget & Calendrier */}
@@ -312,76 +316,7 @@ export default function OfferForm() {
           </div>
         </div>
 
-        {/* Section 3 — Préférences techniques */}
-        <div className="project-form-section">
-          <div className="project-form-section-title">Préférences techniques</div>
-
-          <div className="form-group">
-            <label className="form-label">Qualité attendue</label>
-            <div className="chip-group">
-              {QUALITY_OPTIONS.map((q) => (
-                <button
-                  key={q.key}
-                  type="button"
-                  className={`chip ${form.quality === q.key ? 'active' : ''}`}
-                  onClick={() => update({ quality: form.quality === q.key ? '' : q.key })}
-                >
-                  {q.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Langues requises</label>
-            <div className="chip-group">
-              {LANGUAGES.map((l) => (
-                <button
-                  key={l.key}
-                  type="button"
-                  className={`chip ${form.required_languages.includes(l.key) ? 'active' : ''}`}
-                  onClick={() => update({ required_languages: toggleInArray(form.required_languages, l.key) })}
-                >
-                  {l.flag} {l.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Niveau d'expérience souhaité</label>
-            <div className="chip-group">
-              {EXPERIENCE_OPTIONS.map((e) => (
-                <button
-                  key={e.key}
-                  type="button"
-                  className={`chip ${form.experience_level === e.key ? 'active' : ''}`}
-                  onClick={() => update({ experience_level: form.experience_level === e.key ? '' : e.key })}
-                >
-                  {e.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Type de mission</label>
-            <div className="chip-group">
-              {MISSION_TYPES.map((m) => (
-                <button
-                  key={m.key}
-                  type="button"
-                  className={`chip ${form.mission_type === m.key ? 'active' : ''}`}
-                  onClick={() => update({ mission_type: form.mission_type === m.key ? '' : m.key })}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Section 4 — Rushes */}
+        {/* Section — Rushes */}
         <div className="project-form-section">
           <div className="project-form-section-title">Informations sur les rushes</div>
           <div className="form-group">
