@@ -13,7 +13,8 @@ const pageTransition = {
 }
 
 // Pages that fill viewport and manage their own internal scroll
-const FILL_PAGES = ['/messaging/', '/editor', '/pipeline']
+const FILL_PREFIXES = ['/messaging/']
+const FILL_EXACT = ['/editor', '/pipeline']
 
 // Track visual viewport height (keyboard-aware) via CSS custom property
 function useViewportHeight() {
@@ -33,7 +34,9 @@ function useViewportHeight() {
 
 export default function AppLayout() {
   const location = useLocation()
-  const isFill = FILL_PAGES.some((p) => location.pathname.startsWith(p))
+  const isFill =
+    FILL_PREFIXES.some((p) => location.pathname.startsWith(p)) ||
+    FILL_EXACT.includes(location.pathname)
   const layoutRef = useViewportHeight()
 
   return (
