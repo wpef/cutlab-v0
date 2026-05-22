@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import TopNav from './TopNav'
 import BottomNav from './BottomNav'
 import Toast from '../ui/Toast'
-import CookieBanner from '../ui/CookieBanner'
 import ErrorBoundary from '../ErrorBoundary'
 
 const pageTransition = {
@@ -53,7 +52,6 @@ export default function AppLayout() {
       </AnimatePresence>
       <BottomNav />
       <Toast />
-      <CookieBanner />
     </div>
   )
 }

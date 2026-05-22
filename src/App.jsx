@@ -1,9 +1,11 @@
 import { useEffect, lazy, Suspense } from 'react'
-import { Routes, Route, Navigate, useParams } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { useOnboarding } from './context/OnboardingContext'
 import { STEPS } from './constants/steps'
 import Sidebar from './components/layout/Sidebar'
 import AppLayout from './components/layout/AppLayout'
+import CookieBanner from './components/ui/CookieBanner'
+import { initFromStorage, trackPageView } from './lib/analytics'
 
 // Onboarding steps — kept eager (critical auth path, small footprint)
 import Step1Account from './components/steps/Step1Account'
@@ -145,8 +147,20 @@ function PublicOnly({ children }) {
   return children
 }
 
+function AnalyticsTracker() {
+  const location = useLocation()
+  useEffect(() => { initFromStorage() }, [])
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
+  return null
+}
+
 export default function App() {
   return (
+    <>
+    <AnalyticsTracker />
+    <CookieBanner />
     <Suspense fallback={<div className="page-loading" />}>
     <Routes>
       {/* Public-only routes — logged-in users get redirected to home */}
@@ -223,5 +237,6 @@ export default function App() {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     </Suspense>
+    </>
   )
 }

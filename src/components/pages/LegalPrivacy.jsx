@@ -1,4 +1,10 @@
 import { Link } from 'react-router-dom'
+import { clearConsent } from '../../lib/analytics'
+
+function manageCookies() {
+  clearConsent()
+  window.dispatchEvent(new Event('cutlab-consent-reset'))
+}
 
 export default function LegalPrivacy() {
   return (
@@ -64,8 +70,14 @@ export default function LegalPrivacy() {
         </section>
 
         <section>
-          <h2>8. Cookies</h2>
-          <p>Nous utilisons uniquement des cookies techniques strictement nécessaires au fonctionnement de la plateforme (session d'authentification). Aucun cookie publicitaire ou de tracking tiers.</p>
+          <h2>8. Cookies & mesure d'audience</h2>
+          <p>Nous utilisons deux catégories de cookies :</p>
+          <ul>
+            <li><strong>Cookies strictement nécessaires</strong> : session d'authentification, préférences utilisateur. Ils ne nécessitent pas votre consentement.</li>
+            <li><strong>Cookies de mesure d'audience (Google Analytics 4)</strong> : pour comprendre comment vous utilisez le service (pages vues, durée des sessions, erreurs rencontrées) et l'améliorer. L'adresse IP est anonymisée, les signaux Google et la personnalisation publicitaire sont désactivés. Aucune donnée n'est partagée à des fins publicitaires.</li>
+          </ul>
+          <p>Le dépôt de cookies analytiques est conditionné à votre consentement, qui peut être retiré à tout moment.</p>
+          <p><button type="button" className="legal-inline-btn" onClick={manageCookies}>Gérer mes préférences cookies</button></p>
         </section>
 
         <section>
