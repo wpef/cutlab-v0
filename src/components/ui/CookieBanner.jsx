@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const STORAGE_KEY = 'cutlab_consent'
+import { getConsent, setConsent } from '../../lib/analytics'
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) setVisible(true)
+    if (!getConsent()) setVisible(true)
+    const onChange = () => setVisible(!getConsent())
+    window.addEventListener('cutlab-consent-reset', onChange)
+    return () => window.removeEventListener('cutlab-consent-reset', onChange)
   }, [])
 
   function accept() {
-    localStorage.setItem(STORAGE_KEY, 'accepted')
+    setConsent('granted')
+    setVisible(false)
+  }
+
+  function refuse() {
+    setConsent('denied')
     setVisible(false)
   }
 
@@ -27,10 +34,14 @@ export default function CookieBanner() {
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           <p>
-            Nous utilisons des cookies techniques strictement nécessaires au fonctionnement du service.{' '}
+            Nous utilisons des cookies de mesure d'audience (Google Analytics) pour comprendre comment vous utilisez le service et l'améliorer.
+            Aucune donnée n'est partagée à des fins publicitaires.{' '}
             <Link to="/legal/privacy" className="cookie-link">En savoir plus</Link>
           </p>
-          <button className="cookie-btn" onClick={accept}>Accepter</button>
+          <div className="cookie-actions">
+            <button className="cookie-btn cookie-btn--ghost" onClick={refuse}>Refuser</button>
+            <button className="cookie-btn" onClick={accept}>Accepter</button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
